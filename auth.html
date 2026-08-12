@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join or Log In: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --ink:#0b0f0c; --panel:#11170f; --panel-2:#161d13; --line: rgba(255,255,255,0.09);
+  --paper:#f4f2e9; --paper-dim:#c9c5b4; --lime:#9fe870; --lime-dim:#7bc94e;
+  --gold:#e0b23e; --clay:#e07a3f; --radius:2px;
+}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--ink);color:var(--paper);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--lime);color:var(--ink);}
+a{color:inherit;}
+h1,h2{font-family:'Archivo Black',sans-serif;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.eyebrow{font-family:'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--lime);}
+
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--lime);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--clay);}
+.kente-stripe span:nth-child(4n+4){background:var(--panel-2);}
+
+.brand-mark{
+  width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);position:relative;flex-shrink:0;
+}
+.brand-mark::after{content:'';position:absolute;bottom:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--lime);}
+
+.auth-shell{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  background:radial-gradient(ellipse 900px 560px at 50% -10%, rgba(159,232,112,0.10), transparent 60%),
+             radial-gradient(ellipse 600px 400px at 100% 100%, rgba(224,178,62,0.06), transparent 60%);
+}
+.auth-card{width:100%;max-width:480px;}
+.auth-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:32px;font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:.02em;}
+.auth-box{border:1px solid var(--line);background:var(--panel-2);overflow:hidden;}
+.auth-box-inner{padding:40px;}
+.auth-box h2{font-size:25px;text-transform:none;letter-spacing:0;margin-bottom:10px;}
+.auth-box .sub{font-size:14px;color:var(--paper-dim);line-height:1.55;margin-bottom:26px;}
+.auth-step{display:none;}
+.auth-step.active{display:block;}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);}
+.field input, .field select, .field textarea{
+  background:var(--ink);border:1px solid var(--line);color:var(--paper);padding:14px 16px;
+  font-family:'Archivo',sans-serif;font-size:14.5px;outline:none;border-radius:2px;width:100%;
+}
+.field input::placeholder, .field textarea::placeholder{color:var(--paper-dim);}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--lime);}
+.field-hint{font-size:11.5px;color:var(--paper-dim);}
+.form-status{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--lime);min-height:18px;margin-top:10px;}
+
+.btn-primary{
+  background:var(--lime);color:var(--ink);padding:16px 24px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.04em;font-size:13.5px;border:none;border-radius:2px;cursor:pointer;width:100%;
+  transition:transform .15s, box-shadow .15s;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(159,232,112,0.25);}
+.btn-primary:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+
+.auth-links{display:flex;justify-content:center;margin-top:18px;font-size:12.5px;}
+.auth-links button{color:var(--paper-dim);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:12.5px;font-family:'Archivo',sans-serif;padding:0;}
+.auth-links button:hover{color:var(--lime);}
+
+.back-link{display:flex;align-items:center;gap:8px;color:var(--paper-dim);text-decoration:none;font-size:12.5px;margin-bottom:22px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;}
+.back-link:hover{color:var(--lime);}
+
+.mail-icon{
+  width:56px;height:56px;border-radius:50%;background:rgba(159,232,112,0.12);border:1px solid var(--lime);
+  display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 20px;
+}
+.center{text-align:center;}
+.logo-upload-row{display:flex;align-items:center;gap:16px;}
+.logo-preview{
+  width:56px;height:56px;border-radius:50%;background:var(--ink);border:1px dashed var(--line);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;color:var(--gold);
+  font-size:18px;overflow:hidden;
+}
+.logo-preview img{width:100%;height:100%;object-fit:cover;}
+</style>
+</head>
+<body>
+
+<div class="auth-shell">
+  <div class="auth-card">
+    <a href="landing.html" class="back-link">&larr; Back to byinforgh.com</a>
+    <div class="auth-brand"><div class="brand-mark">B</div>BYINFORGH BUSINESS GROWTH SERIES</div>
+
+    <div class="auth-box">
+      <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="auth-box-inner">
+
+        <!-- STEP 1: email -->
+        <div class="auth-step active" id="stepEmail">
+          <h2>Join or log in</h2>
+          <p class="sub">Enter your email. We'll send you a magic link, no password to remember, completely free.</p>
+          <form id="emailForm">
+            <div class="field">
+              <label>Email address</label>
+              <input type="email" id="emailInput" placeholder="you@example.com" required>
+              <span class="field-hint">Don't have one? A free Gmail account takes about two minutes at gmail.com, then come back here.</span>
+            </div>
+            <button type="submit" class="btn-primary" id="sendLinkBtn">Send Magic Link</button>
+          </form>
+          <div class="form-status" id="emailStatus"></div>
+        </div>
+
+        <!-- STEP 2: waiting for the link -->
+        <div class="auth-step" id="stepWaiting">
+          <div class="center">
+            <div class="mail-icon">✉</div>
+            <h2>Check your email</h2>
+            <p class="sub">We sent a login link to <b id="emailDisplay" style="color:var(--paper);"></b>. Open it on this device to continue, this tab will pick it up automatically.</p>
+          </div>
+          <div class="form-status center" id="waitingStatus"></div>
+          <div class="auth-links">
+            <button type="button" id="resendBtn">Resend link</button>
+            &nbsp;&middot;&nbsp;
+            <button type="button" id="changeEmailBtn">Use a different email</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: business profile (first login only) -->
+        <div class="auth-step" id="stepProfile">
+          <h2>Set up your business profile</h2>
+          <p class="sub">This is how other members and the AI assistant get to know your business. Takes two minutes.</p>
+          <form id="profileForm">
+            <div class="grid2">
+              <div class="field">
+                <label>Your name</label>
+                <input type="text" id="pName" placeholder="Full name" required>
+              </div>
+              <div class="field">
+                <label>Business name</label>
+                <input type="text" id="pBusinessName" placeholder="Business name">
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label>Category</label>
+                <select id="pCategory" required>
+                  <option value="">Select one</option>
+                  <option>Fashion</option><option>Food</option><option>Retail</option>
+                  <option>Services</option><option>Logistics</option><option>Other</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>WhatsApp / phone number</label>
+                <input type="tel" id="pPhone" placeholder="+233 XX XXX XXXX" required>
+              </div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label>Location</label>
+                <input type="text" id="pLocation" placeholder="e.g. Kumasi" required>
+              </div>
+              <div class="field">
+                <label>Nearest landmark</label>
+                <input type="text" id="pLandmark" placeholder="e.g. Near Adum Market">
+              </div>
+            </div>
+            <div class="field">
+              <label>What do you sell or offer</label>
+              <textarea id="pSells" rows="2" placeholder="e.g. Ready to wear dresses and custom tailoring" required></textarea>
+            </div>
+            <div class="field">
+              <label>What are you looking for right now</label>
+              <textarea id="pLookingFor" rows="2" placeholder="e.g. More customers, a supplier, a business partner to collaborate with"></textarea>
+            </div>
+            <div class="field">
+              <label>Business logo or photo (optional)</label>
+              <div class="logo-upload-row">
+                <div class="logo-preview" id="logoPreview">B</div>
+                <div style="flex:1;">
+                  <input type="file" id="pLogo" accept="image/*" style="font-size:12.5px;color:var(--paper-dim);">
+                  <span class="field-hint" style="display:block;margin-top:6px;">Shows on your directory card and any spotlight feature. Skip for now and add it later if you like.</span>
+                </div>
+              </div>
+            </div>
+            <div class="field">
+              <label>What's your biggest struggle right now</label>
+              <textarea id="pStruggle" rows="2" placeholder="e.g. Customers don't reply after I quote a price" required></textarea>
+              <span class="field-hint">This helps the AI assistant and the community actually help you, be specific.</span>
+            </div>
+            <button type="submit" class="btn-primary" id="saveProfileBtn">Enter Business Growth Series &rarr;</button>
+          </form>
+          <div class="form-status" id="profileStatus"></div>
+          <p style="font-size:11.5px;color:var(--paper-dim);margin-top:16px;text-align:center;">By joining you agree to our <a href="privacy.html" style="color:var(--lime);">Privacy Policy &amp; Terms</a>. Your struggle and email stay private, only visible to you and BYINFORGH.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: replace with your own project URL and anon public key
+// (Supabase dashboard: Project Settings > API). If you change this,
+// update the same two lines in landing.html and app.html.
+// =====================================================================
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+let pendingEmail = '';
+
+function showStep(id){
+  document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function currentRedirectUrl(){
+  return location.origin + location.pathname;
+}
+
+// ---- Step 1: send magic link ----
+const emailForm = document.getElementById('emailForm');
+const emailStatus = document.getElementById('emailStatus');
+// Basic email format check before we ever send it to Supabase, catches
+// typos early and reduces wasted send attempts.
+function isValidEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+emailForm.addEventListener('submit', async function(e){
+  e.preventDefault();
+  const email = document.getElementById('emailInput').value.trim();
+  if (!email) return;
+  if (!isValidEmail(email)) { emailStatus.textContent = 'That email address doesn\'t look complete, check it and try again.'; return; }
+  if (!sb) { emailStatus.textContent = 'Supabase is not connected yet.'; return; }
+  document.getElementById('sendLinkBtn').disabled = true;
+  emailStatus.textContent = 'Sending...';
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: currentRedirectUrl() }
+  });
+  document.getElementById('sendLinkBtn').disabled = false;
+  if (error) { emailStatus.textContent = error.message; return; }
+  pendingEmail = email;
+  document.getElementById('emailDisplay').textContent = email;
+  emailStatus.textContent = '';
+  showStep('stepWaiting');
+  startResendCooldown();
+});
+
+// Cooldown on resend so the page itself can't be used to spam someone's
+// inbox with repeated login links, on top of whatever limits Supabase
+// applies server side.
+let resendCooldownTimer = null;
+function startResendCooldown(seconds = 30){
+  const btn = document.getElementById('resendBtn');
+  let remaining = seconds;
+  btn.disabled = true;
+  btn.textContent = `Resend link (${remaining}s)`;
+  clearInterval(resendCooldownTimer);
+  resendCooldownTimer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(resendCooldownTimer);
+      btn.disabled = false;
+      btn.textContent = 'Resend link';
+    } else {
+      btn.textContent = `Resend link (${remaining}s)`;
+    }
+  }, 1000);
+}
+
+document.getElementById('resendBtn').addEventListener('click', async () => {
+  if (!pendingEmail || !sb) return;
+  const statusEl = document.getElementById('waitingStatus');
+  statusEl.textContent = 'Resending...';
+  const { error } = await sb.auth.signInWithOtp({ email: pendingEmail, options: { emailRedirectTo: currentRedirectUrl() } });
+  statusEl.textContent = error ? error.message : 'Link resent, check your inbox.';
+  startResendCooldown();
+});
+document.getElementById('changeEmailBtn').addEventListener('click', () => {
+  showStep('stepEmail');
+  emailStatus.textContent = '';
+  clearInterval(resendCooldownTimer);
+});
+
+// ---- Logo preview ----
+document.getElementById('pLogo').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.getElementById('logoPreview').innerHTML = `<img src="${reader.result}" alt="Logo preview">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+// ---- Step 3: business profile ----
+const profileForm = document.getElementById('profileForm');
+const profileStatus = document.getElementById('profileStatus');
+profileForm.addEventListener('submit', async function(e){
+  e.preventDefault();
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { profileStatus.textContent = 'Session expired, please log in again.'; return; }
+  document.getElementById('saveProfileBtn').disabled = true;
+  profileStatus.textContent = 'Saving...';
+
+  let logoUrl = null;
+  const logoFile = document.getElementById('pLogo').files[0];
+  if (logoFile) {
+    profileStatus.textContent = 'Uploading photo...';
+    const ext = logoFile.name.split('.').pop();
+    const path = `${user.id}/logo-${Date.now()}.${ext}`;
+    const { error: uploadError } = await sb.storage.from('member-photos').upload(path, logoFile, { upsert: true });
+    if (uploadError) {
+      console.error(uploadError);
+      profileStatus.textContent = 'Photo upload failed, saving the rest of your profile without it.';
+    } else {
+      const { data: publicUrlData } = sb.storage.from('member-photos').getPublicUrl(path);
+      logoUrl = publicUrlData.publicUrl;
+    }
+  }
+
+  profileStatus.textContent = 'Saving...';
+  const { error } = await sb.from('profiles').update({
+    name: document.getElementById('pName').value.trim(),
+    business_name: document.getElementById('pBusinessName').value.trim() || null,
+    category: document.getElementById('pCategory').value,
+    phone: document.getElementById('pPhone').value.trim(),
+    location: document.getElementById('pLocation').value.trim(),
+    landmark: document.getElementById('pLandmark').value.trim() || null,
+    sells: document.getElementById('pSells').value.trim(),
+    looking_for: document.getElementById('pLookingFor').value.trim() || null,
+    struggle: document.getElementById('pStruggle').value.trim(),
+    logo_url: logoUrl,
+    last_seen: new Date().toISOString(),
+  }).eq('id', user.id);
+  document.getElementById('saveProfileBtn').disabled = false;
+  if (error) { profileStatus.textContent = 'Something went wrong, please try again.'; console.error(error); return; }
+  goToApp();
+});
+
+function goToApp(){
+  const redirect = sessionStorage.getItem('byg_redirect');
+  sessionStorage.removeItem('byg_redirect');
+  location.href = redirect && redirect.endsWith('.html') ? redirect : 'app.html';
+}
+
+// ---- On load: handle magic link return, or an already active session ----
+async function checkSession(){
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (profile && profile.sells) {
+    goToApp();
+  } else {
+    showStep('stepProfile');
+  }
+}
+
+// supabase-js needs a moment to parse the magic link tokens from the URL
+window.addEventListener('load', () => setTimeout(checkSession, 300));
+if (sb) {
+  sb.auth.onAuthStateChange((event) => {
+    if (event === 'SIGNED_IN') checkSession();
+  });
+}
+</script>
+
+</body>
+</html>
