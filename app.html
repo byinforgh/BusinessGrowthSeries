@@ -1,0 +1,1555 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Business Growth Series: Members</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0b0f0c;
+  --panel:#11170f;
+  --panel-2:#161d13;
+  --line: rgba(255,255,255,0.09);
+  --paper:#f4f2e9;
+  --paper-dim:#c9c5b4;
+  --lime:#9fe870;
+  --lime-dim:#7bc94e;
+  --gold:#e0b23e;
+  --clay:#e07a3f;
+
+  --m1:#3ba55d;
+  --m2:#3b7ee0;
+  --m3:#e0b23e;
+  --m4:#e07a3f;
+  --m5:#a86ee0;
+  --m6:#2fb8a6;
+  --m7:#e0503f;
+  --m8:#5b6b8c;
+
+  --radius:2px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  background:var(--ink);
+  color:var(--paper);
+  font-family:'Archivo',sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--lime);color:var(--ink);}
+a{color:inherit;}
+img{max-width:100%;display:block;}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font-size:12px;
+  font-weight:600;
+  color:var(--lime);
+}
+h1,h2,h3{font-family:'Archivo Black',sans-serif;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+
+/* ===== NAV ===== */
+nav{
+  position:sticky;top:0;z-index:50;
+  background:rgba(11,15,12,0.88);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Archivo Black',sans-serif;font-size:17px;letter-spacing:.02em;text-decoration:none;}
+.brand-mark{
+  width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);position:relative;flex-shrink:0;
+}
+.brand-mark::after{content:'';position:absolute;bottom:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--lime);}
+.nav-links{display:flex;gap:32px;font-size:13px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;}
+.nav-links a{text-decoration:none;color:var(--paper-dim);transition:color .15s;}
+.nav-links a:hover{color:var(--lime);}
+.nav-cta{
+  background:var(--lime);color:var(--ink);padding:10px 20px;font-weight:800;font-size:13px;
+  text-transform:uppercase;letter-spacing:.04em;text-decoration:none;border-radius:var(--radius);border:none;cursor:pointer;
+}
+.nav-ghost{
+  padding:10px 18px;border:1px solid var(--line);color:var(--paper);text-decoration:none;font-weight:700;
+  font-size:13px;text-transform:uppercase;letter-spacing:.03em;border-radius:var(--radius);background:none;cursor:pointer;
+}
+.nav-mobile-toggle{display:none;background:none;border:1px solid var(--line);color:var(--paper);padding:8px 12px;font-size:20px;cursor:pointer;}
+
+section{padding:72px 0;position:relative;}
+section:not(:first-of-type)::before{
+  content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:64px;height:3px;
+  background:linear-gradient(90deg, var(--lime), var(--gold), var(--clay));border-radius:2px;
+}
+.section-head{max-width:640px;margin-bottom:56px;}
+.section-head h2{font-size:clamp(30px,4.5vw,48px);margin-top:14px;}
+.section-head p{color:var(--paper-dim);font-size:16px;line-height:1.6;margin-top:16px;}
+.divider{height:1px;background:var(--line);border:none;margin:0;}
+
+/* ===== BUTTONS ===== */
+.btn-primary{
+  background:var(--lime);color:var(--ink);padding:18px 32px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.04em;font-size:14px;text-decoration:none;border-radius:var(--radius);border:none;cursor:pointer;
+  box-shadow:0 0 0 0 rgba(159,232,112,0.4);transition:transform .15s, box-shadow .15s;display:inline-block;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(159,232,112,0.25);}
+.btn-ghost{
+  padding:18px 28px;border:1px solid var(--line);color:var(--paper);text-decoration:none;font-weight:700;
+  font-size:14px;text-transform:uppercase;letter-spacing:.04em;border-radius:var(--radius);transition:border-color .15s;
+  background:none;cursor:pointer;display:inline-block;
+}
+.btn-ghost:hover{border-color:var(--lime);}
+.btn-primary:disabled, .btn-ghost:disabled{opacity:.5;cursor:default;}
+
+/* ===== FORM FIELDS (shared) ===== */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);}
+.field input, .field select, .field textarea{
+  background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:14px 16px;
+  font-family:'Archivo',sans-serif;font-size:14.5px;outline:none;border-radius:2px;
+}
+.field input::placeholder, .field textarea::placeholder{color:var(--paper-dim);}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--lime);}
+.field-hint{font-size:11.5px;color:var(--paper-dim);}
+.form-status{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--lime);min-height:18px;margin-top:10px;}
+.form-error{color:var(--clay);}
+
+footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--panel);}
+.footer-top{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:32px;margin-bottom:40px;}
+.footer-tagline{max-width:340px;color:var(--paper-dim);font-size:14px;line-height:1.6;margin-top:14px;}
+.footer-cols{display:flex;gap:64px;flex-wrap:wrap;}
+.footer-col h5{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--paper-dim);margin-bottom:14px;}
+.footer-col a{display:block;font-size:14px;color:var(--paper);text-decoration:none;margin-bottom:10px;opacity:.85;}
+.footer-col a:hover{color:var(--lime);}
+.footer-pillars{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);margin-bottom:32px;}
+.pillar{background:var(--ink);flex:1;text-align:center;padding:18px 10px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);}
+.footer-bottom{display:flex;justify-content:space-between;font-size:12px;color:var(--paper-dim);border-top:1px solid var(--line);padding-top:24px;flex-wrap:wrap;gap:12px;}
+
+@media(max-width:860px){
+  .nav-links{display:none;}
+  .nav-mobile-toggle{display:block;}
+}
+
+
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--lime);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--clay);}
+.kente-stripe span:nth-child(4n+4){background:var(--panel-2);}
+
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body{padding-bottom:60px;}
+  .app-topbar{
+    position:sticky;top:0;z-index:50;background:rgba(11,15,12,0.92);backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+  .app-nav-links{display:flex;gap:24px;font-size:12.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;}
+  .app-nav-links a{text-decoration:none;color:var(--paper-dim);}
+  .app-nav-links a:hover{color:var(--lime);}
+  .app-user{display:flex;align-items:center;gap:12px;}
+  .app-user-name{font-size:13px;}
+  .app-user-name small{display:block;color:var(--paper-dim);font-size:11px;}
+  .app-avatar{width:34px;height:34px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);}
+
+  .locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+
+  .path-card{border:1px solid var(--line);background:var(--panel-2);display:flex;overflow:hidden;}
+  .path-kente{width:5px;display:flex;flex-direction:column;flex-shrink:0;}
+  .path-kente span{flex:1;}
+  .path-kente span:nth-child(4n+1){background:var(--lime);}
+  .path-kente span:nth-child(4n+2){background:var(--gold);}
+  .path-kente span:nth-child(4n+3){background:var(--clay);}
+  .path-kente span:nth-child(4n+4){background:var(--m5);}
+  .path-body{padding:30px 32px;flex:1;}
+  .path-body h3{font-size:22px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin:10px 0 8px;}
+  .path-body p{font-size:14px;color:var(--paper-dim);line-height:1.6;margin-bottom:18px;}
+  .path-jump-btn{background:var(--lime);color:var(--ink);border:none;padding:12px 22px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;cursor:pointer;border-radius:2px;}
+
+  .overall-progress{margin-bottom:24px;}
+  .overall-progress-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--paper-dim);}
+  .progress-track{height:8px;background:var(--panel-2);border:1px solid var(--line);border-radius:4px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg, var(--lime), var(--gold));transition:width .4s ease;}
+
+  .leaderboard-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+  .leaderboard-toggle{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);}
+  .lb-toggle-btn{background:var(--ink);border:none;color:var(--paper-dim);padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;}
+  .lb-toggle-btn.active{background:var(--lime);color:var(--ink);font-weight:700;}
+
+  .badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .badge-card{background:var(--ink);padding:22px 18px;text-align:center;opacity:.35;transition:opacity .2s;}
+  .badge-card.earned{opacity:1;}
+  .badge-icon{width:44px;height:44px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 12px;}
+  .badge-card.earned .badge-icon{background:rgba(159,232,112,0.15);border-color:var(--lime);}
+  .badge-card h5{font-size:12.5px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:4px;}
+  .badge-card p{font-size:10.5px;color:var(--paper-dim);line-height:1.4;margin:0;}
+
+  .wins-shell{border:1px solid var(--line);background:var(--ink);padding:28px;margin-bottom:28px;}
+  .wins-submit-btn{background:var(--clay);color:var(--ink);border:none;padding:14px 24px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;cursor:pointer;border-radius:2px;}
+  .wins-feed{display:flex;flex-direction:column;gap:2px;background:var(--line);border:1px solid var(--line);}
+  .win-post{background:var(--ink);padding:20px 24px;display:flex;gap:16px;align-items:flex-start;}
+  .win-badge-icon{width:34px;height:34px;border-radius:50%;background:rgba(224,122,63,0.15);border:1px solid var(--clay);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;}
+  .win-post-name{font-size:13px;font-weight:700;margin-bottom:4px;}
+  .win-post-task{font-size:13.5px;color:var(--paper);margin-bottom:4px;}
+  .win-post-result{font-size:13px;color:var(--paper-dim);line-height:1.5;}
+  .win-post-amount{display:inline-block;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--lime);border:1px solid var(--lime);padding:3px 10px;border-radius:20px;}
+
+  .testimonial-shell{border:1px solid var(--line);background:var(--ink);padding:28px;margin-bottom:28px;}
+  .star-rating{display:flex;gap:6px;margin-bottom:16px;}
+  .star-btn{background:none;border:none;font-size:26px;color:var(--line);cursor:pointer;padding:0;line-height:1;}
+  .star-btn.active{color:var(--gold);}
+  .testimonial-submit-btn{background:var(--gold);color:var(--ink);border:none;padding:14px 24px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;cursor:pointer;border-radius:2px;}
+  .testimonial-feed{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .testimonial-card{background:var(--ink);padding:22px;}
+  .testimonial-stars{color:var(--gold);font-size:13px;margin-bottom:10px;}
+  .testimonial-card p{font-size:13px;color:var(--paper-dim);line-height:1.55;margin-bottom:12px;}
+  .testimonial-card .who{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--paper-dim);}
+
+  .suggestion-strip{border:1px dashed var(--line);padding:24px 28px;display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+  .suggestion-strip form{display:flex;flex:1;gap:10px;min-width:260px;}
+  .suggestion-strip input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:12px 14px;font-family:'Archivo',sans-serif;font-size:13.5px;outline:none;}
+  .suggestion-strip button{background:var(--lime);color:var(--ink);border:none;padding:0 20px;font-weight:800;text-transform:uppercase;font-size:11.5px;cursor:pointer;}
+
+  .audit-cta{
+    border:1px solid var(--gold);background:linear-gradient(180deg, rgba(224,178,62,0.08), transparent 60%);
+    padding:24px 26px;margin-top:24px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
+  }
+  .audit-cta-text h4{font-size:16px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:6px;}
+  .audit-cta-text p{font-size:13px;color:var(--paper-dim);margin:0;max-width:440px;}
+  .audit-cta-btn{background:var(--gold);color:var(--ink);padding:14px 24px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;text-decoration:none;border-radius:2px;white-space:nowrap;flex-shrink:0;}
+
+  @media(max-width:860px){
+    .badges-grid{grid-template-columns:repeat(2,1fr);}
+    .testimonial-feed{grid-template-columns:1fr;}
+  }
+
+  .start-here-banner{
+    margin-top:32px;border:1px solid var(--line);background:var(--panel-2);overflow:hidden;position:relative;display:flex;
+  }
+  .start-here-kente{width:5px;display:flex;flex-direction:column;flex-shrink:0;}
+  .start-here-kente span{flex:1;}
+  .start-here-kente span:nth-child(4n+1){background:var(--lime);}
+  .start-here-kente span:nth-child(4n+2){background:var(--gold);}
+  .start-here-kente span:nth-child(4n+3){background:var(--clay);}
+  .start-here-kente span:nth-child(4n+4){background:var(--m2);}
+  .start-here-body{padding:22px 26px;flex:1;}
+  .start-here-title{font-family:'Archivo Black',sans-serif;font-size:14px;text-transform:none;letter-spacing:0;margin-bottom:14px;}
+  .start-here-steps{display:flex;gap:24px;flex-wrap:wrap;}
+  .start-here-step{
+    font-size:12.5px;color:var(--paper-dim);text-decoration:none;display:flex;gap:6px;transition:color .15s;
+  }
+  .start-here-step:hover{color:var(--lime);}
+  .start-here-step b{color:var(--lime);flex-shrink:0;}
+  .start-here-close{
+    background:none;border:none;color:var(--paper-dim);font-size:20px;cursor:pointer;padding:14px 18px;flex-shrink:0;
+  }
+  .start-here-close:hover{color:var(--paper);}
+  @media(max-width:700px){.start-here-steps{flex-direction:column;gap:10px;}}
+
+  section{padding:64px 0;}
+  .section-head{max-width:640px;margin-bottom:40px;}
+  .section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+  .section-head p{color:var(--paper-dim);font-size:15px;line-height:1.6;margin-top:14px;}
+
+  /* reuse curriculum/AI/community/directory styles from the single page build */
+  .modules-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .module-card{background:var(--ink);padding:28px;cursor:pointer;}
+  .module-card:hover{background:#0f1410;}
+  .module-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px;}
+  .module-num{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em;color:var(--paper-dim);}
+  .module-dot{width:11px;height:11px;border-radius:50%;flex-shrink:0;margin-top:2px;}
+  .module-card h3{font-size:22px;margin-bottom:6px;}
+  .module-lessons{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--paper-dim);margin-bottom:16px;}
+  .module-desc{font-size:13.5px;color:var(--paper-dim);line-height:1.55;margin-bottom:16px;}
+  .module-toggle{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--lime);display:flex;align-items:center;gap:8px;}
+  .module-toggle .arrow{transition:transform .2s;}
+  .module-card.open .module-toggle .arrow{transform:rotate(90deg);}
+  .module-lesson-list{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .module-card.open .module-lesson-list{max-height:2000px;}
+  .module-lesson-list ol{list-style:none;margin:16px 0 0;padding:12px 0 0;border-top:1px solid var(--line);display:flex;flex-direction:column;}
+  .lesson-item{padding:10px 0;border-top:1px solid var(--line);font-size:12.5px;color:var(--paper-dim);line-height:1.5;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;}
+  .lesson-item:first-child{border-top:none;}
+  .lesson-item-head{display:flex;gap:8px;color:var(--paper);font-weight:600;flex:1;}
+  .lesson-item-head b{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--paper);flex-shrink:0;}
+  .lesson-item-truth{margin-top:4px;color:var(--paper-dim);font-style:italic;padding-left:34px;}
+  .lesson-check{flex-shrink:0;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--paper-dim);}
+  .lesson-check.done{background:var(--lime);border-color:var(--lime);color:var(--ink);}
+  .lesson-search{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--panel-2);padding:14px 18px;margin-bottom:28px;}
+  .lesson-search input{flex:1;background:transparent;border:none;color:var(--paper);font-family:'Archivo',sans-serif;font-size:14px;outline:none;}
+  .search-count{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--paper-dim);}
+  .module-card.hidden{display:none;}
+  .lesson-item.hidden{display:none;}
+
+  .ai-shell{border:1px solid var(--line);background:var(--ink);display:grid;grid-template-columns:260px 1fr;}
+  .ai-info{border-right:1px solid var(--line);padding:26px 22px;}
+  .ai-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--lime);color:var(--lime);font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:6px 10px;margin-bottom:16px;}
+  .ai-badge .pulse{width:6px;height:6px;border-radius:50%;background:var(--lime);animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+  .ai-info p{font-size:12.5px;color:var(--paper-dim);line-height:1.6;margin-bottom:16px;}
+  .ai-contribute{margin-top:18px;padding:14px;border:1px dashed var(--line);font-size:11.5px;color:var(--paper-dim);}
+  .ai-contribute b{color:var(--gold);display:block;margin-bottom:6px;font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;}
+  .ai-chat{display:flex;flex-direction:column;height:480px;}
+  .ai-messages{flex:1;overflow-y:auto;padding:24px;display:flex;flex-direction:column;gap:16px;}
+  .ai-msg{display:flex;gap:10px;max-width:88%;}
+  .ai-msg.user{align-self:flex-end;flex-direction:row-reverse;}
+  .ai-msg-avatar{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;}
+  .ai-msg.bot .ai-msg-avatar{background:rgba(159,232,112,0.15);color:var(--lime);border:1px solid var(--lime);}
+  .ai-msg.user .ai-msg-avatar{background:var(--panel-2);color:var(--paper-dim);border:1px solid var(--line);}
+  .ai-msg-bubble{padding:12px 14px;border-radius:4px;font-size:13.5px;line-height:1.6;}
+  .ai-msg.bot .ai-msg-bubble{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);}
+  .ai-msg.user .ai-msg-bubble{background:rgba(159,232,112,0.1);border:1px solid rgba(159,232,112,0.3);color:var(--paper);}
+  .ai-msg-cite{display:block;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--lime);text-transform:uppercase;}
+  .ai-typing{display:flex;gap:4px;padding:12px 14px;}
+  .ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--paper-dim);animation:typingBounce 1.2s infinite;}
+  .ai-typing span:nth-child(2){animation-delay:.2s;}
+  .ai-typing span:nth-child(3){animation-delay:.4s;}
+  @keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.4;}30%{transform:translateY(-4px);opacity:1;}}
+  form.ai-input{display:flex;border-top:1px solid var(--line);}
+  form.ai-input input{flex:1;background:transparent;border:none;padding:16px 18px;color:var(--paper);font-family:'Archivo',sans-serif;font-size:13.5px;outline:none;}
+  form.ai-input button{background:var(--lime);color:var(--ink);border:none;padding:0 22px;font-weight:800;text-transform:uppercase;font-size:12px;cursor:pointer;}
+  .ai-suggestions{display:flex;gap:8px;padding:0 18px 14px;flex-wrap:wrap;}
+  .ai-suggest-chip{font-family:'JetBrains Mono',monospace;font-size:10.5px;border:1px solid var(--line);padding:6px 10px;color:var(--paper-dim);cursor:pointer;}
+  .ai-suggest-chip:hover{border-color:var(--lime);color:var(--lime);}
+  @media(max-width:860px){.ai-shell{grid-template-columns:1fr;}.ai-info{border-right:none;border-bottom:1px solid var(--line);}}
+
+  .feed-shell{border:1px solid var(--line);background:var(--ink);padding:24px;}
+  .comm-post{border:1px solid var(--line);padding:16px;margin-bottom:12px;border-radius:4px;}
+  .comm-post-user{font-size:13px;font-weight:700;margin-bottom:8px;}
+  .comm-post p{font-size:13px;color:var(--paper-dim);line-height:1.55;margin:0;}
+
+  .qa-shell{border:1px solid var(--line);background:var(--ink);}
+  .qa-card{border-bottom:1px solid var(--line);padding:22px 26px;}
+  .qa-card:last-child{border-bottom:none;}
+  .qa-q-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+  .qa-tag{font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;color:var(--lime);}
+  .qa-replies{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--paper-dim);}
+  .qa-q{font-family:'Archivo Black',sans-serif;text-transform:none;letter-spacing:0;font-size:16px;line-height:1.4;}
+  .qa-a-toggle{margin-top:12px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--gold);cursor:pointer;}
+  .qa-a{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+  .qa-card.open .qa-a{max-height:400px;}
+  .qa-a p{margin:14px 0 0;padding:14px 16px;background:var(--panel-2);border-left:2px solid var(--lime);font-size:13.5px;color:var(--paper-dim);line-height:1.6;}
+
+  .directory-controls{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+  .dir-search{flex:1;min-width:200px;border:1px solid var(--line);background:var(--panel-2);padding:12px 16px;color:var(--paper);font-family:'Archivo',sans-serif;font-size:13.5px;outline:none;}
+  .dir-filter{border:1px solid var(--line);background:var(--panel-2);color:var(--paper-dim);padding:12px 16px;font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;cursor:pointer;}
+  .dir-filter.active{border-color:var(--lime);color:var(--lime);}
+  .directory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .dir-card{background:var(--ink);padding:20px;}
+  .dir-card.hidden{display:none;}
+  .dir-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+  .dir-avatar{width:38px;height:38px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);position:relative;overflow:hidden;}
+  .dir-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+  .dir-avatar.online::after{content:'';position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--lime);border:2px solid var(--ink);}
+  .dir-card h4{font-size:14.5px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:4px;}
+  .dir-card .cat{font-size:11.5px;color:var(--paper-dim);margin-bottom:10px;}
+  .dir-card .loc{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--paper-dim);margin-bottom:10px;}
+  .dir-card .sells{font-size:12px;color:var(--paper);line-height:1.5;margin-bottom:6px;}
+  .dir-card .looking{font-size:11.5px;color:var(--lime-dim);line-height:1.5;}
+
+  .accountability-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:2px;background:var(--line);border:1px solid var(--line);}
+  .streak-panel{background:var(--ink);padding:30px;}
+  .streak-num{font-family:'Archivo Black',sans-serif;font-size:44px;}
+  .streak-num span{font-size:14px;color:var(--paper-dim);text-transform:none;font-family:'Archivo',sans-serif;}
+  .streak-days{display:flex;gap:6px;margin:18px 0 24px;}
+  .streak-day{flex:1;height:36px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--paper-dim);}
+  .streak-day.done{background:rgba(159,232,112,0.15);border-color:var(--lime);color:var(--lime);}
+  .checkin-btn{width:100%;background:var(--lime);color:var(--ink);border:none;padding:14px;font-weight:800;text-transform:uppercase;font-size:12.5px;cursor:pointer;}
+  .checkin-btn:disabled{background:var(--panel-2);color:var(--paper-dim);}
+  .leaderboard-panel{background:var(--ink);padding:30px;}
+  .leader-row{display:flex;align-items:center;gap:12px;padding:10px 0;border-top:1px solid var(--line);}
+  .leader-row:first-child{border-top:none;}
+  .leader-rank{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--paper-dim);width:18px;}
+  .leader-name{flex:1;font-size:13px;}
+  .leader-name small{display:block;color:var(--paper-dim);font-size:11px;}
+  .leader-streak{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--lime);}
+
+  .resource-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+  .field label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);}
+  .field input, .field textarea{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:12px 14px;font-family:'Archivo',sans-serif;font-size:13.5px;outline:none;border-radius:2px;width:100%;}
+  .field input::placeholder, .field textarea::placeholder{color:var(--paper-dim);}
+  .field input:focus, .field textarea:focus{border-color:var(--lime);}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  .spotlight-shell{border:1px solid var(--line);background:var(--ink);padding:28px;margin-bottom:28px;}
+  .spotlight-submit-btn{background:var(--gold);color:var(--ink);border:none;padding:14px 24px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:12.5px;cursor:pointer;border-radius:2px;}
+  .spotlight-feed{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .spotlight-post{background:var(--ink);padding:0;overflow:hidden;}
+  .spotlight-post-top{height:4px;background:linear-gradient(90deg, var(--lime), var(--gold), var(--clay));}
+  .spotlight-post-body{padding:24px;display:flex;gap:16px;}
+  .spotlight-post-photo{width:56px;height:56px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);flex-shrink:0;overflow:hidden;}
+  .spotlight-post-photo img{width:100%;height:100%;object-fit:cover;}
+  .spotlight-post h4{font-size:16px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:4px;}
+  .spotlight-post .loc{font-size:11.5px;color:var(--paper-dim);margin-bottom:10px;}
+  .spotlight-post p{font-size:13px;color:var(--paper-dim);line-height:1.55;margin:0 0 8px;}
+  .spotlight-post .label{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--lime);display:block;margin-bottom:3px;}
+  @media(max-width:860px){.grid2{grid-template-columns:1fr;}.spotlight-feed{grid-template-columns:1fr;}}
+  .resource-card{background:var(--ink);padding:22px;}
+  .resource-format{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
+  .resource-card h4{font-size:15px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:8px;}
+  .resource-card p{font-size:12.5px;color:var(--paper-dim);line-height:1.5;margin-bottom:14px;}
+  .resource-btn{font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;color:var(--lime);text-decoration:none;}
+
+  .events-list{display:flex;flex-direction:column;border:1px solid var(--line);}
+  .event-row{display:grid;grid-template-columns:110px 1fr auto;gap:20px;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line);}
+  .event-row:last-child{border-bottom:none;}
+  .event-day{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--paper-dim);text-transform:uppercase;}
+  .event-day b{display:block;font-family:'Archivo Black',sans-serif;font-size:16px;color:var(--paper);text-transform:none;margin-top:3px;}
+  .event-info h4{font-size:14.5px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:4px;}
+  .event-info p{font-size:12px;color:var(--paper-dim);}
+  .event-badge{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;border:1px solid var(--line);padding:6px 12px;color:var(--paper-dim);white-space:nowrap;}
+
+  @media(max-width:860px){
+    .modules-grid,.resource-grid,.directory-grid{grid-template-columns:1fr;}
+    .accountability-grid{grid-template-columns:1fr;}
+    .event-row{grid-template-columns:1fr;gap:8px;}
+  }
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+
+<div id="appShell" style="display:none;">
+
+<nav class="app-topbar">
+<div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="landing.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div class="app-nav-links">
+      <a href="#curriculum">Curriculum</a>
+      <a href="#ai-assistant">AI</a>
+      <a href="#community">Community</a>
+      <a href="#directory">Directory</a>
+      <a href="#accountability">Streak</a>
+      <a href="#wins">Wins</a>
+      <a href="#qa">Q&amp;A</a>
+      <a href="#spotlight">Spotlight</a>
+      <a href="#resources">Resources</a>
+    </div>
+    <div class="app-user">
+      <div class="app-user-name" id="topbarName">Loading...<small id="topbarBiz"></small></div>
+      <button class="nav-ghost" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+</nav>
+
+<header style="padding:56px 0 40px;">
+  <div class="wrap">
+    <span class="eyebrow">Welcome back</span>
+    <h1 style="font-size:clamp(30px,5vw,48px);margin-top:10px;" id="welcomeName">Business Growth Series</h1>
+    <p style="color:var(--paper-dim);font-size:15px;margin-top:12px;max-width:520px;">All 200 lessons, the community, and the AI assistant, all in one place.</p>
+    <div class="start-here-banner" id="startHereBanner">
+      <div class="start-here-kente"><span></span><span></span><span></span><span></span></div>
+      <div class="start-here-body">
+        <div class="start-here-title">New here? Start with these three things</div>
+        <div class="start-here-steps">
+          <a href="#curriculum" class="start-here-step"><b>1.</b> Open Module 01 and read Lesson 1</a>
+          <a href="#accountability" class="start-here-step"><b>2.</b> Check in below to start your streak</a>
+          <a href="#ai-assistant" class="start-here-step"><b>3.</b> Ask the AI one real question about your business</a>
+        </div>
+      </div>
+      <button class="start-here-close" id="startHereClose" aria-label="Dismiss">&times;</button>
+    </div>
+    <div class="audit-cta">
+      <div class="audit-cta-text">
+        <h4>Not sure where your business stands?</h4>
+        <p>Take the free 15-point Business Health &amp; Visibility Audit. Get your real gaps, and a way to book a consultation if you want more help closing them.</p>
+      </div>
+      <a href="https://business-health-visibility-audit-scan.netlify.app/" target="_blank" rel="noopener" class="audit-cta-btn">Take the Free Audit →</a>
+    </div>
+  </div>
+</header>
+
+<section id="your-path">
+  <div class="wrap">
+    <div class="path-card" id="pathCard">
+      <div class="path-kente"><span></span><span></span><span></span><span></span></div>
+      <div class="path-body">
+        <span class="eyebrow">Your path</span>
+        <h3 id="pathHeadline">Loading your recommended starting point...</h3>
+        <p id="pathReason"></p>
+        <button class="path-jump-btn" id="pathJumpBtn">Start Here →</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="curriculum">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Curriculum</span>
+      <h2>200 lessons. 8 modules.</h2>
+      <p>Tap a module to expand it. Mark lessons complete as you go, your progress is saved to your profile.</p>
+    </div>
+    <div class="overall-progress">
+      <div class="overall-progress-top">
+        <span class="eyebrow">Overall progress</span>
+        <span id="progressLabel">0 of 200 lessons</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
+    </div>
+    <div class="lesson-search">
+      <input type="text" id="lessonSearch" placeholder="Search all 200 lessons...">
+      <span class="search-count" id="searchCount">200 lessons</span>
+    </div>
+    <div class="modules-grid" id="modulesGrid"></div>
+  </div>
+</section>
+
+<section id="ai-assistant">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">BYINFORGH AI</span>
+      <h2>Ask anything about your business.</h2>
+      <p>Trained on the 200 lessons, approved member documents, and answered community questions.</p>
+    </div>
+    <div class="ai-shell">
+      <div class="ai-info">
+        <div class="ai-badge"><span class="pulse"></span>Community trained</div>
+        <p>Every answer is grounded in real Ghanaian business material. The more members contribute, the smarter it gets.</p>
+        <div class="ai-contribute">
+          <b>Grow the assistant</b>
+          Share a playbook, a hard lesson, or a document. Reviewed before it trains the assistant.
+          <form id="contributeForm" style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+            <input type="text" id="contribTitle" placeholder="Title" required style="background:var(--ink);border:1px solid var(--line);color:var(--paper);padding:9px 11px;font-size:12px;outline:none;">
+            <textarea id="contribContent" placeholder="Share what you know..." required rows="3" style="background:var(--ink);border:1px solid var(--line);color:var(--paper);padding:9px 11px;font-size:12px;outline:none;resize:vertical;"></textarea>
+            <button type="submit" style="background:var(--gold);color:var(--ink);border:none;padding:9px;font-weight:800;text-transform:uppercase;font-size:10.5px;cursor:pointer;">Submit for review</button>
+          </form>
+          <div id="contribStatus" style="margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--lime);"></div>
+        </div>
+      </div>
+      <div class="ai-chat">
+        <div class="ai-messages" id="aiMessages">
+          <div class="ai-msg bot"><div class="ai-msg-avatar">AI</div><div class="ai-msg-bubble">Hi, ask me anything about pricing, stock, customers, or systems.</div></div>
+        </div>
+        <div class="ai-suggestions">
+          <div class="ai-suggest-chip" data-q="How much should I charge for my product?">Pricing</div>
+          <div class="ai-suggest-chip" data-q="My supplier keeps delivering late">Late deliveries</div>
+          <div class="ai-suggest-chip" data-q="How do I get customers to trust me online?">Trust online</div>
+        </div>
+        <form class="ai-input" id="aiForm">
+          <input type="text" id="aiInput" placeholder="Ask a question...">
+          <button type="submit">Ask</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="community">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Community</span>
+      <h2>Post a win, a question, or something to collaborate on.</h2>
+    </div>
+    <div class="feed-shell">
+      <form id="postForm" style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--line);">
+        <textarea id="postContent" placeholder="Share something with the community..." required rows="2" style="background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:12px 14px;font-family:'Archivo',sans-serif;font-size:13.5px;outline:none;resize:vertical;"></textarea>
+        <button type="submit" style="align-self:flex-end;background:var(--lime);color:var(--ink);border:none;padding:10px 20px;font-weight:800;text-transform:uppercase;font-size:11.5px;cursor:pointer;">Post</button>
+      </form>
+      <div id="communityFeed"></div>
+    </div>
+  </div>
+</section>
+
+<section id="directory">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Business directory</span>
+      <h2>Find owners to trade, partner, or support.</h2>
+    </div>
+    <div class="directory-controls">
+      <input type="text" class="dir-search" id="dirSearch" placeholder="Search by name, category, or location...">
+      <div class="dir-filter active" data-cat="all">All</div>
+      <div class="dir-filter" data-cat="Fashion">Fashion</div>
+      <div class="dir-filter" data-cat="Food">Food</div>
+      <div class="dir-filter" data-cat="Retail">Retail</div>
+      <div class="dir-filter" data-cat="Services">Services</div>
+    </div>
+    <div class="directory-grid" id="directoryGrid"></div>
+  </div>
+</section>
+
+<section id="accountability">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Daily accountability</span>
+      <h2>Show up daily. Get seen doing it.</h2>
+    </div>
+    <div class="accountability-grid">
+      <div class="streak-panel">
+        <div class="streak-num" id="streakNum">0<span> day streak</span></div>
+        <div class="streak-days" id="streakDays"></div>
+        <button class="checkin-btn" id="checkinBtn">Check in for today</button>
+      </div>
+      <div class="leaderboard-panel">
+        <div class="leaderboard-top">
+          <span class="eyebrow">Leaderboard</span>
+          <div class="leaderboard-toggle">
+            <button class="lb-toggle-btn active" data-mode="streak">By Streak</button>
+            <button class="lb-toggle-btn" data-mode="lessons">By Lessons Done</button>
+          </div>
+        </div>
+        <div id="leaderboardList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="badges">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Rewards</span>
+      <h2>Badges you can actually earn.</h2>
+      <p>Not decoration, each one marks something real: lessons done, streaks kept, showing up for the community.</p>
+    </div>
+    <div class="badges-grid" id="badgesGrid"></div>
+  </div>
+</section>
+
+<section id="wins">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Bragging rights</span>
+      <h2>Post a win. Let it be seen.</h2>
+      <p>What did you try, and what actually happened? Numbers welcome, this is where progress gets celebrated, not hidden.</p>
+    </div>
+    <div class="wins-shell">
+      <form id="winForm">
+        <div class="grid2">
+          <div class="field">
+            <label>What did you do</label>
+            <input type="text" id="winTask" placeholder="e.g. Set up WhatsApp quick replies" required>
+          </div>
+          <div class="field">
+            <label>Result (optional)</label>
+            <input type="text" id="winAmount" placeholder="e.g. GHS 400 extra this week">
+          </div>
+        </div>
+        <div class="field">
+          <label>What happened</label>
+          <textarea id="winResult" rows="2" placeholder="e.g. Bookings went up and I stopped losing customers to slow replies" required></textarea>
+        </div>
+        <button type="submit" class="wins-submit-btn">Post Your Win</button>
+      </form>
+      <div class="form-status" id="winStatus" style="padding:0 0 16px;"></div>
+      <div class="wins-feed" id="winsFeed"></div>
+    </div>
+  </div>
+</section>
+
+<section id="qa">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Ask BYINFORGH</span>
+      <h2>Real questions, answered in public.</h2>
+    </div>
+    <div class="qa-shell">
+      <form style="display:flex;border-bottom:1px solid var(--line);" id="qaForm">
+        <input type="text" id="qaInput" placeholder="Ask a business question..." required style="flex:1;background:transparent;border:none;padding:18px 22px;color:var(--paper);font-family:'Archivo',sans-serif;font-size:14px;outline:none;">
+        <button type="submit" style="background:var(--gold);color:var(--ink);border:none;padding:0 26px;font-weight:800;text-transform:uppercase;font-size:12px;cursor:pointer;">Ask</button>
+      </form>
+      <div class="form-status" id="qaStatus" style="padding:0 22px;"></div>
+      <div id="qaFeed"></div>
+    </div>
+  </div>
+</section>
+
+<section id="spotlight">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Business spotlight</span>
+      <h2>Get your business featured.</h2>
+      <p>The same format BYINFORGH uses to feature real businesses: a headline, your story, what you offer, what makes you different, and a way to reach you. Submit yours, BYINFORGH reviews it before it goes live.</p>
+    </div>
+    <div class="spotlight-shell">
+      <form id="spotlightForm">
+        <div class="grid2">
+          <div class="field">
+            <label>Business name</label>
+            <input type="text" id="spName" placeholder="Business name" required>
+          </div>
+          <div class="field">
+            <label>Location</label>
+            <input type="text" id="spLocation" placeholder="e.g. Kumasi" required>
+          </div>
+        </div>
+        <div class="field">
+          <label>What do you do</label>
+          <textarea id="spWhat" rows="2" placeholder="What your business offers" required></textarea>
+        </div>
+        <div class="field">
+          <label>Why did you start</label>
+          <textarea id="spWhy" rows="2" placeholder="The short human story behind the business"></textarea>
+        </div>
+        <div class="field">
+          <label>What makes you different</label>
+          <textarea id="spDifferent" rows="2" placeholder="What sets you apart from others nearby"></textarea>
+        </div>
+        <div class="grid2">
+          <div class="field">
+            <label>Contact number</label>
+            <input type="tel" id="spPhone" placeholder="WhatsApp number">
+          </div>
+          <div class="field">
+            <label>Photo</label>
+            <input type="file" id="spPhoto" accept="image/*" style="padding:12px 0;">
+          </div>
+        </div>
+        <button type="submit" class="spotlight-submit-btn">Submit for Review</button>
+      </form>
+      <div class="form-status" id="spotlightStatus" style="padding:0 0 20px;"></div>
+    </div>
+    <div class="spotlight-feed" id="spotlightFeed"></div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Testimonials</span>
+      <h2>Tell us if this is actually helping.</h2>
+      <p>Honest reviews only, BYINFORGH reviews these before the best ones go on the public site.</p>
+    </div>
+    <div class="testimonial-shell">
+      <form id="testimonialForm">
+        <div class="star-rating" id="starRating">
+          <button type="button" class="star-btn" data-star="1">★</button>
+          <button type="button" class="star-btn" data-star="2">★</button>
+          <button type="button" class="star-btn" data-star="3">★</button>
+          <button type="button" class="star-btn" data-star="4">★</button>
+          <button type="button" class="star-btn" data-star="5">★</button>
+        </div>
+        <div class="field">
+          <label>Your honest review</label>
+          <textarea id="testimonialContent" rows="2" placeholder="What's actually changed for your business since joining?" required></textarea>
+        </div>
+        <button type="submit" class="testimonial-submit-btn">Submit Review</button>
+      </form>
+      <div class="form-status" id="testimonialStatus" style="padding:0 0 16px;"></div>
+    </div>
+    <div class="testimonial-feed" id="testimonialFeed"></div>
+  </div>
+</section>
+
+<section id="resources">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Resource library</span>
+      <h2>Every playbook BYINFORGH uses.</h2>
+    </div>
+    <div class="resource-grid" id="resourceGrid"></div>
+  </div>
+</section>
+
+<section id="events">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Live with BYINFORGH</span>
+      <h2>Weekly live sessions.</h2>
+    </div>
+    <div class="events-list" id="eventsList"></div>
+  </div>
+</section>
+
+<section id="suggestions" style="padding:48px 0;">
+  <div class="wrap">
+    <div class="suggestion-strip">
+      <div>
+        <div style="font-family:'Archivo Black',sans-serif;font-size:14px;margin-bottom:4px;">Something missing, broken, or worth building?</div>
+        <div style="font-size:12.5px;color:var(--paper-dim);">Goes straight to BYINFORGH, only you and BYINFORGH ever see it.</div>
+      </div>
+      <form id="suggestionForm">
+        <input type="text" id="suggestionInput" placeholder="Tell us what would help..." required>
+        <button type="submit">Send</button>
+      </form>
+    </div>
+    <div class="form-status" id="suggestionStatus"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-bottom">
+      <span>© 2026 BYINFORGH. Business Growth Series.</span>
+      <span><a href="privacy.html" style="color:var(--paper-dim);text-decoration:underline;">Privacy &amp; Terms</a> &nbsp;&middot;&nbsp; Visible · Trusted · Local</span>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+const modules = [
+  {n:'01', color:'var(--m1)', title:'Business Foundations', range:'Lessons 1 to 20',
+   desc:'How to think like a business owner: mindset, discipline, and the difference between a hustle and a business.',
+   lessons:[{t:'What is a Business?',truth:'A business is a system that creates value for customers, not just a shop with a name on it.'},{t:'Business vs Hustle',truth:'A hustle earns today\'s money. A business earns money even on the days you don\'t work.'},{t:'Why Businesses Fail',truth:'Most businesses don\'t fail from a bad product. They fail from no system and no cash reserve.'},{t:'Entrepreneur vs Self-Employed',truth:'An entrepreneur builds a business that works without them. A self-employed person built themselves a job.'},{t:'Vision vs Goals',truth:'Vision is the destination. Goals are the steps that get you there on a deadline.'},{t:'Mission Statement',truth:'Your mission is the one sentence that tells a stranger exactly why your business exists.'},{t:'Core Values',truth:'Values are the rules you follow even when no customer is watching.'},{t:'The 4 Stages of Business',truth:'Every business moves through survival, stability, growth, and scale, in that order.'},{t:'Understanding Risk',truth:'Risk isn\'t something to avoid. It\'s something to measure before you take it.'},{t:'Business Discipline',truth:'Discipline is doing the boring task on the day you don\'t feel like it.'},{t:'Consistency',truth:'One good week means nothing. Fifty consistent weeks builds a business.'},{t:'Long-Term Thinking',truth:'Decide today\'s price, hire, and deal by asking what it costs you in three years.'},{t:'Business Terminology',truth:'You can\'t manage what you can\'t name. Learn the words before you learn the strategy.'},{t:'Problem Solving',truth:'Every successful business is just a business that got good at solving one problem repeatedly.'},{t:'Opportunity Spotting',truth:'Opportunities hide inside customer complaints. Listen for what people are frustrated about.'},{t:'Decision Making',truth:'A slow wrong decision costs more than a fast good one.'},{t:'Accountability',truth:'If no one is checking your numbers, your numbers will not improve.'},{t:'Growth Mindset',truth:'Skills are built, not born. The owner who keeps learning outlasts the one who thinks they\'ve arrived.'},{t:'Business Habits',truth:'Your business is the sum of what you do daily, not what you plan to do eventually.'},{t:'Building Trust',truth:'Trust is built in the gap between what you promised and what you delivered.'}]},
+  {n:'02', color:'var(--m2)', title:'Business Time', range:'Lessons 21 to 40',
+   desc:'Planning and structure, from the calendar year down to the daily to-do list, so nothing runs on chaos.',
+   lessons:[{t:'Calendar Year',truth:'Plan your year in advance, or the year will plan itself for you.'},{t:'Quarter System',truth:'Break the year into four 90 day sprints. It\'s easier to win 90 days than 365.'},{t:'Months',truth:'Every month needs one target, not a wish list of ten.'},{t:'Weeks',truth:'Your week should have a repeatable rhythm, not a new plan every Monday.'},{t:'Days',truth:'The first hour of your business day decides the tone for the other nine.'},{t:'Business Planning',truth:'A plan that isn\'t written down is just a thought you\'ll forget by Thursday.'},{t:'Annual Planning',truth:'Set your yearly number first, then work backward into monthly targets.'},{t:'Quarterly Planning',truth:'Review every 90 days: what worked, what didn\'t, and what changes next quarter.'},{t:'Monthly Planning',truth:'Start each month by naming the one thing that must get done by the 30th.'},{t:'Weekly Planning',truth:'Plan Sunday night. A business that plans on Monday morning is already behind.'},{t:'Daily Planning',truth:'Write your top three tasks before you open your phone, not after.'},{t:'Business Deadlines',truth:'A deadline without a consequence is just a suggestion.'},{t:'Time Blocking',truth:'Protect two uninterrupted hours a day for the work that actually grows the business.'},{t:'Time Management',truth:'You don\'t manage time, you manage attention. Guard it like cash.'},{t:'Priority Matrix',truth:'Urgent and important gets done now. Everything else gets scheduled or deleted.'},{t:'Productivity',truth:'Busy is not the same as productive. Measure output, not hours.'},{t:'Review Cycles',truth:'What gets reviewed weekly gets improved monthly.'},{t:'Business Meetings',truth:'A meeting without an agenda and a decision is just a conversation with extra steps.'},{t:'Milestones',truth:'Break big goals into checkpoints you can actually celebrate.'},{t:'Execution',truth:'A good plan executed today beats a perfect plan executed never.'}]},
+  {n:'03', color:'var(--m3)', title:'Business Money', range:'Lessons 41 to 70',
+   desc:'Finance and wealth: revenue, profit, pricing, cash flow, and the numbers every owner must actually understand.',
+   lessons:[{t:'Revenue',truth:'Revenue is everything that comes in before you pay for anything.'},{t:'Profit',truth:'Profit is what\'s left after every single cost is paid, not what\'s in the till.'},{t:'Cash Flow',truth:'A profitable business can still close if cash runs out at the wrong moment.'},{t:'Expenses',truth:'Every expense should answer one question: does this bring in more than it costs?'},{t:'Gross Profit',truth:'Gross profit tells you if the product itself makes sense before overhead touches it.'},{t:'Net Profit',truth:'Net profit is the only number that tells you if the business actually worked this month.'},{t:'Break-Even',truth:'Know the exact number of sales that cover your costs before you celebrate a good day.'},{t:'Pricing',truth:'Price on value delivered, not on what feels comfortable to say out loud.'},{t:'Margin',truth:'Margin is what protects you when costs rise and customers negotiate.'},{t:'Markup',truth:'Markup and margin are not the same number. Know the difference before you price.'},{t:'Discounts',truth:'A discount without a reason trains customers to always wait for one.'},{t:'Budgeting',truth:'A budget is a plan for your money before the month spends it for you.'},{t:'Savings',truth:'Pay your business savings first, like a bill that must be paid.'},{t:'Emergency Fund',truth:'Three months of expenses saved is the difference between a bad month and a closed shop.'},{t:'Reinvestment',truth:'Growth is funded by profit you chose not to spend.'},{t:'Fixed Costs',truth:'Fixed costs don\'t care how many sales you made this month. Know them cold.'},{t:'Variable Costs',truth:'Variable costs move with your sales. Control them per unit, not just in total.'},{t:'Cost of Sales',truth:'Know exactly what it costs to deliver one sale before you price the next hundred.'},{t:'Assets',truth:'An asset puts money in your pocket. Know which of your things actually do that.'},{t:'Liabilities',truth:'A liability takes money out of your pocket, whether it\'s used or not.'},{t:'Equity',truth:'Equity is what you actually own once every debt is subtracted.'},{t:'Accounts Receivable',truth:'Money owed to you is not money you have. Chase it like it\'s already spent.'},{t:'Accounts Payable',truth:'Pay what you owe on time. It\'s the cheapest way to build supplier trust.'},{t:'Inventory',truth:'Stock sitting on a shelf for a year isn\'t inventory, it\'s frozen cash.'},{t:'Financial Reports',truth:'If you can\'t read your own numbers monthly, someone else is reading them for you.'},{t:'Taxes',truth:'Taxes planned for monthly are a bill. Taxes ignored are a crisis.'},{t:'Banking',truth:'Separate business and personal accounts on day one, not after the confusion starts.'},{t:'Mobile Money',truth:'Track every mobile money transaction like it\'s a bank statement, because it is.'},{t:'Financial Discipline',truth:'Financial discipline is spending like the business depends on it, because it does.'},{t:'Growth Finance',truth:'Growth needs funding. Decide early if that\'s profit, a loan, or an investor.'}]},
+  {n:'04', color:'var(--m4)', title:'Customers & Sales', range:'Lessons 71 to 95',
+   desc:'Energy and sales: turning leads into loyal, repeat customers who refer other people to you.',
+   lessons:[{t:'Leads',truth:'A lead is a stranger who showed interest. Treat the first message like it matters.'},{t:'Prospects',truth:'A prospect is a lead who\'s asked a real question. Answer it faster than your competitor.'},{t:'Customers',truth:'A customer paid once. The work of business starts after that, not before.'},{t:'Repeat Customers',truth:'One repeat customer is worth more than five one time sales.'},{t:'Customer Lifetime Value',truth:'Know what one customer is worth over a year, not just today\'s receipt.'},{t:'Referrals',truth:'A referral is free marketing from someone who trusts you more than any advert could.'},{t:'Sales Funnel',truth:'Every customer moves through stranger, lead, buyer, and repeat buyer. Know where yours are stuck.'},{t:'Closing',truth:'The business that replies in five minutes beats the business with the better product.'},{t:'Objections',truth:'An objection is a question in disguise. Answer it, don\'t argue with it.'},{t:'Follow-Up',truth:'Most sales are lost not to a no, but to a follow up that never happened.'},{t:'Customer Service',truth:'Service is remembered longer than price, good or bad.'},{t:'Speed',truth:'Speed of reply is a sales strategy, not an accident.'},{t:'Communication',truth:'Say what you mean clearly. Customers don\'t reward guessing games.'},{t:'Trust',truth:'People buy from businesses they trust before they buy from businesses with the best price.'},{t:'Pricing Conversations',truth:'State your price once, clearly, without apologizing for it.'},{t:'Sales Psychology',truth:'People buy on emotion and justify it with logic afterward.'},{t:'Reviews',truth:'A review is a stranger\'s proof that you deliver what you promise.'},{t:'Testimonials',truth:'Collect testimonials the day a customer is happiest, not weeks later.'},{t:'Upselling',truth:'Offer the better option before the customer settles for the smaller one.'},{t:'Cross-Selling',truth:'The easiest sale is the second item to a customer who\'s already buying.'},{t:'Loyalty',truth:'Loyalty is earned by consistency, not by one great interaction.'},{t:'Customer Journey',truth:'Map every step a customer takes from discovery to purchase, then fix the weakest step.'},{t:'Retention',truth:'It costs less to keep a customer than to find a new one.'},{t:'Relationships',truth:'Business is relationships with paperwork attached.'},{t:'Value Creation',truth:'Sell the transformation the customer gets, not just the product they receive.'}]},
+  {n:'05', color:'var(--m5)', title:'Visibility & Marketing', range:'Lessons 96 to 120',
+   desc:'Brand and authority: getting found online and building a reputation that sells for you.',
+   lessons:[{t:'Visibility',truth:'If people can\'t find you, they can\'t buy from you.'},{t:'Branding',truth:'A brand is the promise customers remember before they remember your name.'},{t:'Logo',truth:'A logo isn\'t your brand. It\'s just the signature at the bottom of it.'},{t:'Identity',truth:'Your business identity should be recognizable even with the name covered.'},{t:'Reputation',truth:'Reputation is what people say about you when you\'re not in the room.'},{t:'Google Business',truth:'If your business isn\'t on Google Maps, it doesn\'t exist to half your customers.'},{t:'Google Maps',truth:'A correct pin on the map is worth more than a hundred posts.'},{t:'SEO',truth:'Show up when people search for what you sell, not just when they search your name.'},{t:'Social Media',truth:'Social media is a shop window. Keep it open and updated.'},{t:'WhatsApp Business',truth:'A WhatsApp Business profile with hours, catalog, and quick replies converts more than a personal number.'},{t:'Facebook',truth:'Facebook still works in Ghana. Post where your customers already are.'},{t:'Instagram',truth:'Instagram sells the look of your business before customers ever visit.'},{t:'TikTok',truth:'TikTok rewards consistency over perfection. Post the raw and real version.'},{t:'LinkedIn',truth:'LinkedIn builds authority with suppliers, partners, and B2B customers.'},{t:'YouTube',truth:'Long form video builds more trust than any single post ever will.'},{t:'Content Strategy',truth:'Post with a plan, not a mood, or your feed will show it.'},{t:'Photography',truth:'Good lighting sells more than good filters.'},{t:'Video',truth:'A 30 second video answering who, where, what builds more trust than paragraphs of text.'},{t:'Storytelling',truth:'Facts tell, stories sell. Lead with the story.'},{t:'Advertising',truth:'Advertise the result the customer gets, not the features of the product.'},{t:'Local Marketing',truth:'Win your own neighborhood completely before chasing the whole city.'},{t:'Community Marketing',truth:'Show up in your customers\' community before asking them to show up in yours.'},{t:'Digital Shopfront',truth:'Your online profile is now your shop\'s front door. Treat it that way.'},{t:'Authority',truth:'Answer questions publicly and you become the expert people trust.'},{t:'Personal Brand',truth:'People trust people before they trust companies. Put a face on the business.'}]},
+  {n:'06', color:'var(--m6)', title:'Business Systems', range:'Lessons 121 to 150',
+   desc:'Organisation and process: the SOPs, checklists, and infrastructure that let a business run without you.',
+   lessons:[{t:'Systems',truth:'A system is anything that works the same way when you\'re not there.'},{t:'SOPs',truth:'Write down how a task is done once, and anyone can repeat it after.'},{t:'Documentation',truth:'If it\'s only in your head, it leaves the business the day you\'re unavailable.'},{t:'Checklists',truth:'A checklist turns I think I did it into I know I did it.'},{t:'Automation',truth:'Automate the repetitive task before you hire someone to do it manually.'},{t:'CRM',truth:'Track every customer somewhere other than your memory.'},{t:'Customer Records',truth:'A customer record kept today saves a lost sale in six months.'},{t:'Staff Manuals',truth:'Train once with a manual instead of retraining every new hire from scratch.'},{t:'Process Mapping',truth:'Draw out how work actually flows before you try to fix it.'},{t:'Workflows',truth:'A clear workflow removes the guesswork from every repeated task.'},{t:'Templates',truth:'Build the template once, reuse it a hundred times.'},{t:'Business Audits',truth:'Audit your business like a stranger would, honestly and without excuses.'},{t:'KPIs',truth:'Pick three numbers that tell you if the week went well, and check them weekly.'},{t:'Reports',truth:'A report you never read is a report you didn\'t need to make.'},{t:'Quality Control',truth:'Check the work before the customer does.'},{t:'Delegation',truth:'Delegate the task, not just the blame if it goes wrong.'},{t:'Accountability Systems',truth:'What gets tracked and reviewed gets taken seriously.'},{t:'Communication Systems',truth:'Decide how the team communicates before a crisis forces the decision.'},{t:'Inventory Systems',truth:'Know what you have, where it is, and how fast it\'s moving.'},{t:'Sales Systems',truth:'A sales system means every lead is followed up the same way, every time.'},{t:'Marketing Systems',truth:'Marketing that runs on a calendar outperforms marketing that runs on inspiration.'},{t:'Finance Systems',truth:'If it only works when you\'re standing there, it\'s not a system. It\'s a favor.'},{t:'HR Basics',truth:'Even one employee needs clear expectations written down.'},{t:'File Management',truth:'A business that can\'t find its own paperwork can\'t grow past its own confusion.'},{t:'Cloud Storage',truth:'Back up anywhere but the one phone that could get lost tomorrow.'},{t:'Security',truth:'Protect your passwords and data like you protect your cash box.'},{t:'Backups',truth:'The backup you never needed is worth more than the one you needed and didn\'t have.'},{t:'Continuous Improvement',truth:'A system built once and never revisited becomes outdated within a year.'},{t:'Business Infrastructure',truth:'Infrastructure is boring until the day it saves your business.'},{t:'Scalability',truth:'Ask if this works the same way at ten times the size before you scale it.'}]},
+  {n:'07', color:'var(--m7)', title:'Operations', range:'Lessons 151 to 170',
+   desc:'Execution and action: the daily discipline of opening, closing, and running a clean, efficient business.',
+   lessons:[{t:'Daily Opening',truth:'How you open the shop sets the standard for how the day runs.'},{t:'Daily Closing',truth:'A clean close today is a faster, easier open tomorrow.'},{t:'Stock Control',truth:'Count your stock regularly, or discover the shortage after it\'s too late.'},{t:'Purchasing',truth:'Buy based on what sells, not on what\'s cheap this week.'},{t:'Supplier Management',truth:'A reliable supplier is worth more than a slightly cheaper one.'},{t:'Delivery',truth:'A late delivery costs more in trust than it saves in convenience.'},{t:'Scheduling',truth:'A written schedule prevents the daily argument about who\'s doing what.'},{t:'Record Keeping',truth:'If it isn\'t written down, it didn\'t happen, as far as your business is concerned.'},{t:'Customer Complaints',truth:'A complaint handled well creates more loyalty than a problem that never happened.'},{t:'Problem Resolution',truth:'Solve the customer\'s problem first, explain the reason after.'},{t:'Team Meetings',truth:'A short daily huddle prevents the long weekly cleanup.'},{t:'Workplace Organisation',truth:'A disorganized shop tells customers the business is disorganized too.'},{t:'Equipment Care',truth:'Maintained equipment is cheaper than replaced equipment.'},{t:'Business Cleanliness',truth:'Cleanliness is free marketing that happens the moment someone walks in.'},{t:'Efficiency',truth:'Do the same work in less time, not more work in the same time.'},{t:'Quality',truth:'Consistency in quality builds more trust than one moment of excellence.'},{t:'Routine',truth:'A strong routine makes good performance the default, not the exception.'},{t:'Standards',truth:'Write your standard down so quality doesn\'t depend on who\'s working that day.'},{t:'Monitoring',truth:'Check on the business often enough to catch small problems before they\'re big ones.'},{t:'Improvement',truth:'Ask weekly: what\'s one thing we can do better than last week?'}]},
+  {n:'08', color:'var(--m8)', title:'Leadership & Growth', range:'Lessons 171 to 200',
+   desc:'Strategy and long-term growth: leading a team, scaling, and building something that outlasts you.',
+   lessons:[{t:'Leadership',truth:'Leadership is doing the hard thing first so your team knows it\'s possible.'},{t:'Management',truth:'Management is making sure the plan actually gets executed, not just written.'},{t:'Delegation',truth:'The owner who delegates nothing builds a job, not a business.'},{t:'Team Building',truth:'A team performs to the standard the leader models, not the standard they announce.'},{t:'Communication',truth:'Say it clearly once instead of hoping people figure it out.'},{t:'Culture',truth:'Culture is what your team does when you\'re not watching.'},{t:'Motivation',truth:'People stay motivated by progress they can see, not speeches they hear.'},{t:'Hiring',truth:'Hire slow, for attitude and trainability, not just for skill.'},{t:'Training',truth:'An untrained employee will cost you more than the time it takes to train them.'},{t:'Performance',truth:'Measure performance against a standard, not against a feeling.'},{t:'Goals',truth:'A team without a shared goal is just a group of people showing up.'},{t:'Vision',truth:'A leader\'s job is to see further than the team and explain what they see.'},{t:'Innovation',truth:'The business that keeps improving stays ahead of the one that stays comfortable.'},{t:'Change',truth:'Businesses that resist change get replaced by businesses that don\'t.'},{t:'Scaling',truth:'Scale the system first, then scale the size.'},{t:'Partnerships',truth:'A good partnership multiplies what you could do alone.'},{t:'Networking',truth:'Your network today decides which opportunities reach you tomorrow.'},{t:'Negotiation',truth:'Negotiate for a deal both sides want to repeat.'},{t:'Confidence',truth:'Confidence is built by preparation, not by pretending.'},{t:'Resilience',truth:'Every business owner fails. The ones who succeed keep going after.'},{t:'Strategic Thinking',truth:'Think three moves ahead of the decision in front of you.'},{t:'Decision Making',truth:'A leader who can\'t decide creates a team that can\'t move.'},{t:'Long-Term Planning',truth:'Build decisions today that your business will thank you for in five years.'},{t:'Legacy',truth:'Build a business that outlasts your involvement in it.'},{t:'Community Impact',truth:'A business that gives back earns loyalty money can\'t buy.'},{t:'Faith & Business',truth:'Whatever grounds you personally should show up in how you run the business.'},{t:'Mentorship',truth:'Find someone ahead of you, and become that person for someone behind you.'},{t:'Personal Development',truth:'The business grows to the level the owner grows to, and no further.'},{t:'Success Habits',truth:'Success is a stack of small daily habits repeated for a long time.'},{t:'Continuous Learning',truth:'The day you stop learning is the day your competitors start passing you.'}]},
+];
+</script>
+<script>
+// =====================================================================
+// SUPABASE CONFIG: replace with your own project URL and anon public key
+// (Supabase dashboard: Project Settings > API). If you change this,
+// update the same two lines in the other HTML files too.
+// =====================================================================
+const SUPABASE_URL = 'YOUR_SUPABASE_PROJECT_URL';
+const SUPABASE_ANON_KEY = 'YOUR_SUPABASE_ANON_KEY';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+// =====================================================================
+// SECURITY: escape any user-submitted text before it's ever inserted as
+// HTML. Every profile field, post, question, answer, and spotlight entry
+// on this page comes from a member, and without this, a member could
+// submit a script tag inside their business name or a community post
+// and have it run in every other member's browser. This function is
+// applied to every single piece of member-submitted content rendered
+// anywhere on this page, no exceptions.
+// =====================================================================
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+let currentUser = null;
+let currentProfile = null;
+
+// =====================================================================
+// SESSION GUARD: everything on this page requires a logged in member
+// =====================================================================
+async function initApp(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet, see config.js.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    location.href = 'auth.html';
+    return;
+  }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) {
+    location.href = 'auth.html';
+    return;
+  }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  document.getElementById('topbarName').innerHTML = `${esc(profile.name)}<small>${esc(profile.business_name || profile.category || '')}</small>`;
+  document.getElementById('welcomeName').textContent = `Welcome back, ${profile.name.split(' ')[0]}`;
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('appShell').style.display = 'block';
+
+  // mark online now, then keep pinging every 60 seconds while the tab is open
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+  setInterval(() => {
+    sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+  }, 60000);
+
+  renderModules();
+  renderYourPath();
+  loadOverallProgress();
+  loadCommunity();
+  loadDirectory();
+  renderAccountability();
+  loadQA();
+  loadResources();
+  loadEvents();
+  loadSpotlights();
+  loadWins();
+  loadTestimonials();
+  checkForNewBadges();
+  initStartHereBanner();
+}
+window.addEventListener('load', () => setTimeout(initApp, 50));
+
+// =====================================================================
+// YOUR PATH: a small, honest recommendation engine. Reads what the
+// member told us at signup (their struggle, what they're looking for,
+// their category) and points them at one specific module to start with,
+// instead of leaving 200 lessons for them to sort out alone.
+// =====================================================================
+const pathRules = [
+  {keys:['money','cash','price','pricing','profit','pay','debt','finance','expensive','cheap'], module:'03', title:'Business Money', reason:"you mentioned money or pricing, Module 03 covers exactly that: pricing, margin, cash flow, and knowing your real numbers."},
+  {keys:['customer','sale','sell','buy','client','reply','respond','trust','order'], module:'04', title:'Customers & Sales', reason:"you mentioned customers or sales, Module 04 covers turning interest into repeat, paying customers."},
+  {keys:['found','visib','online','google','social','market','advert','known','tiktok','instagram','whatsapp'], module:'05', title:'Visibility & Marketing', reason:"you mentioned being found or getting seen online, Module 05 is built for exactly that."},
+  {keys:['system','process','organi','stock','inventory','staff','team','manage','record'], module:'06', title:'Business Systems', reason:"you mentioned organisation or systems, Module 06 turns daily chaos into a repeatable process."},
+  {keys:['time','plan','busy','schedule','consist','discipline'], module:'02', title:'Business Time', reason:"you mentioned time or planning, Module 02 builds the daily and weekly rhythm most businesses are missing."},
+  {keys:['lead','grow','scale','hire','delegate','team','vision'], module:'08', title:'Leadership & Growth', reason:"you mentioned growth or leadership, Module 08 covers scaling beyond just you."},
+];
+
+function renderYourPath(){
+  if (!currentProfile) return;
+  const text = `${currentProfile.struggle || ''} ${currentProfile.looking_for || ''}`.toLowerCase();
+  const match = pathRules.find(r => r.keys.some(k => text.includes(k)));
+  const target = match || {module:'01', title:'Business Foundations', reason:"every business starts here, Module 01 builds how to think like an owner before anything else."};
+  document.getElementById('pathHeadline').textContent = `Start with Module ${target.module}: ${target.title}`;
+  document.getElementById('pathReason').textContent = `Based on what you told us, ${target.reason}`;
+  document.getElementById('pathJumpBtn').addEventListener('click', () => {
+    const card = document.getElementById(`module-${target.module}`);
+    if (!card) return;
+    card.classList.add('open');
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+}
+
+async function loadOverallProgress(){
+  if (!sb || !currentUser) return;
+  const { count } = await sb.from('lesson_progress').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id);
+  updateProgressBar(count || 0);
+}
+function updateProgressBar(count){
+  const pct = Math.round((count / 200) * 100);
+  document.getElementById('progressLabel').textContent = `${count} of 200 lessons`;
+  document.getElementById('progressFill').style.width = `${pct}%`;
+}
+
+function initStartHereBanner(){
+  const banner = document.getElementById('startHereBanner');
+  if (!banner) return;
+  let dismissed = false;
+  try { dismissed = sessionStorage.getItem('byg_start_here_dismissed') === '1'; } catch(e){}
+  if (dismissed) { banner.style.display = 'none'; return; }
+  document.getElementById('startHereClose').addEventListener('click', () => {
+    banner.style.display = 'none';
+    try { sessionStorage.setItem('byg_start_here_dismissed', '1'); } catch(e){}
+  });
+}
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (typeof sb !== 'undefined' && sb) await sb.auth.signOut();
+  location.href = 'landing.html';
+});
+
+// =====================================================================
+// CURRICULUM
+// =====================================================================
+function renderModules(){
+  const grid = document.getElementById('modulesGrid');
+  modules.forEach((m, idx) => {
+    const startLesson = idx === 0 ? 1 : modules.slice(0, idx).reduce((a,b)=>a+b.lessons.length,0) + 1;
+    const card = document.createElement('div');
+    card.className = 'module-card';
+    card.id = `module-${m.n}`;
+    card.innerHTML = `
+      <div class="module-top">
+        <span class="module-num">MODULE ${m.n}</span>
+        <span class="module-dot" style="background:${m.color}"></span>
+      </div>
+      <h3>${m.title}</h3>
+      <div class="module-lessons">${m.range} · ${m.lessons.length} lessons</div>
+      <p class="module-desc">${m.desc}</p>
+      <div class="module-toggle">View all lessons <span class="arrow">→</span></div>
+      <div class="module-lesson-list"><ol>
+        ${m.lessons.map((l,i)=>{
+          const num = startLesson+i;
+          return `<li class="lesson-item" data-lesson="${num}">
+            <div style="flex:1;">
+              <div class="lesson-item-head"><b>${String(num).padStart(3,'0')}</b> ${l.t}</div>
+              <div class="lesson-item-truth">${l.truth}</div>
+            </div>
+            <div class="lesson-check" data-lesson-check="${num}">✓</div>
+          </li>`;
+        }).join('')}
+      </ol></div>
+    `;
+    card.querySelector('.module-top').addEventListener('click', () => card.classList.toggle('open'));
+    card.querySelector('h3').addEventListener('click', () => card.classList.toggle('open'));
+    card.querySelector('.module-toggle').addEventListener('click', () => card.classList.toggle('open'));
+    grid.appendChild(card);
+  });
+
+  grid.querySelectorAll('.lesson-check').forEach(chk => {
+    chk.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const lessonNum = parseInt(chk.getAttribute('data-lesson-check'), 10);
+      chk.classList.toggle('done');
+      if (sb && currentUser) {
+        if (chk.classList.contains('done')) {
+          await sb.from('lesson_progress').upsert({ user_id: currentUser.id, lesson_number: lessonNum }, { onConflict: 'user_id,lesson_number' });
+        } else {
+          await sb.from('lesson_progress').delete().eq('user_id', currentUser.id).eq('lesson_number', lessonNum);
+        }
+        loadOverallProgress();
+        checkForNewBadges();
+      }
+    });
+  });
+
+  if (sb && currentUser) {
+    sb.from('lesson_progress').select('lesson_number').eq('user_id', currentUser.id).then(({ data }) => {
+      (data || []).forEach(row => {
+        const el = grid.querySelector(`.lesson-check[data-lesson-check="${row.lesson_number}"]`);
+        if (el) el.classList.add('done');
+      });
+    });
+  }
+
+  const searchInput = document.getElementById('lessonSearch');
+  const searchCount = document.getElementById('searchCount');
+  searchInput.addEventListener('input', function(){
+    const q = this.value.trim().toLowerCase();
+    let visibleCount = 0;
+    document.querySelectorAll('.module-card').forEach(card => {
+      let moduleHasMatch = false;
+      card.querySelectorAll('.lesson-item').forEach(item => {
+        const match = q === '' || item.textContent.toLowerCase().includes(q);
+        item.classList.toggle('hidden', !match);
+        if (match) { moduleHasMatch = true; visibleCount++; }
+      });
+      card.classList.toggle('hidden', !moduleHasMatch);
+      card.classList.toggle('open', q !== '' && moduleHasMatch);
+    });
+    searchCount.textContent = q === '' ? '200 lessons' : `${visibleCount} match${visibleCount===1?'':'es'}`;
+  });
+}
+
+// =====================================================================
+// AI ASSISTANT
+// =====================================================================
+const aiKnowledge = [
+  {keys:['price','pricing','charge','cost','how much'], reply:"Price on the value you deliver, not on what feels comfortable to say out loud (Business Truth #048). Work out your true cost per unit first, then set a margin that covers slow weeks.", cite:"Module 03 · Business Money, Lessons 44, 48, 51"},
+  {keys:['supplier','delivery','late','stock','inventory'], reply:"A reliable supplier is worth more than a slightly cheaper one. Have a backup supplier lined up and build a 3 to 5 day buffer into your promises to customers.", cite:"Module 07 · Operations, Lessons 154 to 156"},
+  {keys:['trust','online','customer','find me','visibility','google'], reply:"If people can't find you, they can't buy from you. Start with a correct Google Maps pin and a WhatsApp Business profile with real photos and hours.", cite:"Module 05 · Visibility, Lessons 96, 101, 105"},
+  {keys:['whatsapp','reply','slow','respond','message'], reply:"Speed of reply is a sales strategy, not an accident. Set up WhatsApp Business quick replies for your top five questions.", cite:"Module 04 · Customers & Sales, Lesson 82"},
+  {keys:['staff','employee','hire','hiring','team'], reply:"Hire slow, for attitude and trainability, not just for skill. Even one employee needs clear expectations written down.", cite:"Module 08 · Leadership & Growth, Lessons 161, 178"},
+  {keys:['profit','cash flow','money','revenue'], reply:"Revenue is everything that comes in. Profit is what's left after every cost is paid, including your own labour. Separate business and personal accounts.", cite:"Module 03 · Business Money, Lessons 41 to 43"},
+  {keys:['marketing','outreach','cold message','new customers','get more customers'], reply:"Never send a wall of text on WhatsApp, it kills the read rate. Break outreach into three short messages, 30 to 60 seconds apart: an honest opening question, a short explanation of what you offer, then a low pressure ask. On calls or in person, never pitch before you've listened, the sale follows the trust, not the other way around.", cite:"Marketing & Outreach Toolkit, Resource Library"},
+  {keys:['register','registration','tin','rgd','legal','licence','license','incorporate'], reply:"Get a Tax Identification Number first, for individuals this is simply the PIN on your Ghana Card. Reserve your business name and register with the Office of the Registrar of Companies, either online or in person, expect a fee around 100 to 120 cedis and a wait of a few days to a couple of weeks. A registered business can open a proper business bank account and access loans that an unregistered one can't.", cite:"Registering Your Business in Ghana, Resource Library"},
+];
+const aiMessages = document.getElementById('aiMessages');
+function aiAddMessage(role, html){
+  const wrap = document.createElement('div');
+  wrap.className = `ai-msg ${role}`;
+  wrap.innerHTML = `<div class="ai-msg-avatar">${role==='bot'?'AI':'You'}</div><div class="ai-msg-bubble">${html}</div>`;
+  aiMessages.appendChild(wrap);
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+}
+async function aiRespond(question){
+  const typing = document.createElement('div');
+  typing.className = 'ai-msg bot';
+  typing.innerHTML = `<div class="ai-msg-avatar">AI</div><div class="ai-msg-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
+  aiMessages.appendChild(typing);
+  aiMessages.scrollTop = aiMessages.scrollHeight;
+  setTimeout(async () => {
+    const qLower = question.toLowerCase();
+    const matched = aiKnowledge.find(k => k.keys.some(kw => qLower.includes(kw)));
+    if (!matched) {
+      typing.querySelector('.ai-msg-bubble').innerHTML = "That one isn't in what I've been trained on yet. I've posted it to the Q&amp;A hub so BYINFORGH or the community can answer it, and I'll learn from that answer too.";
+      if (sb && currentUser) await sb.from('qa_questions').insert({ user_id: currentUser.id, question, tag: 'Unanswered by AI' });
+    } else {
+      typing.querySelector('.ai-msg-bubble').innerHTML = matched.reply + `<span class="ai-msg-cite">Source: ${matched.cite}</span>`;
+    }
+    aiMessages.scrollTop = aiMessages.scrollHeight;
+  }, 900);
+}
+document.getElementById('aiForm').addEventListener('submit', function(e){
+  e.preventDefault();
+  const input = document.getElementById('aiInput');
+  const val = input.value.trim();
+  if (!val) return;
+  aiAddMessage('user', esc(val));
+  input.value = '';
+  aiRespond(val);
+});
+document.querySelectorAll('.ai-suggest-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const q = chip.getAttribute('data-q');
+    aiAddMessage('user', esc(q));
+    aiRespond(q);
+  });
+});
+
+document.getElementById('contributeForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const title = document.getElementById('contribTitle').value.trim();
+  const content = document.getElementById('contribContent').value.trim();
+  const statusEl = document.getElementById('contribStatus');
+  if (!title || !content) return;
+  if (!sb || !currentUser) { statusEl.textContent = 'Not connected.'; return; }
+  statusEl.textContent = 'Submitting...';
+  const { error } = await sb.from('ai_documents').insert({ user_id: currentUser.id, title, content, source: 'contributed' });
+  statusEl.textContent = error ? 'Something went wrong.' : 'Submitted for review, thank you.';
+  if (!error) this.reset();
+});
+
+// pending question from the landing page teaser, if any
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const pending = sessionStorage.getItem('byg_pending_question');
+    if (pending) {
+      sessionStorage.removeItem('byg_pending_question');
+      document.getElementById('ai-assistant').scrollIntoView({ behavior: 'smooth' });
+      setTimeout(() => { aiAddMessage('user', esc(pending)); aiRespond(pending); }, 600);
+    }
+  }, 800);
+});
+
+// =====================================================================
+// COMMUNITY
+// =====================================================================
+async function loadCommunity(){
+  const feed = document.getElementById('communityFeed');
+  if (!sb) return;
+  const { data: posts, error } = await sb.from('community_posts').select('*').order('created_at', { ascending: false }).limit(20);
+  if (error) { console.error(error); return; }
+  if (!posts || !posts.length) { feed.innerHTML = '<p style="color:var(--paper-dim);">No posts yet, be the first to share something.</p>'; return; }
+  const ids = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
+  const { data: profs } = await sb.from('public_profiles').select('id, name, business_name').in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000']);
+  const profMap = {};
+  (profs || []).forEach(p => profMap[p.id] = p);
+  feed.innerHTML = posts.map(p => {
+    const prof = profMap[p.user_id];
+    return `
+    <div class="comm-post">
+      <div class="comm-post-user">${esc(prof?.name || 'A member')}${prof?.business_name ? ' · ' + esc(prof.business_name) : ''}</div>
+      <p>${esc(p.content)}</p>
+    </div>`;
+  }).join('');
+}
+document.getElementById('postForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const content = document.getElementById('postContent').value.trim();
+  if (!content || !sb || !currentUser) return;
+  const { error } = await sb.from('community_posts').insert({ user_id: currentUser.id, content });
+  if (!error) { document.getElementById('postContent').value = ''; loadCommunity(); }
+});
+
+// =====================================================================
+// DIRECTORY
+// =====================================================================
+let directoryData = [];
+let activeCat = 'all';
+async function loadDirectory(){
+  if (!sb) return;
+  const { data, error } = await sb.from('public_profiles').select('*').not('sells', 'is', null).order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  const now = Date.now();
+  directoryData = (data || []).map(p => ({
+    name: p.business_name || p.name, cat: p.category, loc: p.location, landmark: p.landmark,
+    sells: p.sells, looking: p.looking_for, verified: p.verified, logo: p.logo_url,
+    online: p.last_seen && (now - new Date(p.last_seen).getTime()) < 5*60*1000,
+  }));
+  renderDirectory();
+}
+function renderDirectory(){
+  const grid = document.getElementById('directoryGrid');
+  const query = (document.getElementById('dirSearch').value || '').toLowerCase();
+  const filtered = directoryData
+    .filter(d => activeCat === 'all' || d.cat === activeCat)
+    .filter(d => `${d.name} ${d.cat} ${d.loc}`.toLowerCase().includes(query));
+  grid.innerHTML = filtered.map(d => `
+    <div class="dir-card">
+      <div class="dir-top">
+        <div class="dir-avatar${d.online ? ' online' : ''}">${d.logo ? `<img src="${esc(d.logo)}" alt="${esc(d.name)}">` : ''}</div>
+        ${d.verified ? '<span style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--lime);border:1px solid var(--lime);padding:3px 7px;border-radius:20px;">Verified</span>' : ''}
+      </div>
+      <h4>${esc(d.name)}</h4>
+      <div class="cat">${esc(d.cat || '')}</div>
+      <div class="loc">📍 ${esc(d.loc || '')}${d.landmark ? ', ' + esc(d.landmark) : ''}</div>
+      <div class="sells">${esc(d.sells || '')}</div>
+      ${d.looking ? `<div class="looking">Looking for: ${esc(d.looking)}</div>` : ''}
+    </div>
+  `).join('') || '<p style="color:var(--paper-dim);padding:20px;">No businesses match yet.</p>';
+}
+document.getElementById('dirSearch').addEventListener('input', renderDirectory);
+document.querySelectorAll('.dir-filter').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.dir-filter').forEach(b=>b.classList.remove('active'));
+    this.classList.add('active');
+    activeCat = this.getAttribute('data-cat');
+    renderDirectory();
+  });
+});
+
+// =====================================================================
+// ACCOUNTABILITY
+// =====================================================================
+const dayLabels = ['M','T','W','T','F','S','S'];
+function computeStreak(dates){
+  if (!dates.length) return 0;
+  const oneDay = 86400000;
+  let streak = 0;
+  let cursor = new Date(); cursor.setHours(0,0,0,0);
+  const todayStr = cursor.toISOString().slice(0,10);
+  const set = new Set(dates);
+  if (!set.has(todayStr)) cursor = new Date(cursor.getTime() - oneDay);
+  while (set.has(cursor.toISOString().slice(0,10))) { streak++; cursor = new Date(cursor.getTime() - oneDay); }
+  return streak;
+}
+async function renderAccountability(){
+  if (!sb || !currentUser) return;
+  const { data } = await sb.from('checkins').select('checkin_date').eq('user_id', currentUser.id).order('checkin_date', { ascending: false });
+  const dates = (data || []).map(r => r.checkin_date);
+  const streak = computeStreak(dates);
+  document.getElementById('streakNum').innerHTML = `${streak}<span> day streak</span>`;
+  const todayStr = new Date().toISOString().slice(0,10);
+  const checkedToday = dates.includes(todayStr);
+  document.getElementById('streakDays').innerHTML = dayLabels.map((d,i) => `<div class="streak-day${i < Math.min(streak,7) ? ' done' : ''}">${d}</div>`).join('');
+  const btn = document.getElementById('checkinBtn');
+  btn.disabled = checkedToday;
+  btn.textContent = checkedToday ? 'Checked in today' : 'Check in for today';
+  renderLeaderboard(leaderboardMode);
+}
+
+let leaderboardMode = 'streak';
+async function renderLeaderboard(mode){
+  leaderboardMode = mode || leaderboardMode;
+  const list = document.getElementById('leaderboardList');
+  list.innerHTML = '<p style="color:var(--paper-dim);font-size:13px;">Loading...</p>';
+
+  let ranked = [];
+  if (leaderboardMode === 'lessons') {
+    const { data } = await sb.from('lesson_progress').select('user_id').limit(5000);
+    const byUser = {};
+    (data || []).forEach(r => { byUser[r.user_id] = (byUser[r.user_id] || 0) + 1; });
+    ranked = Object.entries(byUser).map(([user_id, count]) => ({ user_id, value: count, label: `${count} lesson${count===1?'':'s'}` })).sort((a,b)=>b.value-a.value).slice(0,5);
+  } else {
+    const { data } = await sb.from('checkins').select('user_id, checkin_date').order('checkin_date', { ascending: false }).limit(3000);
+    const byUser = {};
+    (data || []).forEach(r => { (byUser[r.user_id] = byUser[r.user_id] || []).push(r.checkin_date); });
+    ranked = Object.entries(byUser).map(([user_id, dates]) => { const s = computeStreak(dates); return { user_id, value: s, label: `${s} day${s===1?'':'s'}` }; }).sort((a,b)=>b.value-a.value).slice(0,5);
+  }
+
+  if (!ranked.length) { list.innerHTML = '<p style="color:var(--paper-dim);font-size:13px;">Nobody yet, be the first.</p>'; return; }
+  const { data: profiles } = await sb.from('public_profiles').select('id, name, business_name, location').in('id', ranked.map(r=>r.user_id));
+  const map = {};
+  (profiles || []).forEach(p => map[p.id] = p);
+  list.innerHTML = ranked.map((r,i) => {
+    const p = map[r.user_id];
+    return `<div class="leader-row"><div class="leader-rank">${i+1}</div><div class="leader-name">${esc(p?.name || 'A member')}<small>${esc(p?.location || '')}</small></div><div class="leader-streak">${r.label}</div></div>`;
+  }).join('');
+}
+document.querySelectorAll('.lb-toggle-btn').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.lb-toggle-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    renderLeaderboard(this.getAttribute('data-mode'));
+  });
+});
+document.getElementById('checkinBtn').addEventListener('click', async function(){
+  if (!sb || !currentUser) return;
+  const todayStr = new Date().toISOString().slice(0,10);
+  const { error } = await sb.from('checkins').insert({ user_id: currentUser.id, checkin_date: todayStr });
+  if (error && !String(error.message).includes('duplicate')) { console.error(error); return; }
+  renderAccountability();
+  checkForNewBadges();
+});
+
+// =====================================================================
+// BADGES: computed client side from real activity, no separate table
+// needed. Recalculated whenever a lesson, check in, post, or win happens.
+// =====================================================================
+const badgeDefs = [
+  {id:'first_lesson', icon:'📘', title:'First Step', desc:'Complete 1 lesson', check:(s)=>s.lessons>=1},
+  {id:'ten_lessons', icon:'📗', title:'Getting Started', desc:'Complete 10 lessons', check:(s)=>s.lessons>=10},
+  {id:'fifty_lessons', icon:'📙', title:'Building Momentum', desc:'Complete 50 lessons', check:(s)=>s.lessons>=50},
+  {id:'hundred_lessons', icon:'📕', title:'Halfway There', desc:'Complete 100 lessons', check:(s)=>s.lessons>=100},
+  {id:'all_lessons', icon:'🎓', title:'Business Graduate', desc:'Complete all 200 lessons', check:(s)=>s.lessons>=200},
+  {id:'week_streak', icon:'🔥', title:'Week Warrior', desc:'7 day check in streak', check:(s)=>s.streak>=7},
+  {id:'month_streak', icon:'⚡', title:'Unstoppable', desc:'30 day check in streak', check:(s)=>s.streak>=30},
+  {id:'first_post', icon:'💬', title:'Speaking Up', desc:'Post in the community', check:(s)=>s.posts>=1},
+  {id:'active_voice', icon:'📣', title:'Voice of the Community', desc:'5 community posts', check:(s)=>s.posts>=5},
+  {id:'first_win', icon:'🏆', title:'First Win', desc:'Post a win', check:(s)=>s.wins>=1},
+  {id:'five_wins', icon:'🥇', title:'On a Roll', desc:'Post 5 wins', check:(s)=>s.wins>=5},
+  {id:'featured', icon:'⭐', title:'Featured', desc:'Get your spotlight approved', check:(s)=>s.spotlights>=1},
+];
+
+async function checkForNewBadges(){
+  if (!sb || !currentUser) return;
+  const [{ count: lessons }, { data: checkinRows }, { count: posts }, { count: wins }, { count: spotlights }] = await Promise.all([
+    sb.from('lesson_progress').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id),
+    sb.from('checkins').select('checkin_date').eq('user_id', currentUser.id).order('checkin_date', { ascending: false }),
+    sb.from('community_posts').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id),
+    sb.from('wins').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id),
+    sb.from('spotlights').select('*', { count: 'exact', head: true }).eq('user_id', currentUser.id).eq('status', 'approved'),
+  ]);
+  const streak = computeStreak((checkinRows || []).map(r => r.checkin_date));
+  const stats = { lessons: lessons || 0, streak, posts: posts || 0, wins: wins || 0, spotlights: spotlights || 0 };
+  const grid = document.getElementById('badgesGrid');
+  grid.innerHTML = badgeDefs.map(b => {
+    const earned = b.check(stats);
+    return `<div class="badge-card${earned ? ' earned' : ''}"><div class="badge-icon">${b.icon}</div><h5>${b.title}</h5><p>${b.desc}</p></div>`;
+  }).join('');
+}
+
+// =====================================================================
+// Q&A
+// =====================================================================
+async function loadQA(){
+  const feed = document.getElementById('qaFeed');
+  const { data, error } = await sb.from('qa_questions').select('*, qa_answers(*)').order('created_at', { ascending: false }).limit(20);
+  if (error) { console.error(error); return; }
+  if (!data || !data.length) { feed.innerHTML = '<p style="color:var(--paper-dim);padding:20px;">No questions yet, ask the first one above.</p>'; return; }
+  const ids = [...new Set(data.map(q => q.user_id).filter(Boolean))];
+  const { data: profs } = await sb.from('public_profiles').select('id, name').in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000']);
+  const profMap = {};
+  (profs || []).forEach(p => profMap[p.id] = p);
+  feed.innerHTML = '';
+  data.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'qa-card';
+    const answers = item.qa_answers || [];
+    const answersHtml = answers.length
+      ? answers.map(a => `<p>${esc(a.answer)}</p>`).join('')
+      : '<p>No answer yet.</p>';
+    const askerName = profMap[item.user_id]?.name || 'A member';
+    el.innerHTML = `
+      <div class="qa-q-row"><span class="qa-tag">${esc(askerName)}</span><span class="qa-replies">${answers.length} repl${answers.length===1?'y':'ies'}</span></div>
+      <div class="qa-q">${esc(item.question)}</div>
+      <div class="qa-a-toggle">Show answer →</div>
+      <div class="qa-a">${answersHtml}</div>
+    `;
+    el.querySelector('.qa-a-toggle').addEventListener('click', () => el.classList.toggle('open'));
+    feed.appendChild(el);
+  });
+}
+document.getElementById('qaForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const input = document.getElementById('qaInput');
+  const question = input.value.trim();
+  const statusEl = document.getElementById('qaStatus');
+  if (!question || !sb || !currentUser) return;
+  statusEl.textContent = 'Posting...';
+  const { error } = await sb.from('qa_questions').insert({ user_id: currentUser.id, question });
+  statusEl.textContent = error ? 'Something went wrong.' : 'Posted.';
+  if (!error) { input.value = ''; loadQA(); }
+});
+
+// =====================================================================
+// RESOURCES + EVENTS
+// =====================================================================
+async function loadResources(){
+  const grid = document.getElementById('resourceGrid');
+  const { data } = await sb.from('resources').select('*').order('created_at', { ascending: true });
+  grid.innerHTML = (data || []).map(r => `
+    <div class="resource-card">
+      <span class="resource-format">${esc(r.format || '')}</span>
+      <h4>${esc(r.title)}</h4>
+      <p>${esc(r.description || '')}</p>
+      ${r.file_url ? `<a href="${esc(r.file_url)}" class="resource-btn" target="_blank">Download →</a>` : `<span class="resource-btn" style="color:var(--paper-dim);">Coming soon</span>`}
+    </div>
+  `).join('');
+}
+async function loadEvents(){
+  const list = document.getElementById('eventsList');
+  const { data } = await sb.from('events').select('*').order('created_at', { ascending: true });
+  list.innerHTML = (data || []).map(ev => `
+    <div class="event-row">
+      <div class="event-day">${esc(ev.day_label)}<b>${esc(ev.title)}</b></div>
+      <div class="event-info"><h4>${esc(ev.title)}</h4><p>${esc(ev.description || '')}</p></div>
+      <div class="event-badge">${esc(ev.time_label)}</div>
+    </div>
+  `).join('');
+}
+
+// =====================================================================
+// BUSINESS SPOTLIGHT
+// =====================================================================
+function prefillSpotlightForm(){
+  if (!currentProfile) return;
+  document.getElementById('spName').value = currentProfile.business_name || '';
+  document.getElementById('spLocation').value = currentProfile.location || '';
+  document.getElementById('spWhat').value = currentProfile.sells || '';
+  document.getElementById('spPhone').value = currentProfile.phone || '';
+}
+
+async function loadSpotlights(){
+  prefillSpotlightForm();
+  const feed = document.getElementById('spotlightFeed');
+  const { data, error } = await sb.from('spotlights').select('*').eq('status', 'approved').order('created_at', { ascending: false }).limit(12);
+  if (error) { console.error(error); return; }
+  if (!data || !data.length) {
+    feed.innerHTML = '<p style="color:var(--paper-dim);padding:20px;grid-column:1/-1;">No spotlights published yet, submit yours above to be considered for the next feature.</p>';
+    return;
+  }
+  feed.innerHTML = data.map(s => `
+    <div class="spotlight-post">
+      <div class="spotlight-post-top"></div>
+      <div class="spotlight-post-body">
+        <div class="spotlight-post-photo">${s.photo_url ? `<img src="${esc(s.photo_url)}" alt="${esc(s.business_name)}">` : ''}</div>
+        <div>
+          <h4>${esc(s.business_name)}</h4>
+          <div class="loc">📍 ${esc(s.location)}</div>
+          <p><span class="label">What they do</span>${esc(s.what_they_do)}</p>
+          ${s.why_started ? `<p><span class="label">Why they started</span>${esc(s.why_started)}</p>` : ''}
+          ${s.what_makes_different ? `<p><span class="label">What makes them different</span>${esc(s.what_makes_different)}</p>` : ''}
+          ${s.phone ? `<p><span class="label">Contact</span>${esc(s.phone)}</p>` : ''}
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('spotlightForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const statusEl = document.getElementById('spotlightStatus');
+  if (!sb || !currentUser) return;
+  const business_name = document.getElementById('spName').value.trim();
+  const location = document.getElementById('spLocation').value.trim();
+  const what_they_do = document.getElementById('spWhat').value.trim();
+  if (!business_name || !location || !what_they_do) return;
+
+  statusEl.textContent = 'Submitting...';
+  let photo_url = null;
+  const photoFile = document.getElementById('spPhoto').files[0];
+  if (photoFile) {
+    statusEl.textContent = 'Uploading photo...';
+    const ext = photoFile.name.split('.').pop();
+    const path = `${currentUser.id}/spotlight-${Date.now()}.${ext}`;
+    const { error: uploadError } = await sb.storage.from('member-photos').upload(path, photoFile, { upsert: true });
+    if (!uploadError) {
+      const { data: publicUrlData } = sb.storage.from('member-photos').getPublicUrl(path);
+      photo_url = publicUrlData.publicUrl;
+    }
+  }
+
+  statusEl.textContent = 'Submitting...';
+  const { error } = await sb.from('spotlights').insert({
+    user_id: currentUser.id,
+    business_name, location, what_they_do,
+    why_started: document.getElementById('spWhy').value.trim() || null,
+    what_makes_different: document.getElementById('spDifferent').value.trim() || null,
+    phone: document.getElementById('spPhone').value.trim() || null,
+    photo_url,
+  });
+  statusEl.textContent = error ? 'Something went wrong, please try again.' : 'Submitted for review. BYINFORGH will feature approved spotlights here.';
+});
+
+// =====================================================================
+// WINS: bragging rights wall
+// =====================================================================
+async function loadWins(){
+  const feed = document.getElementById('winsFeed');
+  if (!sb) return;
+  const { data, error } = await sb.from('wins').select('*').order('created_at', { ascending: false }).limit(20);
+  if (error) { console.error(error); return; }
+  if (!data || !data.length) { feed.innerHTML = '<p style="color:var(--paper-dim);padding:20px;">No wins posted yet, be the first to share what worked.</p>'; return; }
+  const ids = [...new Set(data.map(w => w.user_id).filter(Boolean))];
+  const { data: profs } = await sb.from('public_profiles').select('id, name, business_name').in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000']);
+  const profMap = {};
+  (profs || []).forEach(p => profMap[p.id] = p);
+  feed.innerHTML = data.map(w => {
+    const prof = profMap[w.user_id];
+    return `
+      <div class="win-post">
+        <div class="win-badge-icon">🏆</div>
+        <div>
+          <div class="win-post-name">${esc(prof?.name || 'A member')}${prof?.business_name ? ' · ' + esc(prof.business_name) : ''}</div>
+          <div class="win-post-task">${esc(w.task)}</div>
+          <div class="win-post-result">${esc(w.result)}</div>
+          ${w.amount ? `<div class="win-post-amount">${esc(w.amount)}</div>` : ''}
+        </div>
+      </div>`;
+  }).join('');
+}
+document.getElementById('winForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const statusEl = document.getElementById('winStatus');
+  if (!sb || !currentUser) return;
+  const task = document.getElementById('winTask').value.trim();
+  const result = document.getElementById('winResult').value.trim();
+  const amount = document.getElementById('winAmount').value.trim() || null;
+  if (!task || !result) return;
+  statusEl.textContent = 'Posting...';
+  const { error } = await sb.from('wins').insert({ user_id: currentUser.id, task, result, amount });
+  statusEl.textContent = error ? 'Something went wrong, please try again.' : 'Posted. Nicely done.';
+  if (!error) { this.reset(); loadWins(); checkForNewBadges(); }
+});
+
+// =====================================================================
+// TESTIMONIALS
+// =====================================================================
+let selectedRating = 0;
+document.querySelectorAll('.star-btn').forEach(star => {
+  star.addEventListener('click', function(){
+    selectedRating = parseInt(this.getAttribute('data-star'), 10);
+    document.querySelectorAll('.star-btn').forEach(s => {
+      s.classList.toggle('active', parseInt(s.getAttribute('data-star'), 10) <= selectedRating);
+    });
+  });
+});
+async function loadTestimonials(){
+  const feed = document.getElementById('testimonialFeed');
+  if (!sb || !feed) return;
+  const { data, error } = await sb.from('testimonials').select('content, rating').eq('status', 'approved').order('created_at', { ascending: false }).limit(9);
+  if (error) { console.error(error); return; }
+  if (!data || !data.length) { feed.innerHTML = '<p style="color:var(--paper-dim);padding:20px;grid-column:1/-1;">No published reviews yet, yours could be the first.</p>'; return; }
+  feed.innerHTML = data.map(t => `
+    <div class="testimonial-card">
+      <div class="testimonial-stars">${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}</div>
+      <p>${esc(t.content)}</p>
+      <div class="who">Verified member</div>
+    </div>
+  `).join('');
+}
+document.getElementById('testimonialForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const statusEl = document.getElementById('testimonialStatus');
+  if (!sb || !currentUser) return;
+  const content = document.getElementById('testimonialContent').value.trim();
+  if (!content) return;
+  if (!selectedRating) { statusEl.textContent = 'Pick a star rating first.'; return; }
+  statusEl.textContent = 'Submitting...';
+  const { error } = await sb.from('testimonials').insert({ user_id: currentUser.id, content, rating: selectedRating });
+  statusEl.textContent = error ? 'Something went wrong, please try again.' : 'Thank you, submitted for review.';
+  if (!error) { this.reset(); selectedRating = 0; document.querySelectorAll('.star-btn').forEach(s => s.classList.remove('active')); }
+});
+
+// =====================================================================
+// SUGGESTIONS
+// =====================================================================
+document.getElementById('suggestionForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const statusEl = document.getElementById('suggestionStatus');
+  const input = document.getElementById('suggestionInput');
+  if (!sb || !currentUser) return;
+  const content = input.value.trim();
+  if (!content) return;
+  statusEl.textContent = 'Sending...';
+  const { error } = await sb.from('suggestions').insert({ user_id: currentUser.id, content });
+  statusEl.textContent = error ? 'Something went wrong.' : 'Thanks, BYINFORGH will see this.';
+  if (!error) input.value = '';
+});
+</script>
+
+</body>
+</html>
