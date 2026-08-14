@@ -412,11 +412,135 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
     .accountability-grid{grid-template-columns:1fr;}
     .event-row{grid-template-columns:1fr;gap:8px;}
   }
+
+  /* ============ shared: pill toggle, buttons, badges ============ */
+  .pill-toggle{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);margin-bottom:24px;flex-wrap:wrap;}
+  .pill-toggle button{background:var(--ink);border:none;color:var(--paper-dim);padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;}
+  .pill-toggle button.active{background:var(--lime);color:var(--ink);font-weight:700;}
+  .pill-toggle button .count-badge{margin-left:6px;opacity:.7;}
+  .btn-primary{background:var(--lime);color:var(--ink);border:none;padding:10px 16px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+  .btn-primary:disabled{background:var(--panel-2);color:var(--paper-dim);cursor:default;}
+  .btn-ghost{background:transparent;color:var(--paper-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+  .btn-ghost:hover{border-color:var(--paper-dim);color:var(--paper);}
+  .btn-danger{background:transparent;color:var(--m7);border:1px solid var(--m7);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+  .empty-note{color:var(--paper-dim);padding:24px;font-size:13px;border:1px dashed var(--line);text-align:center;}
+
+  /* ============ directory card actions ============ */
+  .dir-actions{display:flex;gap:8px;margin-top:14px;}
+  .dir-connect-btn{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:9px 10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;text-transform:uppercase;cursor:pointer;}
+  .dir-connect-btn:hover{border-color:var(--lime);color:var(--lime);}
+  .dir-report-btn{background:transparent;border:1px solid var(--line);color:var(--paper-dim);padding:9px 10px;cursor:pointer;font-size:12px;}
+  .dir-report-btn:hover{border-color:var(--m7);color:var(--m7);}
+
+  /* ============ connections ============ */
+  .conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .conn-card{background:var(--ink);padding:20px;display:flex;flex-direction:column;gap:10px;}
+  .conn-card-top{display:flex;gap:12px;align-items:center;}
+  .conn-avatar{width:38px;height:38px;border-radius:50%;background:var(--panel-2);border:1px solid var(--line);flex-shrink:0;overflow:hidden;}
+  .conn-avatar img{width:100%;height:100%;object-fit:cover;}
+  .conn-name{font-size:13.5px;font-weight:700;}
+  .conn-meta{font-size:11px;color:var(--paper-dim);}
+  .conn-score{display:inline-block;font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:2px 8px;border-radius:20px;width:fit-content;}
+  .conn-why{font-size:11.5px;color:var(--lime-dim);line-height:1.5;}
+  .conn-actions{display:flex;gap:8px;margin-top:auto;}
+  .conn-actions button{flex:1;}
+  @media(max-width:860px){.conn-grid{grid-template-columns:1fr;}}
+
+  /* ============ groups ============ */
+  .groups-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+  .groups-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+  .group-card{background:var(--ink);padding:22px;display:flex;flex-direction:column;gap:10px;cursor:pointer;}
+  .group-card:hover{background:var(--panel-2);}
+  .group-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .group-card h4{font-size:15px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin:0;}
+  .group-lock{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;color:var(--paper-dim);border:1px solid var(--line);padding:3px 8px;border-radius:20px;white-space:nowrap;}
+  .group-card p{font-size:12.5px;color:var(--paper-dim);line-height:1.5;margin:0;}
+  .group-card-meta{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--lime-dim);}
+  @media(max-width:860px){.groups-grid{grid-template-columns:1fr;}}
+
+  .group-create-form{border:1px solid var(--line);background:var(--panel-2);padding:22px;margin-bottom:28px;display:none;}
+  .group-create-form.open{display:block;}
+  .checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+  .checkbox-row label{font-size:12.5px;color:var(--paper-dim);}
+
+  .group-detail{display:none;border:1px solid var(--line);background:var(--ink);}
+  .group-detail.open{display:block;}
+  .group-detail-head{padding:22px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  .group-detail-head h3{font-size:20px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin:0 0 6px;}
+  .group-detail-head p{font-size:12.5px;color:var(--paper-dim);margin:0;max-width:480px;}
+  .group-detail-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .group-back-btn{background:none;border:none;color:var(--paper-dim);font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;cursor:pointer;padding:0;margin-bottom:14px;}
+  .group-body{display:grid;grid-template-columns:1fr 260px;}
+  @media(max-width:860px){.group-body{grid-template-columns:1fr;}}
+  .group-chat-col{padding:20px 26px;border-right:1px solid var(--line);}
+  .group-chat-feed{display:flex;flex-direction:column;gap:12px;height:340px;overflow-y:auto;margin-bottom:14px;padding-right:6px;}
+  .group-msg{max-width:80%;}
+  .group-msg-name{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--paper-dim);margin-bottom:3px;}
+  .group-msg-body{background:var(--panel-2);border:1px solid var(--line);padding:10px 13px;font-size:13px;line-height:1.5;border-radius:2px;}
+  .group-chat-composer{display:flex;gap:8px;}
+  .group-chat-composer input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:11px 13px;font-family:'Archivo',sans-serif;font-size:13px;outline:none;}
+  .group-side-col{padding:20px;}
+  .group-side-label{font-family:'JetBrains Mono',monospace;font-size:10px;text-transform:uppercase;color:var(--paper-dim);margin-bottom:12px;}
+  .group-member-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:12.5px;border-top:1px solid var(--line);}
+  .group-member-row:first-child{border-top:none;}
+  .group-member-admin{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--gold);}
+  .group-pending-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:12px;border-top:1px solid var(--line);}
+  .group-pending-row button{font-size:9.5px;padding:5px 8px;}
+
+  /* ============ messages ============ */
+  .messages-shell{display:grid;grid-template-columns:280px 1fr;border:1px solid var(--line);background:var(--ink);min-height:480px;}
+  @media(max-width:860px){.messages-shell{grid-template-columns:1fr;}}
+  .convo-list{border-right:1px solid var(--line);}
+  @media(max-width:860px){.convo-list{border-right:none;border-bottom:1px solid var(--line);}}
+  .convo-row{display:flex;gap:10px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;}
+  .convo-row:hover,.convo-row.active{background:var(--panel-2);}
+  .convo-row .conn-avatar{position:relative;}
+  .convo-name{font-size:13px;font-weight:700;}
+  .convo-preview{font-size:11px;color:var(--paper-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;}
+  .convo-unread{width:8px;height:8px;border-radius:50%;background:var(--lime);margin-left:auto;flex-shrink:0;}
+  .thread-col{display:flex;flex-direction:column;}
+  .thread-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+  .thread-head-name{font-size:14px;font-weight:700;}
+  .thread-feed{flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:10px;min-height:340px;max-height:420px;overflow-y:auto;}
+  .thread-msg{max-width:65%;padding:10px 13px;border-radius:2px;font-size:13px;line-height:1.5;}
+  .thread-msg.mine{align-self:flex-end;background:rgba(159,232,112,0.14);border:1px solid var(--lime-dim);}
+  .thread-msg.theirs{align-self:flex-start;background:var(--panel-2);border:1px solid var(--line);}
+  .thread-msg-time{font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--paper-dim);margin-top:4px;}
+  .thread-composer{display:flex;gap:8px;padding:16px 22px;border-top:1px solid var(--line);}
+  .thread-composer input{flex:1;background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:11px 13px;font-family:'Archivo',sans-serif;font-size:13px;outline:none;}
+  .thread-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--paper-dim);font-size:13px;padding:40px;text-align:center;}
+
+  /* ============ report modal ============ */
+  .modal-overlay{position:fixed;inset:0;background:rgba(11,15,12,0.85);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:var(--panel);border:1px solid var(--line);padding:28px;max-width:420px;width:100%;}
+  .modal-box h4{font-size:16px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin:0 0 6px;}
+  .modal-box p{font-size:12.5px;color:var(--paper-dim);margin:0 0 18px;}
+  .modal-actions{display:flex;gap:10px;margin-top:18px;}
+  .modal-actions button{flex:1;}
+  select.field-select{background:var(--panel-2);border:1px solid var(--line);color:var(--paper);padding:12px 14px;font-family:'Archivo',sans-serif;font-size:13.5px;outline:none;border-radius:2px;width:100%;}
+
+  /* ============ banned gate ============ */
+  .banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(224,80,63,0.06);padding:44px 36px;}
+  .banned-gate h2{font-family:'Archivo Black',sans-serif;font-size:24px;margin-bottom:14px;}
+  .banned-gate p{color:var(--paper-dim);font-size:14px;line-height:1.6;}
+
+  /* ============ inline safety notice ============ */
+  .safety-notice{border:1px solid var(--line);background:var(--panel-2);padding:14px 18px;font-size:11.5px;color:var(--paper-dim);line-height:1.6;margin-bottom:20px;}
+  .safety-notice b{color:var(--paper);}
+  .filter-warning{color:var(--m7);font-size:11.5px;margin-top:6px;display:none;}
+  .filter-warning.show{display:block;}
 </style>
 </head>
 <body>
 
 <div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
 
 <div id="appShell" style="display:none;">
 
@@ -429,6 +553,9 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
       <a href="#ai-assistant">AI</a>
       <a href="#community">Community</a>
       <a href="#directory">Directory</a>
+      <a href="#connections">Connections</a>
+      <a href="#groups">Groups</a>
+      <a href="#messages">Messages</a>
       <a href="#accountability">Streak</a>
       <a href="#wins">Wins</a>
       <a href="#qa">Q&amp;A</a>
@@ -578,6 +705,135 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
     <div class="directory-grid" id="directoryGrid"></div>
   </div>
 </section>
+
+<section id="connections">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Your network</span>
+      <h2>Build real connections, not just contacts.</h2>
+      <p>Connect with other business owners here. Once you're connected, you can message each other directly.</p>
+    </div>
+    <div class="pill-toggle" id="connTabs">
+      <button class="active" data-tab="suggested">Suggested</button>
+      <button data-tab="accepted">My Connections <span class="count-badge" id="connAcceptedCount"></span></button>
+      <button data-tab="incoming">Requests <span class="count-badge" id="connIncomingCount"></span></button>
+      <button data-tab="outgoing">Sent</button>
+    </div>
+    <div class="conn-grid" id="connGrid"></div>
+  </div>
+</section>
+
+<section id="groups">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Business groups</span>
+      <h2>Join a room built around what you do.</h2>
+      <p>Group chats for business, nothing else. Join a group, leave whenever you like, download the conversation if you need it later.</p>
+    </div>
+    <div class="groups-toolbar">
+      <div class="pill-toggle" id="groupTabs" style="margin-bottom:0;">
+        <button class="active" data-tab="all">All Groups</button>
+        <button data-tab="mine">My Groups</button>
+      </div>
+      <button class="btn-primary" id="groupCreateToggle">+ Create a group</button>
+    </div>
+    <form class="group-create-form" id="groupCreateForm">
+      <div class="field">
+        <label>Group name</label>
+        <input type="text" id="grpName" placeholder="e.g. Fashion &amp; Textile Owners Accra" required maxlength="80">
+      </div>
+      <div class="field">
+        <label>What's it for</label>
+        <textarea id="grpDesc" rows="2" placeholder="What should members expect in here?"></textarea>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <input type="text" id="grpCategory" placeholder="e.g. Fashion, Food, Funding, Export">
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="grpPrivate">
+        <label for="grpPrivate">Private — new members must be approved to join</label>
+      </div>
+      <button type="submit" class="btn-primary">Create group</button>
+      <div id="groupCreateStatus" style="margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--lime);"></div>
+    </form>
+    <div class="groups-grid" id="groupsGrid"></div>
+
+    <div class="group-detail" id="groupDetail">
+      <div class="wrap" style="padding:20px 0 0;">
+        <button class="group-back-btn" id="groupBackBtn">← Back to all groups</button>
+      </div>
+      <div class="group-detail-head">
+        <div>
+          <h3 id="grpDetailName"></h3>
+          <p id="grpDetailDesc"></p>
+        </div>
+        <div class="group-detail-actions" id="grpDetailActions"></div>
+      </div>
+      <div class="group-body">
+        <div class="group-chat-col">
+          <div class="group-chat-feed" id="grpChatFeed"></div>
+          <div class="group-chat-composer">
+            <input type="text" id="grpChatInput" placeholder="Message the group about business...">
+            <button class="btn-primary" id="grpChatSend">Send</button>
+          </div>
+          <div class="filter-warning" id="grpFilterWarning">Keep it respectful — no foul language, threats, or harassment. Rewrite your message.</div>
+        </div>
+        <div class="group-side-col">
+          <div class="group-side-label">Members</div>
+          <div id="grpMembersList"></div>
+          <div id="grpPendingWrap" style="display:none;margin-top:18px;">
+            <div class="group-side-label">Join requests</div>
+            <div id="grpPendingList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="messages">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Direct messages</span>
+      <h2>Talk directly with your connections.</h2>
+      <p>You can only message people you're connected with — this keeps messaging for real business relationships, not strangers.</p>
+    </div>
+    <div class="safety-notice"><b>Keep it respectful.</b> No foul language, aggressive behaviour, or intimidation. Members who break this get a strike — three strikes and the account is suspended. Use the ⚑ button to report anything that crosses the line.</div>
+    <div class="messages-shell">
+      <div class="convo-list" id="convoList"></div>
+      <div class="thread-col" id="threadCol">
+        <div class="thread-empty">Pick a connection on the left to start messaging.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box">
+    <h4>Report this member</h4>
+    <p id="reportModalTarget">Reports are reviewed by BYINFORGH. Repeated violations lead to a suspension.</p>
+    <div class="field">
+      <label>Reason</label>
+      <select class="field-select" id="reportReason">
+        <option value="foul_language">Foul language</option>
+        <option value="harassment_or_threats">Harassment, aggression, or threats</option>
+        <option value="spam">Spam</option>
+        <option value="scam_or_fraud">Scam or fraud</option>
+        <option value="impersonation">Impersonation</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Details (optional)</label>
+      <textarea id="reportDetails" rows="3" placeholder="Anything that helps us understand what happened"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="reportCancelBtn" type="button">Cancel</button>
+      <button class="btn-danger" id="reportSubmitBtn" type="button">Submit report</button>
+    </div>
+  </div>
+</div>
 
 <section id="accountability">
   <div class="wrap">
@@ -872,6 +1128,13 @@ async function initApp(){
   currentUser = session.user;
   currentProfile = profile;
 
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
   document.getElementById('topbarName').innerHTML = `${esc(profile.name)}<small>${esc(profile.business_name || profile.category || '')}</small>`;
   document.getElementById('welcomeName').textContent = `Welcome back, ${profile.name.split(' ')[0]}`;
 
@@ -898,6 +1161,8 @@ async function initApp(){
   loadTestimonials();
   checkForNewBadges();
   initStartHereBanner();
+  loadConnections();
+  loadGroups();
 }
 window.addEventListener('load', () => setTimeout(initApp, 50));
 
@@ -1164,7 +1429,7 @@ async function loadDirectory(){
   if (error) { console.error(error); return; }
   const now = Date.now();
   directoryData = (data || []).map(p => ({
-    name: p.business_name || p.name, cat: p.category, loc: p.location, landmark: p.landmark,
+    id: p.id, name: p.business_name || p.name, cat: p.category, loc: p.location, landmark: p.landmark,
     sells: p.sells, looking: p.looking_for, verified: p.verified, logo: p.logo_url,
     online: p.last_seen && (now - new Date(p.last_seen).getTime()) < 5*60*1000,
   }));
@@ -1187,6 +1452,11 @@ function renderDirectory(){
       <div class="loc">📍 ${esc(d.loc || '')}${d.landmark ? ', ' + esc(d.landmark) : ''}</div>
       <div class="sells">${esc(d.sells || '')}</div>
       ${d.looking ? `<div class="looking">Looking for: ${esc(d.looking)}</div>` : ''}
+      ${d.id && d.id !== currentUser?.id ? `
+      <div class="dir-actions">
+        <button class="dir-connect-btn" data-id="${esc(d.id)}">${connectionStatusWith(d.id) === 'accepted' ? 'Message' : connectionStatusWith(d.id) === 'pending' ? 'Pending' : 'Connect'}</button>
+        <button class="dir-report-btn" data-id="${esc(d.id)}" data-name="${esc(d.name)}" title="Report">⚑</button>
+      </div>` : ''}
     </div>
   `).join('') || '<p style="color:var(--paper-dim);padding:20px;">No businesses match yet.</p>';
 }
@@ -1549,6 +1819,516 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
   statusEl.textContent = error ? 'Something went wrong.' : 'Thanks, BYINFORGH will see this.';
   if (!error) input.value = '';
 });
+
+// =====================================================================
+// RESPECT FILTER
+// A first line of defense, not a full moderation system: blocks the
+// most obvious foul language, threats, and intimidation client-side
+// before a message is even sent. It cannot catch everything, which is
+// why every message also has a Report button behind it and the 3
+// strike system behind that. Kept as a plain word list on purpose, so
+// it's easy for you to extend later without touching any other code.
+// =====================================================================
+const FORBIDDEN_TERMS = [
+  'fuck','fucking','fucker','shit','bitch','asshole','bastard','cunt','dick','pussy','whore','slut',
+  'nigger','nigga','faggot','retard','stupid idiot',
+  'kill you','i will kill','i will hurt you','i will beat you','i will deal with you','watch your back',
+  'you will regret','i know where you live','come and die','i go kill you','i go beat you','i go deal with you'
+];
+function hasForbiddenLanguage(text){
+  const t = (text || '').toLowerCase();
+  return FORBIDDEN_TERMS.some(term => t.includes(term));
+}
+
+// =====================================================================
+// REPORTING
+// =====================================================================
+let reportContext = null;
+function openReportModal(reportedUserId, reportedName, contextType, contextId){
+  reportContext = { reportedUserId, contextType, contextId: contextId || null };
+  document.getElementById('reportModalTarget').textContent = `Reporting ${reportedName || 'this member'}. Reviewed by BYINFORGH. Repeated violations lead to a suspension.`;
+  document.getElementById('reportModal').classList.add('open');
+}
+document.getElementById('reportCancelBtn').addEventListener('click', () => {
+  document.getElementById('reportModal').classList.remove('open');
+  reportContext = null;
+});
+document.getElementById('reportSubmitBtn').addEventListener('click', async () => {
+  if (!sb || !currentUser || !reportContext) return;
+  const reason = document.getElementById('reportReason').value;
+  const details = document.getElementById('reportDetails').value.trim();
+  const { error } = await sb.from('reports').insert({
+    reporter_id: currentUser.id,
+    reported_user_id: reportContext.reportedUserId,
+    context_type: reportContext.contextType,
+    context_id: reportContext.contextId,
+    reason, details: details || null,
+  });
+  document.getElementById('reportModal').classList.remove('open');
+  document.getElementById('reportDetails').value = '';
+  reportContext = null;
+  alert(error ? 'Could not submit the report, please try again.' : 'Report submitted. BYINFORGH will review it.');
+});
+
+// =====================================================================
+// CONNECTIONS
+// =====================================================================
+let allConnections = [];
+let profileDirectory = {}; // id -> {name, business_name, category, location, sells, looking_for, logo_url}
+let activeConnTab = 'suggested';
+
+function connectionStatusWith(otherId){
+  const c = allConnections.find(c => c.requester_id === otherId || c.addressee_id === otherId);
+  if (!c) return 'none';
+  if (c.status === 'accepted') return 'accepted';
+  if (c.status === 'pending') return 'pending';
+  return 'none';
+}
+function connectionRowWith(otherId){
+  return allConnections.find(c => c.requester_id === otherId || c.addressee_id === otherId) || null;
+}
+
+async function loadConnections(){
+  if (!sb || !currentUser) return;
+  const [{ data: profiles }, { data: conns }] = await Promise.all([
+    sb.from('public_profiles').select('*'),
+    sb.from('connections').select('*').or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`),
+  ]);
+  profileDirectory = {};
+  (profiles || []).forEach(p => { profileDirectory[p.id] = p; });
+  allConnections = conns || [];
+  renderConnections();
+  renderDirectory(); // refresh Connect/Message/Pending state on directory cards
+  renderConversationList();
+}
+
+function computeSuggestedConnections(){
+  const mine = currentProfile || {};
+  const connectedOrPendingIds = new Set(
+    allConnections.map(c => c.requester_id === currentUser.id ? c.addressee_id : c.requester_id)
+  );
+  const mySells = (mine.sells || '').toLowerCase();
+  const myLooking = (mine.looking_for || '').toLowerCase();
+  const scored = Object.values(profileDirectory)
+    .filter(p => p.id !== currentUser.id && !connectedOrPendingIds.has(p.id) && p.sells)
+    .map(p => {
+      let score = 0, reasons = [];
+      if (p.category && mine.category && p.category === mine.category) { score += 3; reasons.push(`Same category: ${p.category}`); }
+      if (p.location && mine.location && p.location.toLowerCase() === mine.location.toLowerCase()) { score += 2; reasons.push(`Also based in ${p.location}`); }
+      const theirLooking = (p.looking_for || '').toLowerCase();
+      const theirSells = (p.sells || '').toLowerCase();
+      if (mySells && theirLooking && theirLooking.split(/\W+/).some(w => w.length > 3 && mySells.includes(w))) { score += 3; reasons.push('They may be looking for what you sell'); }
+      if (myLooking && theirSells && theirSells.split(/\W+/).some(w => w.length > 3 && myLooking.includes(w))) { score += 3; reasons.push('They may sell what you\'re looking for'); }
+      if (!reasons.length) { score += 1; reasons.push('New in the directory'); }
+      return { p, score, reason: reasons[0] };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 12);
+  return scored;
+}
+
+function renderConnections(){
+  document.getElementById('connAcceptedCount').textContent = allConnections.filter(c => c.status === 'accepted').length || '';
+  document.getElementById('connIncomingCount').textContent = allConnections.filter(c => c.status === 'pending' && c.addressee_id === currentUser.id).length || '';
+
+  const grid = document.getElementById('connGrid');
+  let items = [];
+
+  if (activeConnTab === 'suggested') {
+    items = computeSuggestedConnections().map(({ p, reason }) => `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}${p.location ? ' · ' + esc(p.location) : ''}</div></div>
+        </div>
+        <div class="conn-why">${esc(reason)}</div>
+        <div class="conn-actions"><button class="btn-primary conn-request-btn" data-id="${esc(p.id)}">Connect</button></div>
+      </div>`).join('') || '<p class="empty-note">No suggestions yet, more will appear as more members join.</p>';
+  } else if (activeConnTab === 'accepted') {
+    items = allConnections.filter(c => c.status === 'accepted').map(c => {
+      const otherId = c.requester_id === currentUser.id ? c.addressee_id : c.requester_id;
+      const p = profileDirectory[otherId]; if (!p) return '';
+      return `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}</div></div>
+        </div>
+        <div class="conn-actions">
+          <button class="btn-primary conn-message-btn" data-id="${esc(otherId)}">Message</button>
+          <button class="btn-ghost conn-remove-btn" data-id="${esc(c.id)}">Remove</button>
+        </div>
+      </div>`;
+    }).join('') || '<p class="empty-note">No connections yet, try Suggested to find your first ones.</p>';
+  } else if (activeConnTab === 'incoming') {
+    items = allConnections.filter(c => c.status === 'pending' && c.addressee_id === currentUser.id).map(c => {
+      const p = profileDirectory[c.requester_id]; if (!p) return '';
+      return `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">wants to connect</div></div>
+        </div>
+        <div class="conn-actions">
+          <button class="btn-primary conn-accept-btn" data-id="${esc(c.id)}">Accept</button>
+          <button class="btn-ghost conn-decline-btn" data-id="${esc(c.id)}">Decline</button>
+        </div>
+      </div>`;
+    }).join('') || '<p class="empty-note">No pending requests.</p>';
+  } else if (activeConnTab === 'outgoing') {
+    items = allConnections.filter(c => c.status === 'pending' && c.requester_id === currentUser.id).map(c => {
+      const p = profileDirectory[c.addressee_id]; if (!p) return '';
+      return `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">Request sent, awaiting reply</div></div>
+        </div>
+        <div class="conn-actions"><button class="btn-ghost conn-remove-btn" data-id="${esc(c.id)}">Cancel</button></div>
+      </div>`;
+    }).join('') || '<p class="empty-note">No outstanding requests.</p>';
+  }
+  grid.innerHTML = items;
+}
+
+document.querySelectorAll('#connTabs button').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#connTabs button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeConnTab = this.getAttribute('data-tab');
+    renderConnections();
+  });
+});
+
+document.getElementById('connGrid').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button');
+  if (!btn || !sb || !currentUser) return;
+  if (btn.classList.contains('conn-request-btn')) {
+    btn.disabled = true; btn.textContent = 'Sending...';
+    const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: btn.dataset.id, status: 'pending' });
+    if (error) { btn.disabled = false; btn.textContent = 'Connect'; alert('Could not send request.'); }
+    else loadConnections();
+  } else if (btn.classList.contains('conn-accept-btn')) {
+    await sb.from('connections').update({ status: 'accepted', responded_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadConnections();
+  } else if (btn.classList.contains('conn-decline-btn')) {
+    await sb.from('connections').update({ status: 'declined', responded_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadConnections();
+  } else if (btn.classList.contains('conn-remove-btn')) {
+    await sb.from('connections').update({ status: 'removed', responded_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadConnections();
+  } else if (btn.classList.contains('conn-message-btn')) {
+    location.hash = 'messages';
+    openConversation(btn.dataset.id);
+  }
+});
+
+// Directory card actions (Connect / Message / Pending / Report)
+document.getElementById('directoryGrid').addEventListener('click', async (e) => {
+  const connBtn = e.target.closest('.dir-connect-btn');
+  const reportBtn = e.target.closest('.dir-report-btn');
+  if (connBtn && sb && currentUser) {
+    const otherId = connBtn.dataset.id;
+    const status = connectionStatusWith(otherId);
+    if (status === 'accepted') { location.hash = 'messages'; openConversation(otherId); }
+    else if (status === 'none') {
+      connBtn.disabled = true; connBtn.textContent = 'Sending...';
+      const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: otherId, status: 'pending' });
+      if (!error) loadConnections(); else { connBtn.disabled = false; connBtn.textContent = 'Connect'; }
+    }
+  } else if (reportBtn) {
+    openReportModal(reportBtn.dataset.id, reportBtn.dataset.name, 'profile', null);
+  }
+});
+
+// =====================================================================
+// MESSAGES
+// =====================================================================
+let activeConvoUserId = null;
+let dmChannel = null;
+
+function renderConversationList(){
+  const list = document.getElementById('convoList');
+  const accepted = allConnections.filter(c => c.status === 'accepted');
+  if (!accepted.length) { list.innerHTML = '<p class="empty-note" style="margin:16px;">Connect with someone first, then message them here.</p>'; return; }
+  list.innerHTML = accepted.map(c => {
+    const otherId = c.requester_id === currentUser.id ? c.addressee_id : c.requester_id;
+    const p = profileDirectory[otherId];
+    if (!p) return '';
+    return `
+    <div class="convo-row${activeConvoUserId === otherId ? ' active' : ''}" data-id="${esc(otherId)}">
+      <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+      <div style="min-width:0;">
+        <div class="convo-name">${esc(p.business_name || p.name)}</div>
+        <div class="convo-preview">${esc(p.category || '')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+document.getElementById('convoList').addEventListener('click', (e) => {
+  const row = e.target.closest('.convo-row');
+  if (row) openConversation(row.dataset.id);
+});
+
+async function openConversation(otherId){
+  activeConvoUserId = otherId;
+  renderConversationList();
+  const p = profileDirectory[otherId];
+  const col = document.getElementById('threadCol');
+  col.innerHTML = `
+    <div class="thread-head">
+      <div class="thread-head-name">${esc(p ? (p.business_name || p.name) : 'Member')}</div>
+      <button class="dir-report-btn" id="threadReportBtn" title="Report">⚑</button>
+    </div>
+    <div class="thread-feed" id="threadFeed"></div>
+    <div class="thread-composer">
+      <input type="text" id="threadInput" placeholder="Write a message...">
+      <button class="btn-primary" id="threadSendBtn">Send</button>
+    </div>
+    <div class="filter-warning" id="threadFilterWarning">Keep it respectful — no foul language, threats, or harassment. Rewrite your message.</div>
+  `;
+  document.getElementById('threadReportBtn').addEventListener('click', () => openReportModal(otherId, p ? (p.business_name || p.name) : 'this member', 'dm_message', null));
+  document.getElementById('threadSendBtn').addEventListener('click', sendDM);
+  document.getElementById('threadInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendDM(); });
+
+  await loadThread(otherId);
+  subscribeToDMs(otherId);
+}
+
+async function loadThread(otherId){
+  const { data } = await sb.from('dm_messages').select('*')
+    .or(`and(sender_id.eq.${currentUser.id},recipient_id.eq.${otherId}),and(sender_id.eq.${otherId},recipient_id.eq.${currentUser.id})`)
+    .order('created_at', { ascending: true });
+  renderThread(data || []);
+  // mark unread messages from them as read
+  sb.from('dm_messages').update({ read_at: new Date().toISOString() }).eq('sender_id', otherId).eq('recipient_id', currentUser.id).is('read_at', null).then(()=>{});
+}
+function renderThread(messages){
+  const feed = document.getElementById('threadFeed');
+  if (!feed) return;
+  feed.innerHTML = messages.map(m => `
+    <div class="thread-msg ${m.sender_id === currentUser.id ? 'mine' : 'theirs'}">
+      ${esc(m.body)}
+      <div class="thread-msg-time">${new Date(m.created_at).toLocaleString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</div>
+    </div>`).join('') || '<div class="thread-empty">No messages yet, say hello.</div>';
+  feed.scrollTop = feed.scrollHeight;
+}
+async function sendDM(){
+  const input = document.getElementById('threadInput');
+  const warn = document.getElementById('threadFilterWarning');
+  const body = input.value.trim();
+  if (!body || !activeConvoUserId || !sb || !currentUser) return;
+  if (hasForbiddenLanguage(body)) { warn.classList.add('show'); return; }
+  warn.classList.remove('show');
+  input.value = '';
+  const { error } = await sb.from('dm_messages').insert({ sender_id: currentUser.id, recipient_id: activeConvoUserId, body });
+  if (error) { alert('Message could not be sent. ' + (error.message || '')); return; }
+  loadThread(activeConvoUserId);
+}
+function subscribeToDMs(otherId){
+  if (dmChannel) sb.removeChannel(dmChannel);
+  dmChannel = sb.channel('dm_' + otherId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_messages' }, (payload) => {
+      const m = payload.new;
+      if ((m.sender_id === otherId && m.recipient_id === currentUser.id) || (m.sender_id === currentUser.id && m.recipient_id === otherId)) {
+        loadThread(otherId);
+      }
+    }).subscribe();
+}
+
+// =====================================================================
+// GROUPS
+// =====================================================================
+let groupsData = [];
+let myGroupMemberships = {}; // group_id -> {status, role}
+let activeGroupTab = 'all';
+let currentGroupId = null;
+let groupChatChannel = null;
+
+async function loadGroups(){
+  if (!sb || !currentUser) return;
+  const [{ data: groups }, { data: myMemberships }] = await Promise.all([
+    sb.from('groups').select('*').order('created_at', { ascending: false }),
+    sb.from('group_members').select('*').eq('user_id', currentUser.id),
+  ]);
+  groupsData = groups || [];
+  myGroupMemberships = {};
+  (myMemberships || []).forEach(m => { myGroupMemberships[m.group_id] = m; });
+  // member counts
+  const { data: counts } = await sb.from('group_members').select('group_id').eq('status', 'active');
+  const countMap = {};
+  (counts || []).forEach(r => { countMap[r.group_id] = (countMap[r.group_id] || 0) + 1; });
+  groupsData.forEach(g => { g.memberCount = countMap[g.id] || 0; });
+  renderGroupsGrid();
+}
+function renderGroupsGrid(){
+  const grid = document.getElementById('groupsGrid');
+  const list = activeGroupTab === 'mine'
+    ? groupsData.filter(g => myGroupMemberships[g.id] && myGroupMemberships[g.id].status === 'active')
+    : groupsData;
+  grid.innerHTML = list.map(g => {
+    const membership = myGroupMemberships[g.id];
+    const label = membership?.status === 'active' ? 'Joined' : membership?.status === 'pending' ? 'Request pending' : g.is_private ? '🔒 Private' : 'Open';
+    return `
+    <div class="group-card" data-id="${esc(g.id)}">
+      <div class="group-card-top"><h4>${esc(g.name)}</h4><span class="group-lock">${label}</span></div>
+      <p>${esc(g.description || '')}</p>
+      <div class="group-card-meta">${esc(g.category || 'General')} · ${g.memberCount} member${g.memberCount === 1 ? '' : 's'}</div>
+    </div>`;
+  }).join('') || '<p class="empty-note">No groups yet, be the first to create one.</p>';
+}
+document.querySelectorAll('#groupTabs button').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#groupTabs button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeGroupTab = this.getAttribute('data-tab');
+    renderGroupsGrid();
+  });
+});
+document.getElementById('groupCreateToggle').addEventListener('click', () => {
+  document.getElementById('groupCreateForm').classList.toggle('open');
+});
+document.getElementById('groupCreateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!sb || !currentUser) return;
+  const name = document.getElementById('grpName').value.trim();
+  const description = document.getElementById('grpDesc').value.trim();
+  const category = document.getElementById('grpCategory').value.trim();
+  const is_private = document.getElementById('grpPrivate').checked;
+  const statusEl = document.getElementById('groupCreateStatus');
+  if (!name) return;
+  statusEl.textContent = 'Creating...';
+  const { error } = await sb.from('groups').insert({ name, description, category, is_private, created_by: currentUser.id });
+  statusEl.textContent = error ? 'Something went wrong.' : 'Group created.';
+  if (!error) {
+    e.target.reset();
+    document.getElementById('groupCreateForm').classList.remove('open');
+    loadGroups();
+  }
+});
+document.getElementById('groupsGrid').addEventListener('click', (e) => {
+  const card = e.target.closest('.group-card');
+  if (card) openGroup(card.dataset.id);
+});
+document.getElementById('groupBackBtn').addEventListener('click', () => {
+  document.getElementById('groupDetail').classList.remove('open');
+  currentGroupId = null;
+  if (groupChatChannel) { sb.removeChannel(groupChatChannel); groupChatChannel = null; }
+});
+
+async function openGroup(groupId){
+  currentGroupId = groupId;
+  const g = groupsData.find(x => x.id === groupId);
+  if (!g) return;
+  document.getElementById('grpDetailName').textContent = g.name;
+  document.getElementById('grpDetailDesc').textContent = g.description || '';
+  document.getElementById('groupDetail').classList.add('open');
+  document.getElementById('groupDetail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  await renderGroupDetailActions(groupId, g);
+  await loadGroupMembers(groupId);
+  await loadGroupChat(groupId);
+}
+
+async function renderGroupDetailActions(groupId, g){
+  const membership = myGroupMemberships[groupId];
+  const actionsEl = document.getElementById('grpDetailActions');
+  let html = '';
+  if (!membership || membership.status === 'left') {
+    html = `<button class="btn-primary" id="grpJoinBtn">${g.is_private ? 'Request to join' : 'Join group'}</button>`;
+  } else if (membership.status === 'pending') {
+    html = `<button class="btn-ghost" disabled>Request pending</button>`;
+  } else if (membership.status === 'active') {
+    html = `<button class="btn-ghost" id="grpDownloadBtn">Download chat</button><button class="btn-danger" id="grpLeaveBtn">Leave group</button>`;
+  }
+  actionsEl.innerHTML = html;
+  const joinBtn = document.getElementById('grpJoinBtn');
+  if (joinBtn) joinBtn.addEventListener('click', async () => {
+    joinBtn.disabled = true;
+    const { error } = await sb.from('group_members').insert({ group_id: groupId, user_id: currentUser.id, status: g.is_private ? 'pending' : 'active' });
+    if (!error) { await loadGroups(); await openGroup(groupId); } else joinBtn.disabled = false;
+  });
+  const leaveBtn = document.getElementById('grpLeaveBtn');
+  if (leaveBtn) leaveBtn.addEventListener('click', async () => {
+    await sb.from('group_members').update({ status: 'left' }).eq('group_id', groupId).eq('user_id', currentUser.id);
+    await loadGroups();
+    document.getElementById('groupDetail').classList.remove('open');
+  });
+  const downloadBtn = document.getElementById('grpDownloadBtn');
+  if (downloadBtn) downloadBtn.addEventListener('click', () => downloadGroupChat(groupId, g.name));
+}
+
+async function loadGroupMembers(groupId){
+  const { data: members } = await sb.from('group_members').select('*').eq('group_id', groupId).eq('status', 'active');
+  const membersList = document.getElementById('grpMembersList');
+  membersList.innerHTML = (members || []).map(m => {
+    const p = profileDirectory[m.user_id];
+    return `<div class="group-member-row"><span>${esc(p ? (p.business_name || p.name) : 'Member')}</span>${m.role === 'admin' ? '<span class="group-member-admin">ADMIN</span>' : ''}</div>`;
+  }).join('') || '<p class="empty-note">No members yet.</p>';
+
+  const myMembership = (members || []).find(m => m.user_id === currentUser.id);
+  const pendingWrap = document.getElementById('grpPendingWrap');
+  if (myMembership && myMembership.role === 'admin') {
+    const { data: pending } = await sb.from('group_members').select('*').eq('group_id', groupId).eq('status', 'pending');
+    if (pending && pending.length) {
+      pendingWrap.style.display = 'block';
+      document.getElementById('grpPendingList').innerHTML = pending.map(m => {
+        const p = profileDirectory[m.user_id];
+        return `<div class="group-pending-row"><span>${esc(p ? (p.business_name || p.name) : 'Member')}</span><button class="btn-primary grp-approve-btn" data-id="${esc(m.id)}">Approve</button></div>`;
+      }).join('');
+    } else pendingWrap.style.display = 'none';
+  } else pendingWrap.style.display = 'none';
+}
+document.getElementById('grpPendingList').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.grp-approve-btn');
+  if (!btn) return;
+  await sb.from('group_members').update({ status: 'active' }).eq('id', btn.dataset.id);
+  loadGroupMembers(currentGroupId);
+});
+
+async function loadGroupChat(groupId){
+  const { data } = await sb.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true }).limit(200);
+  renderGroupChat(data || []);
+  if (groupChatChannel) sb.removeChannel(groupChatChannel);
+  groupChatChannel = sb.channel('group_' + groupId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${groupId}` }, () => loadGroupChat(groupId))
+    .subscribe();
+}
+function renderGroupChat(messages){
+  const feed = document.getElementById('grpChatFeed');
+  feed.innerHTML = messages.map(m => {
+    const p = profileDirectory[m.sender_id];
+    return `<div class="group-msg"><div class="group-msg-name">${esc(p ? (p.business_name || p.name) : 'Member')} · ${new Date(m.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div><div class="group-msg-body">${esc(m.body)}</div></div>`;
+  }).join('') || '<p class="empty-note">No messages yet, start the conversation.</p>';
+  feed.scrollTop = feed.scrollHeight;
+}
+document.getElementById('grpChatSend').addEventListener('click', sendGroupMessage);
+document.getElementById('grpChatInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendGroupMessage(); });
+async function sendGroupMessage(){
+  const input = document.getElementById('grpChatInput');
+  const warn = document.getElementById('grpFilterWarning');
+  const body = input.value.trim();
+  if (!body || !currentGroupId || !sb || !currentUser) return;
+  if (hasForbiddenLanguage(body)) { warn.classList.add('show'); return; }
+  warn.classList.remove('show');
+  input.value = '';
+  const { error } = await sb.from('group_messages').insert({ group_id: currentGroupId, sender_id: currentUser.id, body });
+  if (error) alert('Message could not be sent. ' + (error.message || ''));
+}
+function downloadGroupChat(groupId, groupName){
+  sb.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true }).then(({ data }) => {
+    const lines = (data || []).map(m => {
+      const p = profileDirectory[m.sender_id];
+      const who = p ? (p.business_name || p.name) : 'Member';
+      return `[${new Date(m.created_at).toLocaleString('en-GB')}] ${who}: ${m.body}`;
+    });
+    const blob = new Blob([`${groupName} — group chat export\n\n${lines.join('\n')}`], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${groupName.replace(/[^a-z0-9]+/gi, '_')}_chat.txt`;
+    a.click();
+  });
+}
 </script>
 
 </body>
