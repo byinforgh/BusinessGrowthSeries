@@ -352,6 +352,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
   .dir-card h4{font-size:14.5px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:4px;}
   .dir-card .cat{font-size:11.5px;color:var(--paper-dim);margin-bottom:10px;}
   .dir-card .loc{font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--paper-dim);margin-bottom:10px;}
+  .dir-card .member-since{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--paper-dim);margin-bottom:10px;}
+  .dir-card .member-since.new{color:var(--gold);}
   .dir-card .sells{font-size:12px;color:var(--paper);line-height:1.5;margin-bottom:6px;}
   .dir-card .looking{font-size:11.5px;color:var(--lime-dim);line-height:1.5;}
 
@@ -392,7 +394,18 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
   .spotlight-post p{font-size:13px;color:var(--paper-dim);line-height:1.55;margin:0 0 8px;}
   .spotlight-post .label{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--lime);display:block;margin-bottom:3px;}
   @media(max-width:860px){.grid2{grid-template-columns:1fr;}.spotlight-feed{grid-template-columns:1fr;}}
-  .resource-card{background:var(--ink);padding:22px;}
+  .resource-card{background:var(--ink);padding:22px;cursor:pointer;transition:background .15s;}
+.resource-card:hover{background:var(--panel-2);}
+.resource-modal-box{max-width:640px;max-height:82vh;display:flex;flex-direction:column;padding:0;overflow:hidden;}
+.resource-modal-head{display:flex;justify-content:space-between;align-items:center;padding:22px 26px 0;}
+.resource-modal-close{background:none;border:none;color:var(--paper-dim);font-size:24px;cursor:pointer;line-height:1;padding:0;}
+.resource-modal-close:hover{color:var(--paper);}
+#resModalTitle{padding:8px 26px 18px;font-size:20px;font-family:'Archivo Black',sans-serif;text-transform:none;letter-spacing:0;border-bottom:1px solid var(--line);}
+.resource-modal-body{padding:22px 26px 30px;overflow-y:auto;color:var(--paper);font-size:14px;line-height:1.75;}
+.resource-modal-body p{margin:0 0 14px;color:var(--paper);}
+.resource-modal-body h5{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--lime);margin:20px 0 8px;}
+.resource-modal-body ul{margin:0 0 14px;padding-left:20px;}
+.resource-modal-body li{margin-bottom:6px;color:var(--paper);}
   .resource-format{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--gold);text-transform:uppercase;margin-bottom:12px;}
   .resource-card h4{font-size:15px;text-transform:none;letter-spacing:0;font-family:'Archivo Black',sans-serif;margin-bottom:8px;}
   .resource-card p{font-size:12.5px;color:var(--paper-dim);line-height:1.5;margin-bottom:14px;}
@@ -530,6 +543,30 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
   .safety-notice b{color:var(--paper);}
   .filter-warning{color:var(--m7);font-size:11.5px;margin-top:6px;display:none;}
   .filter-warning.show{display:block;}
+
+  /* ============ verification ============ */
+  .verify-panel{border:1px solid var(--line);background:var(--panel-2);padding:20px 24px;margin-bottom:24px;}
+  .verify-panel.verified{border-color:var(--lime);}
+  .verify-panel.pending{border-color:var(--gold);}
+  .verify-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+  .verify-title{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+  .verify-desc{font-size:11.5px;color:var(--paper-dim);max-width:480px;line-height:1.5;}
+  .verify-status-badge{font-family:'JetBrains Mono',monospace;font-size:9.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1px solid var(--line);white-space:nowrap;}
+  .verify-status-badge.approved{color:var(--lime);border-color:var(--lime);}
+  .verify-status-badge.pending{color:var(--gold);border-color:var(--gold);}
+  .verify-status-badge.rejected{color:var(--m7);border-color:var(--m7);}
+  .verify-form{margin-top:16px;display:none;}
+  .verify-form.open{display:block;}
+
+  /* ============ admin console ============ */
+  .admin-queue-item{border:1px solid var(--line);background:var(--panel-2);padding:18px 20px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+  .admin-queue-main{flex:1;min-width:220px;}
+  .admin-queue-name{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+  .admin-queue-meta{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--paper-dim);margin-bottom:8px;}
+  .admin-queue-body{font-size:12.5px;color:var(--paper);line-height:1.5;white-space:pre-wrap;}
+  .admin-queue-actions{display:flex;gap:8px;flex-wrap:wrap;}
+  .admin-queue-actions button{white-space:nowrap;}
+  .admin-doc-link{color:var(--lime);font-size:11px;text-decoration:underline;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -556,6 +593,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
       <a href="#connections">Connections</a>
       <a href="#groups">Groups</a>
       <a href="#messages">Messages</a>
+      <a href="#admin" id="navAdminLink" style="display:none;">Admin</a>
       <a href="#accountability">Streak</a>
       <a href="#wins">Wins</a>
       <a href="#qa">Q&amp;A</a>
@@ -573,7 +611,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
   <div class="wrap">
     <span class="eyebrow">Welcome back</span>
     <h1 style="font-size:clamp(30px,5vw,48px);margin-top:10px;" id="welcomeName">Business Growth Series</h1>
-    <p style="color:var(--paper-dim);font-size:15px;margin-top:12px;max-width:520px;">All 202 lessons, the community, and the AI assistant, all in one place.</p>
+    <p style="color:var(--paper-dim);font-size:15px;margin-top:12px;max-width:520px;">All 203 lessons, the community, and the AI assistant, all in one place.</p>
     <div class="start-here-banner" id="startHereBanner">
       <div class="start-here-kente"><span></span><span></span><span></span><span></span></div>
       <div class="start-here-body">
@@ -614,19 +652,19 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Curriculum</span>
-      <h2>202 lessons. 8 modules.</h2>
+      <h2>203 lessons. 8 modules.</h2>
       <p>Tap a module to expand it. Mark lessons complete as you go, your progress is saved to your profile.</p>
     </div>
     <div class="overall-progress">
       <div class="overall-progress-top">
         <span class="eyebrow">Overall progress</span>
-        <span id="progressLabel">0 of 202 lessons</span>
+        <span id="progressLabel">0 of 203 lessons</span>
       </div>
       <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%;"></div></div>
     </div>
     <div class="lesson-search">
-      <input type="text" id="lessonSearch" placeholder="Search all 202 lessons...">
-      <span class="search-count" id="searchCount">202 lessons</span>
+      <input type="text" id="lessonSearch" placeholder="Search all 203 lessons...">
+      <span class="search-count" id="searchCount">203 lessons</span>
     </div>
     <div class="modules-grid" id="modulesGrid"></div>
   </div>
@@ -637,7 +675,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
     <div class="section-head">
       <span class="eyebrow">BYINFORGH AI</span>
       <h2>Ask anything about your business.</h2>
-      <p>Trained on the 202 lessons, approved member documents, and answered community questions.</p>
+      <p>Trained on the 203 lessons, approved member documents, and answered community questions.</p>
     </div>
     <div class="ai-shell">
       <div class="ai-info">
@@ -694,6 +732,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
       <span class="eyebrow">Business directory</span>
       <h2>Find owners to trade, partner, or support.</h2>
     </div>
+    <div class="verify-panel" id="verifyPanel"></div>
     <div class="directory-controls">
       <input type="text" class="dir-search" id="dirSearch" placeholder="Search by name, category, or location...">
       <div class="dir-filter active" data-cat="all">All</div>
@@ -701,6 +740,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
       <div class="dir-filter" data-cat="Food">Food</div>
       <div class="dir-filter" data-cat="Retail">Retail</div>
       <div class="dir-filter" data-cat="Services">Services</div>
+      <div class="dir-filter" id="dirDiasporaFilter">🌍 Diaspora</div>
     </div>
     <div class="directory-grid" id="directoryGrid"></div>
   </div>
@@ -752,7 +792,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
       </div>
       <div class="checkbox-row">
         <input type="checkbox" id="grpPrivate">
-        <label for="grpPrivate">Private — new members must be approved to join</label>
+        <label for="grpPrivate">Private, new members must be approved to join</label>
       </div>
       <button type="submit" class="btn-primary">Create group</button>
       <div id="groupCreateStatus" style="margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--lime);"></div>
@@ -777,7 +817,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
             <input type="text" id="grpChatInput" placeholder="Message the group about business...">
             <button class="btn-primary" id="grpChatSend">Send</button>
           </div>
-          <div class="filter-warning" id="grpFilterWarning">Keep it respectful — no foul language, threats, or harassment. Rewrite your message.</div>
+          <div class="filter-warning" id="grpFilterWarning">Keep it respectful, no foul language, threats, or harassment. Rewrite your message.</div>
         </div>
         <div class="group-side-col">
           <div class="group-side-label">Members</div>
@@ -797,9 +837,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
     <div class="section-head">
       <span class="eyebrow">Direct messages</span>
       <h2>Talk directly with your connections.</h2>
-      <p>You can only message people you're connected with — this keeps messaging for real business relationships, not strangers.</p>
+      <p>You can only message people you're connected with, this keeps messaging for real business relationships, not strangers.</p>
     </div>
-    <div class="safety-notice"><b>Keep it respectful.</b> No foul language, aggressive behaviour, or intimidation. Members who break this get a strike — three strikes and the account is suspended. Use the ⚑ button to report anything that crosses the line.</div>
+    <div class="safety-notice"><b>Keep it respectful.</b> No foul language, aggressive behaviour, or intimidation. Members who break this get a strike, three strikes and the account is suspended. Use the ⚑ button to report anything that crosses the line. <b>Before you trust a business opportunity:</b> check how long they've been a member and whether they carry a Verified badge, shown on every profile. A real partner never asks for money upfront, a fee to "unlock" an opportunity, or pressure to decide fast.</div>
+    <div class="safety-notice"><b>New here?</b> Accounts are limited to 8 connection requests a day for their first week, this is normal and lifts automatically, it exists to slow down anyone trying to mass-message strangers right after signing up.</div>
     <div class="messages-shell">
       <div class="convo-list" id="convoList"></div>
       <div class="thread-col" id="threadCol">
@@ -834,6 +875,22 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
     </div>
   </div>
 </div>
+
+<section id="admin" style="display:none;">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Admin console</span>
+      <h2>One screen for everything waiting on you.</h2>
+      <p>Verification, reports, and content approvals, in one place instead of three Table Editor tabs.</p>
+    </div>
+    <div class="pill-toggle" id="adminTabs">
+      <button class="active" data-tab="verification">Verification <span class="count-badge" id="adminVerifyCount"></span></button>
+      <button data-tab="reports">Reports <span class="count-badge" id="adminReportsCount"></span></button>
+      <button data-tab="content">Content <span class="count-badge" id="adminContentCount"></span></button>
+    </div>
+    <div id="adminPanelBody"></div>
+  </div>
+</section>
 
 <section id="accountability">
   <div class="wrap">
@@ -1002,10 +1059,22 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--pan
     <div class="section-head">
       <span class="eyebrow">Resource library</span>
       <h2>Every playbook BYINFORGH uses.</h2>
+      <p>Read every guide right here, nothing to download. Ask the AI assistant or the community if anything raises a question while you read.</p>
     </div>
     <div class="resource-grid" id="resourceGrid"></div>
   </div>
 </section>
+
+<div class="modal-overlay" id="resourceModal">
+  <div class="modal-box resource-modal-box">
+    <div class="resource-modal-head">
+      <span class="resource-format" id="resModalFormat"></span>
+      <button class="resource-modal-close" id="resModalClose" aria-label="Close">&times;</button>
+    </div>
+    <h3 id="resModalTitle"></h3>
+    <div class="resource-modal-body" id="resModalBody"></div>
+  </div>
+</div>
 
 <section id="events">
   <div class="wrap">
@@ -1052,22 +1121,22 @@ const modules = [
   {n:'02', color:'var(--m2)', title:'Business Time', range:'Lessons 21 to 40',
    desc:'Planning and structure, from the calendar year down to the daily to-do list, so nothing runs on chaos.',
    lessons:[{t:'Calendar Year',truth:'Plan your year in advance, or the year will plan itself for you.'},{t:'Quarter System',truth:'Break the year into four 90 day sprints. It\'s easier to win 90 days than 365.'},{t:'Months',truth:'Every month needs one target, not a wish list of ten.'},{t:'Weeks',truth:'Your week should have a repeatable rhythm, not a new plan every Monday.'},{t:'Days',truth:'The first hour of your business day decides the tone for the other nine.'},{t:'Business Planning',truth:'A plan that isn\'t written down is just a thought you\'ll forget by Thursday.'},{t:'Annual Planning',truth:'Set your yearly number first, then work backward into monthly targets.'},{t:'Quarterly Planning',truth:'Review every 90 days: what worked, what didn\'t, and what changes next quarter.'},{t:'Monthly Planning',truth:'Start each month by naming the one thing that must get done by the 30th.'},{t:'Weekly Planning',truth:'Plan Sunday night. A business that plans on Monday morning is already behind.'},{t:'Daily Planning',truth:'Write your top three tasks before you open your phone, not after.'},{t:'Business Deadlines',truth:'A deadline without a consequence is just a suggestion.'},{t:'Time Blocking',truth:'Protect two uninterrupted hours a day for the work that actually grows the business.'},{t:'Time Management',truth:'You don\'t manage time, you manage attention. Guard it like cash.'},{t:'Priority Matrix',truth:'Urgent and important gets done now. Everything else gets scheduled or deleted.'},{t:'Productivity',truth:'Busy is not the same as productive. Measure output, not hours.'},{t:'Review Cycles',truth:'What gets reviewed weekly gets improved monthly.'},{t:'Business Meetings',truth:'A meeting without an agenda and a decision is just a conversation with extra steps.'},{t:'Milestones',truth:'Break big goals into checkpoints you can actually celebrate.'},{t:'Execution',truth:'A good plan executed today beats a perfect plan executed never.'}]},
-  {n:'03', color:'var(--m3)', title:'Business Money', range:'Lessons 41 to 72',
+  {n:'03', color:'var(--m3)', title:'Business Money', range:'Lessons 41 to 73',
    desc:'Finance and wealth: revenue, profit, pricing, cash flow, and the numbers every owner must actually understand.',
-   lessons:[{t:'Revenue',truth:'Revenue is everything that comes in before you pay for anything.'},{t:'Profit',truth:'Profit is what\'s left after every single cost is paid, not what\'s in the till.'},{t:'Cash Flow',truth:'A profitable business can still close if cash runs out at the wrong moment.'},{t:'Expenses',truth:'Every expense should answer one question: does this bring in more than it costs?'},{t:'Gross Profit',truth:'Gross profit tells you if the product itself makes sense before overhead touches it.'},{t:'Net Profit',truth:'Net profit is the only number that tells you if the business actually worked this month.'},{t:'Break-Even',truth:'Know the exact number of sales that cover your costs before you celebrate a good day.'},{t:'Pricing',truth:'Price on value delivered, not on what feels comfortable to say out loud.'},{t:'Margin',truth:'Margin is what protects you when costs rise and customers negotiate.'},{t:'Markup',truth:'Markup and margin are not the same number. Know the difference before you price.'},{t:'Discounts',truth:'A discount without a reason trains customers to always wait for one.'},{t:'Budgeting',truth:'A budget is a plan for your money before the month spends it for you.'},{t:'Savings',truth:'Pay your business savings first, like a bill that must be paid.'},{t:'Emergency Fund',truth:'Three months of expenses saved is the difference between a bad month and a closed shop.'},{t:'Reinvestment',truth:'Growth is funded by profit you chose not to spend.'},{t:'Fixed Costs',truth:'Fixed costs don\'t care how many sales you made this month. Know them cold.'},{t:'Variable Costs',truth:'Variable costs move with your sales. Control them per unit, not just in total.'},{t:'Cost of Sales',truth:'Know exactly what it costs to deliver one sale before you price the next hundred.'},{t:'Assets',truth:'An asset puts money in your pocket. Know which of your things actually do that.'},{t:'Liabilities',truth:'A liability takes money out of your pocket, whether it\'s used or not.'},{t:'Equity',truth:'Equity is what you actually own once every debt is subtracted.'},{t:'Accounts Receivable',truth:'Money owed to you is not money you have. Chase it like it\'s already spent.'},{t:'Accounts Payable',truth:'Pay what you owe on time. It\'s the cheapest way to build supplier trust.'},{t:'Inventory',truth:'Stock sitting on a shelf for a year isn\'t inventory, it\'s frozen cash.'},{t:'Financial Reports',truth:'If you can\'t read your own numbers monthly, someone else is reading them for you.'},{t:'Taxes',truth:'Taxes planned for monthly are a bill. Taxes ignored are a crisis.'},{t:'Banking',truth:'Separate business and personal accounts on day one, not after the confusion starts.'},{t:'Mobile Money',truth:'Track every mobile money transaction like it\'s a bank statement, because it is.'},{t:'MoMo & Mobile Money Scams',truth:'If a "wrong transfer" never actually landed in your account, there is nothing to send back. Check your own history before you reverse anything.'},{t:'The Fake "Account Frozen" Call',truth:'A text says money landed, then a "network support" call says your account is frozen and pressures you to fix it by phone, right now. Real support never works that fast, and never needs your PIN to "unfreeze" anything.'},{t:'Financial Discipline',truth:'Financial discipline is spending like the business depends on it, because it does.'},{t:'Growth Finance',truth:'Growth needs funding. Decide early if that\'s profit, a loan, or an investor.'}]},
-  {n:'04', color:'var(--m4)', title:'Customers & Sales', range:'Lessons 73 to 97',
+   lessons:[{t:'Revenue',truth:'Revenue is everything that comes in before you pay for anything.'},{t:'Profit',truth:'Profit is what\'s left after every single cost is paid, not what\'s in the till.'},{t:'Cash Flow',truth:'A profitable business can still close if cash runs out at the wrong moment.'},{t:'Expenses',truth:'Every expense should answer one question: does this bring in more than it costs?'},{t:'Gross Profit',truth:'Gross profit tells you if the product itself makes sense before overhead touches it.'},{t:'Net Profit',truth:'Net profit is the only number that tells you if the business actually worked this month.'},{t:'Break-Even',truth:'Know the exact number of sales that cover your costs before you celebrate a good day.'},{t:'Pricing',truth:'Price on value delivered, not on what feels comfortable to say out loud.'},{t:'Margin',truth:'Margin is what protects you when costs rise and customers negotiate.'},{t:'Markup',truth:'Markup and margin are not the same number. Know the difference before you price.'},{t:'Discounts',truth:'A discount without a reason trains customers to always wait for one.'},{t:'Budgeting',truth:'A budget is a plan for your money before the month spends it for you.'},{t:'Savings',truth:'Pay your business savings first, like a bill that must be paid.'},{t:'Emergency Fund',truth:'Three months of expenses saved is the difference between a bad month and a closed shop.'},{t:'Reinvestment',truth:'Growth is funded by profit you chose not to spend.'},{t:'Fixed Costs',truth:'Fixed costs don\'t care how many sales you made this month. Know them cold.'},{t:'Variable Costs',truth:'Variable costs move with your sales. Control them per unit, not just in total.'},{t:'Cost of Sales',truth:'Know exactly what it costs to deliver one sale before you price the next hundred.'},{t:'Assets',truth:'An asset puts money in your pocket. Know which of your things actually do that.'},{t:'Liabilities',truth:'A liability takes money out of your pocket, whether it\'s used or not.'},{t:'Equity',truth:'Equity is what you actually own once every debt is subtracted.'},{t:'Accounts Receivable',truth:'Money owed to you is not money you have. Chase it like it\'s already spent.'},{t:'Accounts Payable',truth:'Pay what you owe on time. It\'s the cheapest way to build supplier trust.'},{t:'Inventory',truth:'Stock sitting on a shelf for a year isn\'t inventory, it\'s frozen cash.'},{t:'Financial Reports',truth:'If you can\'t read your own numbers monthly, someone else is reading them for you.'},{t:'Taxes',truth:'Taxes planned for monthly are a bill. Taxes ignored are a crisis.'},{t:'Banking',truth:'Separate business and personal accounts on day one, not after the confusion starts.'},{t:'Mobile Money',truth:'Track every mobile money transaction like it\'s a bank statement, because it is.'},{t:'MoMo & Mobile Money Scams',truth:'If a "wrong transfer" never actually landed in your account, there is nothing to send back. Check your own history before you reverse anything.'},{t:'The Fake "Account Frozen" Call',truth:'A text says money landed, then a "network support" call says your account is frozen and pressures you to fix it by phone, right now. Real support never works that fast, and never needs your PIN to "unfreeze" anything.'},{t:'Fake Investment & Diaspora Schemes',truth:'A real investor never needs you to recruit others or pay a fee first. Ghana\'s Cyber Security Authority tracked over 350 fake investment schemes in early 2026 alone, many posing as diaspora opportunities. Verify through the SEC before a single cedi moves.'},{t:'Financial Discipline',truth:'Financial discipline is spending like the business depends on it, because it does.'},{t:'Growth Finance',truth:'Growth needs funding. Decide early if that\'s profit, a loan, or an investor.'}]},
+  {n:'04', color:'var(--m4)', title:'Customers & Sales', range:'Lessons 74 to 98',
    desc:'Energy and sales: turning leads into loyal, repeat customers who refer other people to you.',
    lessons:[{t:'Leads',truth:'A lead is a stranger who showed interest. Treat the first message like it matters.'},{t:'Prospects',truth:'A prospect is a lead who\'s asked a real question. Answer it faster than your competitor.'},{t:'Customers',truth:'A customer paid once. The work of business starts after that, not before.'},{t:'Repeat Customers',truth:'One repeat customer is worth more than five one time sales.'},{t:'Customer Lifetime Value',truth:'Know what one customer is worth over a year, not just today\'s receipt.'},{t:'Referrals',truth:'A referral is free marketing from someone who trusts you more than any advert could.'},{t:'Sales Funnel',truth:'Every customer moves through stranger, lead, buyer, and repeat buyer. Know where yours are stuck.'},{t:'Closing',truth:'The business that replies in five minutes beats the business with the better product.'},{t:'Objections',truth:'An objection is a question in disguise. Answer it, don\'t argue with it.'},{t:'Follow-Up',truth:'Most sales are lost not to a no, but to a follow up that never happened.'},{t:'Customer Service',truth:'Service is remembered longer than price, good or bad.'},{t:'Speed',truth:'Speed of reply is a sales strategy, not an accident.'},{t:'Communication',truth:'Say what you mean clearly. Customers don\'t reward guessing games.'},{t:'Trust',truth:'People buy from businesses they trust before they buy from businesses with the best price.'},{t:'Pricing Conversations',truth:'State your price once, clearly, without apologizing for it.'},{t:'Sales Psychology',truth:'People buy on emotion and justify it with logic afterward.'},{t:'Reviews',truth:'A review is a stranger\'s proof that you deliver what you promise.'},{t:'Testimonials',truth:'Collect testimonials the day a customer is happiest, not weeks later.'},{t:'Upselling',truth:'Offer the better option before the customer settles for the smaller one.'},{t:'Cross-Selling',truth:'The easiest sale is the second item to a customer who\'s already buying.'},{t:'Loyalty',truth:'Loyalty is earned by consistency, not by one great interaction.'},{t:'Customer Journey',truth:'Map every step a customer takes from discovery to purchase, then fix the weakest step.'},{t:'Retention',truth:'It costs less to keep a customer than to find a new one.'},{t:'Relationships',truth:'Business is relationships with paperwork attached.'},{t:'Value Creation',truth:'Sell the transformation the customer gets, not just the product they receive.'}]},
-  {n:'05', color:'var(--m5)', title:'Visibility & Marketing', range:'Lessons 98 to 122',
+  {n:'05', color:'var(--m5)', title:'Visibility & Marketing', range:'Lessons 99 to 123',
    desc:'Brand and authority: getting found online and building a reputation that sells for you.',
    lessons:[{t:'Visibility',truth:'If people can\'t find you, they can\'t buy from you.'},{t:'Branding',truth:'A brand is the promise customers remember before they remember your name.'},{t:'Logo',truth:'A logo isn\'t your brand. It\'s just the signature at the bottom of it.'},{t:'Identity',truth:'Your business identity should be recognizable even with the name covered.'},{t:'Reputation',truth:'Reputation is what people say about you when you\'re not in the room.'},{t:'Google Business',truth:'If your business isn\'t on Google Maps, it doesn\'t exist to half your customers.'},{t:'Google Maps',truth:'A correct pin on the map is worth more than a hundred posts.'},{t:'SEO',truth:'Show up when people search for what you sell, not just when they search your name.'},{t:'Social Media',truth:'Social media is a shop window. Keep it open and updated.'},{t:'WhatsApp Business',truth:'A WhatsApp Business profile with hours, catalog, and quick replies converts more than a personal number.'},{t:'Facebook',truth:'Facebook still works in Ghana. Post where your customers already are.'},{t:'Instagram',truth:'Instagram sells the look of your business before customers ever visit.'},{t:'TikTok',truth:'TikTok rewards consistency over perfection. Post the raw and real version.'},{t:'LinkedIn',truth:'LinkedIn builds authority with suppliers, partners, and B2B customers.'},{t:'YouTube',truth:'Long form video builds more trust than any single post ever will.'},{t:'Content Strategy',truth:'Post with a plan, not a mood, or your feed will show it.'},{t:'Photography',truth:'Good lighting sells more than good filters.'},{t:'Video',truth:'A 30 second video answering who, where, what builds more trust than paragraphs of text.'},{t:'Storytelling',truth:'Facts tell, stories sell. Lead with the story.'},{t:'Advertising',truth:'Advertise the result the customer gets, not the features of the product.'},{t:'Local Marketing',truth:'Win your own neighborhood completely before chasing the whole city.'},{t:'Community Marketing',truth:'Show up in your customers\' community before asking them to show up in yours.'},{t:'Digital Shopfront',truth:'Your online profile is now your shop\'s front door. Treat it that way.'},{t:'Authority',truth:'Answer questions publicly and you become the expert people trust.'},{t:'Personal Brand',truth:'People trust people before they trust companies. Put a face on the business.'}]},
-  {n:'06', color:'var(--m6)', title:'Business Systems', range:'Lessons 123 to 152',
+  {n:'06', color:'var(--m6)', title:'Business Systems', range:'Lessons 124 to 153',
    desc:'Organisation and process: the SOPs, checklists, and infrastructure that let a business run without you.',
    lessons:[{t:'Systems',truth:'A system is anything that works the same way when you\'re not there.'},{t:'SOPs',truth:'Write down how a task is done once, and anyone can repeat it after.'},{t:'Documentation',truth:'If it\'s only in your head, it leaves the business the day you\'re unavailable.'},{t:'Checklists',truth:'A checklist turns I think I did it into I know I did it.'},{t:'Automation',truth:'Automate the repetitive task before you hire someone to do it manually.'},{t:'CRM',truth:'Track every customer somewhere other than your memory.'},{t:'Customer Records',truth:'A customer record kept today saves a lost sale in six months.'},{t:'Staff Manuals',truth:'Train once with a manual instead of retraining every new hire from scratch.'},{t:'Process Mapping',truth:'Draw out how work actually flows before you try to fix it.'},{t:'Workflows',truth:'A clear workflow removes the guesswork from every repeated task.'},{t:'Templates',truth:'Build the template once, reuse it a hundred times.'},{t:'Business Audits',truth:'Audit your business like a stranger would, honestly and without excuses.'},{t:'KPIs',truth:'Pick three numbers that tell you if the week went well, and check them weekly.'},{t:'Reports',truth:'A report you never read is a report you didn\'t need to make.'},{t:'Quality Control',truth:'Check the work before the customer does.'},{t:'Delegation',truth:'Delegate the task, not just the blame if it goes wrong.'},{t:'Accountability Systems',truth:'What gets tracked and reviewed gets taken seriously.'},{t:'Communication Systems',truth:'Decide how the team communicates before a crisis forces the decision.'},{t:'Inventory Systems',truth:'Know what you have, where it is, and how fast it\'s moving.'},{t:'Sales Systems',truth:'A sales system means every lead is followed up the same way, every time.'},{t:'Marketing Systems',truth:'Marketing that runs on a calendar outperforms marketing that runs on inspiration.'},{t:'Finance Systems',truth:'If it only works when you\'re standing there, it\'s not a system. It\'s a favor.'},{t:'HR Basics',truth:'Even one employee needs clear expectations written down.'},{t:'File Management',truth:'A business that can\'t find its own paperwork can\'t grow past its own confusion.'},{t:'Cloud Storage',truth:'Back up anywhere but the one phone that could get lost tomorrow.'},{t:'Security',truth:'Protect your passwords and data like you protect your cash box.'},{t:'Backups',truth:'The backup you never needed is worth more than the one you needed and didn\'t have.'},{t:'Continuous Improvement',truth:'A system built once and never revisited becomes outdated within a year.'},{t:'Business Infrastructure',truth:'Infrastructure is boring until the day it saves your business.'},{t:'Scalability',truth:'Ask if this works the same way at ten times the size before you scale it.'}]},
-  {n:'07', color:'var(--m7)', title:'Operations', range:'Lessons 153 to 172',
+  {n:'07', color:'var(--m7)', title:'Operations', range:'Lessons 154 to 173',
    desc:'Execution and action: the daily discipline of opening, closing, and running a clean, efficient business.',
    lessons:[{t:'Daily Opening',truth:'How you open the shop sets the standard for how the day runs.'},{t:'Daily Closing',truth:'A clean close today is a faster, easier open tomorrow.'},{t:'Stock Control',truth:'Count your stock regularly, or discover the shortage after it\'s too late.'},{t:'Purchasing',truth:'Buy based on what sells, not on what\'s cheap this week.'},{t:'Supplier Management',truth:'A reliable supplier is worth more than a slightly cheaper one.'},{t:'Delivery',truth:'A late delivery costs more in trust than it saves in convenience.'},{t:'Scheduling',truth:'A written schedule prevents the daily argument about who\'s doing what.'},{t:'Record Keeping',truth:'If it isn\'t written down, it didn\'t happen, as far as your business is concerned.'},{t:'Customer Complaints',truth:'A complaint handled well creates more loyalty than a problem that never happened.'},{t:'Problem Resolution',truth:'Solve the customer\'s problem first, explain the reason after.'},{t:'Team Meetings',truth:'A short daily huddle prevents the long weekly cleanup.'},{t:'Workplace Organisation',truth:'A disorganized shop tells customers the business is disorganized too.'},{t:'Equipment Care',truth:'Maintained equipment is cheaper than replaced equipment.'},{t:'Business Cleanliness',truth:'Cleanliness is free marketing that happens the moment someone walks in.'},{t:'Efficiency',truth:'Do the same work in less time, not more work in the same time.'},{t:'Quality',truth:'Consistency in quality builds more trust than one moment of excellence.'},{t:'Routine',truth:'A strong routine makes good performance the default, not the exception.'},{t:'Standards',truth:'Write your standard down so quality doesn\'t depend on who\'s working that day.'},{t:'Monitoring',truth:'Check on the business often enough to catch small problems before they\'re big ones.'},{t:'Improvement',truth:'Ask weekly: what\'s one thing we can do better than last week?'}]},
-  {n:'08', color:'var(--m8)', title:'Leadership & Growth', range:'Lessons 173 to 202',
+  {n:'08', color:'var(--m8)', title:'Leadership & Growth', range:'Lessons 174 to 203',
    desc:'Strategy and long-term growth: leading a team, scaling, and building something that outlasts you.',
    lessons:[{t:'Leadership',truth:'Leadership is doing the hard thing first so your team knows it\'s possible.'},{t:'Management',truth:'Management is making sure the plan actually gets executed, not just written.'},{t:'Delegation',truth:'The owner who delegates nothing builds a job, not a business.'},{t:'Team Building',truth:'A team performs to the standard the leader models, not the standard they announce.'},{t:'Communication',truth:'Say it clearly once instead of hoping people figure it out.'},{t:'Culture',truth:'Culture is what your team does when you\'re not watching.'},{t:'Motivation',truth:'People stay motivated by progress they can see, not speeches they hear.'},{t:'Hiring',truth:'Hire slow, for attitude and trainability, not just for skill.'},{t:'Training',truth:'An untrained employee will cost you more than the time it takes to train them.'},{t:'Performance',truth:'Measure performance against a standard, not against a feeling.'},{t:'Goals',truth:'A team without a shared goal is just a group of people showing up.'},{t:'Vision',truth:'A leader\'s job is to see further than the team and explain what they see.'},{t:'Innovation',truth:'The business that keeps improving stays ahead of the one that stays comfortable.'},{t:'Change',truth:'Businesses that resist change get replaced by businesses that don\'t.'},{t:'Scaling',truth:'Scale the system first, then scale the size.'},{t:'Partnerships',truth:'A good partnership multiplies what you could do alone.'},{t:'Networking',truth:'Your network today decides which opportunities reach you tomorrow.'},{t:'Negotiation',truth:'Negotiate for a deal both sides want to repeat.'},{t:'Confidence',truth:'Confidence is built by preparation, not by pretending.'},{t:'Resilience',truth:'Every business owner fails. The ones who succeed keep going after.'},{t:'Strategic Thinking',truth:'Think three moves ahead of the decision in front of you.'},{t:'Decision Making',truth:'A leader who can\'t decide creates a team that can\'t move.'},{t:'Long-Term Planning',truth:'Build decisions today that your business will thank you for in five years.'},{t:'Legacy',truth:'Build a business that outlasts your involvement in it.'},{t:'Community Impact',truth:'A business that gives back earns loyalty money can\'t buy.'},{t:'Faith & Business',truth:'Whatever grounds you personally should show up in how you run the business.'},{t:'Mentorship',truth:'Find someone ahead of you, and become that person for someone behind you.'},{t:'Personal Development',truth:'The business grows to the level the owner grows to, and no further.'},{t:'Success Habits',truth:'Success is a stack of small daily habits repeated for a long time.'},{t:'Continuous Learning',truth:'The day you stop learning is the day your competitors start passing you.'}]},
 ];
@@ -1102,6 +1171,19 @@ function esc(str){
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+// A brand new profile looking identical to one that's been trading
+// for two years is exactly the gap fake and scam profiles exploit.
+// This makes tenure visible everywhere a profile is shown, without
+// needing anyone to do anything, the data already exists.
+function memberSinceLabel(createdAt){
+  if (!createdAt) return '';
+  const d = new Date(createdAt);
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  const label = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  if (days < 7) return `New member · joined this week`;
+  return `Member since ${label}`;
 }
 
 let currentUser = null;
@@ -1163,6 +1245,12 @@ async function initApp(){
   initStartHereBanner();
   loadConnections();
   loadGroups();
+  loadVerifyPanel();
+  if (currentProfile.is_admin) {
+    document.getElementById('navAdminLink').style.display = 'inline-block';
+    document.getElementById('admin').style.display = 'block';
+    loadAdminConsole();
+  }
 }
 window.addEventListener('load', () => setTimeout(initApp, 50));
 
@@ -1170,7 +1258,7 @@ window.addEventListener('load', () => setTimeout(initApp, 50));
 // YOUR PATH: a small, honest recommendation engine. Reads what the
 // member told us at signup (their struggle, what they're looking for,
 // their category) and points them at one specific module to start with,
-// instead of leaving 202 lessons for them to sort out alone.
+// instead of leaving 203 lessons for them to sort out alone.
 // =====================================================================
 const pathRules = [
   {keys:['money','cash','price','pricing','profit','pay','debt','finance','expensive','cheap'], module:'03', title:'Business Money', reason:"you mentioned money or pricing, Module 03 covers exactly that: pricing, margin, cash flow, and knowing your real numbers."},
@@ -1202,8 +1290,8 @@ async function loadOverallProgress(){
   updateProgressBar(count || 0);
 }
 function updateProgressBar(count){
-  const pct = Math.round((count / 202) * 100);
-  document.getElementById('progressLabel').textContent = `${count} of 202 lessons`;
+  const pct = Math.round((count / 203) * 100);
+  document.getElementById('progressLabel').textContent = `${count} of 203 lessons`;
   document.getElementById('progressFill').style.width = `${pct}%`;
 }
 
@@ -1303,7 +1391,7 @@ function renderModules(){
       card.classList.toggle('hidden', !moduleHasMatch);
       card.classList.toggle('open', q !== '' && moduleHasMatch);
     });
-    searchCount.textContent = q === '' ? '202 lessons' : `${visibleCount} match${visibleCount===1?'':'es'}`;
+    searchCount.textContent = q === '' ? '203 lessons' : `${visibleCount} match${visibleCount===1?'':'es'}`;
   });
 }
 
@@ -1319,6 +1407,7 @@ const aiKnowledge = [
   {keys:['profit','cash flow','money','revenue'], reply:"Revenue is everything that comes in. Profit is what's left after every cost is paid, including your own labour. Separate business and personal accounts.", cite:"Module 03 · Business Money, Lessons 41 to 43"},
   {keys:['marketing','outreach','cold message','new customers','get more customers'], reply:"Never send a wall of text on WhatsApp, it kills the read rate. Break outreach into three short messages, 30 to 60 seconds apart: an honest opening question, a short explanation of what you offer, then a low pressure ask. On calls or in person, never pitch before you've listened, the sale follows the trust, not the other way around.", cite:"Marketing & Outreach Toolkit, Resource Library"},
   {keys:['scam','fraud','momo scam','wrong transfer','frozen','account frozen','telecel','mtn support','fake agent','pin','otp','someone sent me money'], reply:"If you get a text saying money was sent, check your own MoMo history first, if nothing landed, there's nothing to send back. A real network will never call you saying your account is frozen and rush you to fix it over the phone, and will never ask for your PIN or OTP for any reason. If a call feels off, hang up and call the official number yourself, most scam numbers aren't even on WhatsApp, that's a quick way to check. If you already shared your PIN, open your provider's app immediately and check for any number or name added to your account that isn't yours.", cite:"Module 03 · Business Money, Lessons 69 to 70"},
+  {keys:['investment','investor','invest','diaspora money','send money to invest','double my money','trading platform','forex','crypto opportunity'], reply:"A real investor or partner never asks you to pay a fee first, recruit others, or promises guaranteed high returns fast. Ghana's Cyber Security Authority tracked over 350 fake investment scheme reports in the first half of 2026 alone, many disguised as diaspora business opportunities and pushed through WhatsApp or social media. Verify any investment offer through the SEC before any money moves, and never send funds based on a social media message alone.", cite:"Module 03 · Business Money, Lesson 71"},
   {keys:['register','registration','tin','rgd','legal','licence','license','incorporate'], reply:"Get a Tax Identification Number first, for individuals this is simply the PIN on your Ghana Card. Reserve your business name and register with the Office of the Registrar of Companies, either online or in person, expect a fee around 100 to 120 cedis and a wait of a few days to a couple of weeks. A registered business can open a proper business bank account and access loans that an unregistered one can't.", cite:"Registering Your Business in Ghana, Resource Library"},
 ];
 const aiMessages = document.getElementById('aiMessages');
@@ -1424,6 +1513,7 @@ document.getElementById('postForm').addEventListener('submit', async function(e)
 // =====================================================================
 let directoryData = [];
 let activeCat = 'all';
+let diasporaOnly = false;
 async function loadDirectory(){
   if (!sb) return;
   const { data, error } = await sb.from('public_profiles').select('*').not('sells', 'is', null).order('created_at', { ascending: false });
@@ -1432,6 +1522,8 @@ async function loadDirectory(){
   directoryData = (data || []).map(p => ({
     id: p.id, name: p.business_name || p.name, cat: p.category, loc: p.location, landmark: p.landmark,
     sells: p.sells, looking: p.looking_for, verified: p.verified, logo: p.logo_url,
+    isDiaspora: p.is_diaspora, diasporaCountry: p.diaspora_country,
+    memberSince: p.created_at,
     online: p.last_seen && (now - new Date(p.last_seen).getTime()) < 5*60*1000,
   }));
   renderDirectory();
@@ -1441,6 +1533,7 @@ function renderDirectory(){
   const query = (document.getElementById('dirSearch').value || '').toLowerCase();
   const filtered = directoryData
     .filter(d => activeCat === 'all' || d.cat === activeCat)
+    .filter(d => !diasporaOnly || d.isDiaspora)
     .filter(d => `${d.name} ${d.cat} ${d.loc}`.toLowerCase().includes(query));
   grid.innerHTML = filtered.map(d => `
     <div class="dir-card">
@@ -1451,6 +1544,8 @@ function renderDirectory(){
       <h4>${esc(d.name)}</h4>
       <div class="cat">${esc(d.cat || '')}</div>
       <div class="loc">📍 ${esc(d.loc || '')}${d.landmark ? ', ' + esc(d.landmark) : ''}</div>
+      ${d.isDiaspora ? `<div class="loc" style="color:var(--gold);">🌍 Based in ${esc(d.diasporaCountry || 'the diaspora')}</div>` : ''}
+      <div class="member-since${(Date.now() - new Date(d.memberSince).getTime()) < 7*86400000 ? ' new' : ''}">${esc(memberSinceLabel(d.memberSince))}</div>
       <div class="sells">${esc(d.sells || '')}</div>
       ${d.looking ? `<div class="looking">Looking for: ${esc(d.looking)}</div>` : ''}
       ${d.id && d.id !== currentUser?.id ? `
@@ -1462,9 +1557,15 @@ function renderDirectory(){
   `).join('') || '<p style="color:var(--paper-dim);padding:20px;">No businesses match yet.</p>';
 }
 document.getElementById('dirSearch').addEventListener('input', renderDirectory);
+document.getElementById('dirDiasporaFilter').addEventListener('click', function(){
+  diasporaOnly = !diasporaOnly;
+  this.classList.toggle('active', diasporaOnly);
+  renderDirectory();
+});
 document.querySelectorAll('.dir-filter').forEach(btn => {
   btn.addEventListener('click', function(){
-    document.querySelectorAll('.dir-filter').forEach(b=>b.classList.remove('active'));
+    if (this.id === 'dirDiasporaFilter') return;
+    document.querySelectorAll('.dir-filter').forEach(b=>{ if (b.id !== 'dirDiasporaFilter') b.classList.remove('active'); });
     this.classList.add('active');
     activeCat = this.getAttribute('data-cat');
     renderDirectory();
@@ -1554,7 +1655,7 @@ const badgeDefs = [
   {id:'ten_lessons', icon:'📗', title:'Getting Started', desc:'Complete 10 lessons', check:(s)=>s.lessons>=10},
   {id:'fifty_lessons', icon:'📙', title:'Building Momentum', desc:'Complete 50 lessons', check:(s)=>s.lessons>=50},
   {id:'hundred_lessons', icon:'📕', title:'Halfway There', desc:'Complete 100 lessons', check:(s)=>s.lessons>=100},
-  {id:'all_lessons', icon:'🎓', title:'Business Graduate', desc:'Complete all 202 lessons', check:(s)=>s.lessons>=202},
+  {id:'all_lessons', icon:'🎓', title:'Business Graduate', desc:'Complete all 203 lessons', check:(s)=>s.lessons>=203},
   {id:'week_streak', icon:'🔥', title:'Week Warrior', desc:'7 day check in streak', check:(s)=>s.streak>=7},
   {id:'month_streak', icon:'⚡', title:'Unstoppable', desc:'30 day check in streak', check:(s)=>s.streak>=30},
   {id:'first_post', icon:'💬', title:'Speaking Up', desc:'Post in the community', check:(s)=>s.posts>=1},
@@ -1628,18 +1729,55 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
 // =====================================================================
 // RESOURCES + EVENTS
 // =====================================================================
+let resourceData = [];
+// Renders BYINFORGH's own resource content (from Table Editor, not member
+// input) as readable HTML. Still escaped since it's inserted as HTML.
+function renderResourceContent(text){
+  if (!text) return '<p>This guide is being finalised, check back soon.</p>';
+  const blocks = String(text).split(/\n\s*\n/);
+  return blocks.map(block => {
+    const trimmed = block.trim();
+    if (!trimmed) return '';
+    const lines = trimmed.split('\n').map(l => l.trim()).filter(Boolean);
+    const isList = lines.length > 1 && lines.every(l => l.startsWith('- ') || /^\d+\.\s/.test(l));
+    if (isList) {
+      return `<ul>${lines.map(l => `<li>${esc(l.replace(/^-\s|^\d+\.\s/, ''))}</li>`).join('')}</ul>`;
+    }
+    if (trimmed.startsWith('## ')) {
+      return `<h5>${esc(trimmed.slice(3))}</h5>`;
+    }
+    return `<p>${esc(trimmed).replace(/\n/g, '<br>')}</p>`;
+  }).join('');
+}
 async function loadResources(){
   const grid = document.getElementById('resourceGrid');
   const { data } = await sb.from('resources').select('*').order('created_at', { ascending: true });
-  grid.innerHTML = (data || []).map(r => `
-    <div class="resource-card">
+  resourceData = data || [];
+  grid.innerHTML = resourceData.map((r, i) => `
+    <div class="resource-card" data-index="${i}">
       <span class="resource-format">${esc(r.format || '')}</span>
       <h4>${esc(r.title)}</h4>
       <p>${esc(r.description || '')}</p>
-      ${r.file_url ? `<a href="${esc(r.file_url)}" class="resource-btn" target="_blank">Download →</a>` : `<span class="resource-btn" style="color:var(--paper-dim);">Coming soon</span>`}
+      <span class="resource-btn">Read inside →</span>
     </div>
   `).join('');
+  grid.querySelectorAll('.resource-card').forEach(card => {
+    card.addEventListener('click', () => openResourceModal(resourceData[parseInt(card.dataset.index, 10)]));
+  });
 }
+function openResourceModal(r){
+  if (!r) return;
+  document.getElementById('resModalFormat').textContent = r.format || '';
+  document.getElementById('resModalTitle').textContent = r.title;
+  document.getElementById('resModalBody').innerHTML = renderResourceContent(r.content);
+  document.getElementById('resourceModal').classList.add('open');
+}
+document.getElementById('resModalClose').addEventListener('click', () => {
+  document.getElementById('resourceModal').classList.remove('open');
+});
+document.getElementById('resourceModal').addEventListener('click', (e) => {
+  if (e.target.id === 'resourceModal') document.getElementById('resourceModal').classList.remove('open');
+});
 async function loadEvents(){
   const list = document.getElementById('eventsList');
   const { data } = await sb.from('events').select('*').order('created_at', { ascending: true });
@@ -1916,6 +2054,8 @@ function computeSuggestedConnections(){
       let score = 0, reasons = [];
       if (p.category && mine.category && p.category === mine.category) { score += 3; reasons.push(`Same category: ${p.category}`); }
       if (p.location && mine.location && p.location.toLowerCase() === mine.location.toLowerCase()) { score += 2; reasons.push(`Also based in ${p.location}`); }
+      if (p.is_diaspora && !mine.is_diaspora) { score += 1; reasons.push(`Based abroad in ${p.diaspora_country || 'the diaspora'}, open to networking with Ghana businesses`); }
+      if (mine.is_diaspora && !p.is_diaspora) { score += 1; reasons.push('A Ghana-based business you could connect with directly'); }
       const theirLooking = (p.looking_for || '').toLowerCase();
       const theirSells = (p.sells || '').toLowerCase();
       if (mySells && theirLooking && theirLooking.split(/\W+/).some(w => w.length > 3 && mySells.includes(w))) { score += 3; reasons.push('They may be looking for what you sell'); }
@@ -1940,7 +2080,7 @@ function renderConnections(){
       <div class="conn-card">
         <div class="conn-card-top">
           <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
-          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}${p.location ? ' · ' + esc(p.location) : ''}</div></div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}${p.location ? ' · ' + esc(p.location) : ''}</div><div class="conn-meta">${esc(memberSinceLabel(p.created_at))}</div></div>
         </div>
         <div class="conn-why">${esc(reason)}</div>
         <div class="conn-actions"><button class="btn-primary conn-request-btn" data-id="${esc(p.id)}">Connect</button></div>
@@ -1968,7 +2108,7 @@ function renderConnections(){
       <div class="conn-card">
         <div class="conn-card-top">
           <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
-          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">wants to connect</div></div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">wants to connect · ${esc(memberSinceLabel(p.created_at))}</div></div>
         </div>
         <div class="conn-actions">
           <button class="btn-primary conn-accept-btn" data-id="${esc(c.id)}">Accept</button>
@@ -2007,7 +2147,7 @@ document.getElementById('connGrid').addEventListener('click', async (e) => {
   if (btn.classList.contains('conn-request-btn')) {
     btn.disabled = true; btn.textContent = 'Sending...';
     const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: btn.dataset.id, status: 'pending' });
-    if (error) { btn.disabled = false; btn.textContent = 'Connect'; alert('Could not send request.'); }
+    if (error) { btn.disabled = false; btn.textContent = 'Connect'; alert(error.message || 'Could not send request.'); }
     else loadConnections();
   } else if (btn.classList.contains('conn-accept-btn')) {
     await sb.from('connections').update({ status: 'accepted', responded_at: new Date().toISOString() }).eq('id', btn.dataset.id);
@@ -2035,7 +2175,7 @@ document.getElementById('directoryGrid').addEventListener('click', async (e) => 
     else if (status === 'none') {
       connBtn.disabled = true; connBtn.textContent = 'Sending...';
       const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: otherId, status: 'pending' });
-      if (!error) loadConnections(); else { connBtn.disabled = false; connBtn.textContent = 'Connect'; }
+      if (!error) loadConnections(); else { connBtn.disabled = false; connBtn.textContent = 'Connect'; alert(error.message || 'Could not send request.'); }
     }
   } else if (reportBtn) {
     openReportModal(reportBtn.dataset.id, reportBtn.dataset.name, 'profile', null);
@@ -2078,7 +2218,7 @@ async function openConversation(otherId){
   const col = document.getElementById('threadCol');
   col.innerHTML = `
     <div class="thread-head">
-      <div class="thread-head-name">${esc(p ? (p.business_name || p.name) : 'Member')}</div>
+      <div><div class="thread-head-name">${esc(p ? (p.business_name || p.name) : 'Member')}${p && p.verified ? ' <span style="font-family:JetBrains Mono,monospace;font-size:9px;color:var(--lime);border:1px solid var(--lime);padding:2px 6px;border-radius:20px;vertical-align:middle;">Verified</span>' : ''}</div><div class="convo-preview">${esc(memberSinceLabel(p ? p.created_at : null))}</div></div>
       <button class="dir-report-btn" id="threadReportBtn" title="Report">⚑</button>
     </div>
     <div class="thread-feed" id="threadFeed"></div>
@@ -2086,7 +2226,7 @@ async function openConversation(otherId){
       <input type="text" id="threadInput" placeholder="Write a message...">
       <button class="btn-primary" id="threadSendBtn">Send</button>
     </div>
-    <div class="filter-warning" id="threadFilterWarning">Keep it respectful — no foul language, threats, or harassment. Rewrite your message.</div>
+    <div class="filter-warning" id="threadFilterWarning">Keep it respectful, no foul language, threats, or harassment. Rewrite your message.</div>
   `;
   document.getElementById('threadReportBtn').addEventListener('click', () => openReportModal(otherId, p ? (p.business_name || p.name) : 'this member', 'dm_message', null));
   document.getElementById('threadSendBtn').addEventListener('click', sendDM);
@@ -2323,13 +2463,218 @@ function downloadGroupChat(groupId, groupName){
       const who = p ? (p.business_name || p.name) : 'Member';
       return `[${new Date(m.created_at).toLocaleString('en-GB')}] ${who}: ${m.body}`;
     });
-    const blob = new Blob([`${groupName} — group chat export\n\n${lines.join('\n')}`], { type: 'text/plain' });
+    const blob = new Blob([`${groupName}, group chat export\n\n${lines.join('\n')}`], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = `${groupName.replace(/[^a-z0-9]+/gi, '_')}_chat.txt`;
     a.click();
   });
 }
+
+// =====================================================================
+// VERIFICATION
+// The "Verified" badge is only trustworthy if it costs something to
+// get. This panel is the only way a member can request it, submitting
+// a real document to a private bucket only you can review, never
+// self-granted, never automatic.
+// =====================================================================
+async function loadVerifyPanel(){
+  if (!sb || !currentUser || !currentProfile) return;
+  const panel = document.getElementById('verifyPanel');
+
+  if (currentProfile.verified) {
+    panel.className = 'verify-panel verified';
+    panel.innerHTML = `
+      <div class="verify-row">
+        <div><div class="verify-title">✅ Your business is verified</div><div class="verify-desc">Other members see your Verified badge everywhere your profile appears.</div></div>
+      </div>`;
+    return;
+  }
+
+  const { data: requests } = await sb.from('verification_requests').select('*').eq('user_id', currentUser.id).order('submitted_at', { ascending: false }).limit(1);
+  const latest = requests && requests[0];
+
+  if (latest && latest.status === 'pending') {
+    panel.className = 'verify-panel pending';
+    panel.innerHTML = `
+      <div class="verify-row">
+        <div><div class="verify-title">Verification submitted</div><div class="verify-desc">Your document is being reviewed. This usually takes a few days.</div></div>
+        <span class="verify-status-badge pending">Pending review</span>
+      </div>`;
+    return;
+  }
+
+  panel.className = 'verify-panel';
+  panel.innerHTML = `
+    <div class="verify-row">
+      <div><div class="verify-title">Get a Verified badge</div><div class="verify-desc">Submit your Ghana Card or business registration document. A real person reviews it, nobody else can see it, and it's what tells other members you're really who you say you are.${latest && latest.status === 'rejected' ? " Your last submission wasn't approved, you can try again below." : ''}</div></div>
+      <button class="btn-primary" id="verifyToggleBtn">${latest && latest.status === 'rejected' ? 'Resubmit' : 'Request verification'}</button>
+    </div>
+    <form class="verify-form" id="verifyForm">
+      <div class="field">
+        <label>Document type</label>
+        <select class="field-select" id="verifyDocType">
+          <option value="ghana_card">Ghana Card</option>
+          <option value="business_registration">Business registration certificate</option>
+          <option value="other">Other proof of business</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Upload document (photo or scan)</label>
+        <input type="file" id="verifyDocFile" accept="image/*,.pdf" required>
+      </div>
+      <div class="field">
+        <label>Anything that helps us confirm this (optional)</label>
+        <textarea id="verifyNotes" rows="2" placeholder="e.g. name on the document, business registration number"></textarea>
+      </div>
+      <button type="submit" class="btn-primary">Submit for review</button>
+      <div id="verifySubmitStatus" style="margin-top:10px;font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--lime);"></div>
+    </form>
+  `;
+  document.getElementById('verifyToggleBtn').addEventListener('click', () => {
+    document.getElementById('verifyForm').classList.toggle('open');
+  });
+  document.getElementById('verifyForm').addEventListener('submit', submitVerification);
+}
+
+async function submitVerification(e){
+  e.preventDefault();
+  const statusEl = document.getElementById('verifySubmitStatus');
+  const file = document.getElementById('verifyDocFile').files[0];
+  const docType = document.getElementById('verifyDocType').value;
+  const notes = document.getElementById('verifyNotes').value.trim();
+  if (!file || !sb || !currentUser) return;
+
+  statusEl.textContent = 'Uploading...';
+  const path = `${currentUser.id}/${Date.now()}_${file.name.replace(/[^a-z0-9.]+/gi, '_')}`;
+  const { error: uploadError } = await sb.storage.from('verification-documents').upload(path, file);
+  if (uploadError) {
+    statusEl.textContent = 'Upload failed, please try again.';
+    return;
+  }
+  const { error } = await sb.from('verification_requests').insert({
+    user_id: currentUser.id, document_url: path, document_type: docType, notes: notes || null,
+  });
+  statusEl.textContent = error ? 'Something went wrong, please try again.' : 'Submitted. Thanks, someone will review this soon.';
+  if (!error) setTimeout(loadVerifyPanel, 1200);
+}
+
+// =====================================================================
+// ADMIN CONSOLE
+// Only ever loaded and shown if currentProfile.is_admin is true, which
+// only you can set, in Table Editor, never from inside the app. Turns
+// three separate Table Editor habits into one screen: verification,
+// reports, and pending content approvals.
+// =====================================================================
+let activeAdminTab = 'verification';
+
+async function loadAdminConsole(){
+  const [{ data: verifs }, { data: reports }, { data: spotlights }, { data: testimonials }, { data: aiDocs }] = await Promise.all([
+    sb.from('verification_requests').select('*').eq('status', 'pending').order('submitted_at', { ascending: true }),
+    sb.from('reports').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+    sb.from('spotlights').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+    sb.from('testimonials').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+    sb.from('ai_documents').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+  ]);
+  window._adminData = { verifs: verifs || [], reports: reports || [], content: [
+    ...(spotlights || []).map(s => ({ ...s, kind: 'spotlight' })),
+    ...(testimonials || []).map(t => ({ ...t, kind: 'testimonial' })),
+    ...(aiDocs || []).map(a => ({ ...a, kind: 'ai_document' })),
+  ]};
+  document.getElementById('adminVerifyCount').textContent = window._adminData.verifs.length || '';
+  document.getElementById('adminReportsCount').textContent = window._adminData.reports.length || '';
+  document.getElementById('adminContentCount').textContent = window._adminData.content.length || '';
+  renderAdminPanel();
+}
+
+function renderAdminPanel(){
+  const body = document.getElementById('adminPanelBody');
+  const d = window._adminData;
+  if (activeAdminTab === 'verification') {
+    body.innerHTML = d.verifs.map(v => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(profileDirectory[v.user_id] ? (profileDirectory[v.user_id].business_name || profileDirectory[v.user_id].name) : v.user_id)}</div>
+          <div class="admin-queue-meta">${esc(v.document_type || '')} · submitted ${new Date(v.submitted_at).toLocaleDateString('en-GB')}</div>
+          <div class="admin-queue-body">${esc(v.notes || 'No notes provided.')}</div>
+          <a class="admin-doc-link" data-path="${esc(v.document_url)}">View document →</a>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-primary admin-verify-approve" data-id="${esc(v.id)}" data-user="${esc(v.user_id)}">Approve</button>
+          <button class="btn-danger admin-verify-reject" data-id="${esc(v.id)}">Reject</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No pending verification requests.</p>';
+  } else if (activeAdminTab === 'reports') {
+    body.innerHTML = d.reports.map(r => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">Report against ${esc(profileDirectory[r.reported_user_id] ? (profileDirectory[r.reported_user_id].business_name || profileDirectory[r.reported_user_id].name) : r.reported_user_id)}</div>
+          <div class="admin-queue-meta">${esc(r.reason)} · ${esc(r.context_type)} · filed ${new Date(r.created_at).toLocaleDateString('en-GB')}</div>
+          <div class="admin-queue-body">${esc(r.details || 'No further details provided.')}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-danger admin-report-strike" data-id="${esc(r.id)}" data-user="${esc(r.reported_user_id)}">Issue strike</button>
+          <button class="btn-ghost admin-report-dismiss" data-id="${esc(r.id)}">Dismiss</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No pending reports.</p>';
+  } else if (activeAdminTab === 'content') {
+    body.innerHTML = d.content.map(c => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(c.kind.replace('_',' '))} from ${esc(profileDirectory[c.user_id] ? (profileDirectory[c.user_id].business_name || profileDirectory[c.user_id].name) : c.user_id)}</div>
+          <div class="admin-queue-meta">submitted ${new Date(c.created_at).toLocaleDateString('en-GB')}</div>
+          <div class="admin-queue-body">${esc((c.kind === 'spotlight' ? `${c.business_name}: ${c.what_they_do}` : c.kind === 'ai_document' ? `${c.title}: ${c.content}` : c.content || '').toString().slice(0, 400))}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-primary admin-content-approve" data-id="${esc(c.id)}" data-kind="${esc(c.kind)}">Approve</button>
+          <button class="btn-danger admin-content-reject" data-id="${esc(c.id)}" data-kind="${esc(c.kind)}">Reject</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">Nothing pending.</p>';
+  }
+}
+document.querySelectorAll('#adminTabs button').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#adminTabs button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeAdminTab = this.getAttribute('data-tab');
+    renderAdminPanel();
+  });
+});
+
+document.getElementById('adminPanelBody').addEventListener('click', async (e) => {
+  const docLink = e.target.closest('.admin-doc-link');
+  if (docLink) {
+    const { data, error } = await sb.storage.from('verification-documents').createSignedUrl(docLink.dataset.path, 3600);
+    if (data && data.signedUrl) window.open(data.signedUrl, '_blank');
+    else alert('Could not open document.');
+    return;
+  }
+  const btn = e.target.closest('button');
+  if (!btn) return;
+
+  if (btn.classList.contains('admin-verify-approve')) {
+    await sb.from('verification_requests').update({ status: 'approved', reviewed_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    await sb.from('profiles').update({ verified: true }).eq('id', btn.dataset.user);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-verify-reject')) {
+    await sb.from('verification_requests').update({ status: 'rejected', reviewed_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-report-dismiss')) {
+    await sb.from('reports').update({ status: 'dismissed' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-report-strike')) {
+    if (!confirm('Issue a strike to this member? Three strikes suspends their account automatically.')) return;
+    await sb.from('strikes').insert({ user_id: btn.dataset.user, report_id: btn.dataset.id, reason: 'Reported and reviewed by admin' });
+    await sb.from('reports').update({ status: 'actioned' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-content-approve')) {
+    await sb.from(btn.dataset.kind === 'ai_document' ? 'ai_documents' : btn.dataset.kind + 's').update({ status: 'approved' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-content-reject')) {
+    await sb.from(btn.dataset.kind === 'ai_document' ? 'ai_documents' : btn.dataset.kind + 's').update({ status: 'rejected' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  }
+});
 </script>
 
 </body>
