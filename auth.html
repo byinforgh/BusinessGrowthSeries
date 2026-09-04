@@ -6,86 +6,86 @@
 <title>Join or Log In: BYINFORGH Business Growth Series</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Archivo:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
-  --ink:#0b0f0c; --panel:#11170f; --panel-2:#161d13; --line: rgba(255,255,255,0.09);
-  --paper:#f4f2e9; --paper-dim:#c9c5b4; --lime:#9fe870; --lime-dim:#7bc94e;
-  --gold:#e0b23e; --clay:#e07a3f; --radius:2px;
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F;
+  --gold:#B08D3F; --blue:#3F93A8; --radius:6px;
 }
 *{box-sizing:border-box;}
-body{margin:0;background:var(--ink);color:var(--paper);font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased;}
-::selection{background:var(--lime);color:var(--ink);}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+::selection{background:var(--teal);color:var(--bg);}
 a{color:inherit;}
-h1,h2{font-family:'Archivo Black',sans-serif;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
-.eyebrow{font-family:'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--lime);}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
 
 .kente-stripe{height:6px;display:flex;}
 .kente-stripe span{flex:1;}
-.kente-stripe span:nth-child(4n+1){background:var(--lime);}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
 .kente-stripe span:nth-child(4n+2){background:var(--gold);}
-.kente-stripe span:nth-child(4n+3){background:var(--clay);}
-.kente-stripe span:nth-child(4n+4){background:var(--panel-2);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
 
 .brand-mark{
   width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);
   display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);position:relative;flex-shrink:0;
 }
-.brand-mark::after{content:'';position:absolute;bottom:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--lime);}
+.brand-mark::after{content:'';position:absolute;bottom:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--teal);}
 
 .auth-shell{
   min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
-  background:radial-gradient(ellipse 900px 560px at 50% -10%, rgba(159,232,112,0.10), transparent 60%),
-             radial-gradient(ellipse 600px 400px at 100% 100%, rgba(224,178,62,0.06), transparent 60%);
+  background:radial-gradient(ellipse 900px 560px at 50% -10%, rgba(15,76,92,0.10), transparent 60%),
+             radial-gradient(ellipse 600px 400px at 100% 100%, rgba(176,141,63,0.06), transparent 60%);
 }
 .auth-card{width:100%;max-width:480px;}
-.auth-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:32px;font-family:'Archivo Black',sans-serif;font-size:16px;letter-spacing:.02em;}
-.auth-box{border:1px solid var(--line);background:var(--panel-2);overflow:hidden;}
+.auth-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:32px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;letter-spacing:.02em;}
+.auth-box{border:1px solid var(--line);background:var(--surface-2);overflow:hidden;}
 .auth-box-inner{padding:40px;}
 .auth-box h2{font-size:25px;text-transform:none;letter-spacing:0;margin-bottom:10px;}
-.auth-box .sub{font-size:14px;color:var(--paper-dim);line-height:1.55;margin-bottom:26px;}
+.auth-box .sub{font-size:14px;color:var(--ink-dim);line-height:1.55;margin-bottom:26px;}
 .auth-step{display:none;}
 .auth-step.active{display:block;}
 
 .field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
-.field label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--paper-dim);}
+.field label{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
 .field input, .field select, .field textarea{
-  background:var(--ink);border:1px solid var(--line);color:var(--paper);padding:14px 16px;
-  font-family:'Archivo',sans-serif;font-size:14.5px;outline:none;border-radius:2px;width:100%;
+  background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:14px 16px;
+  font-family:'Poppins',sans-serif;font-size:14.5px;outline:none;border-radius:2px;width:100%;
 }
-.field input::placeholder, .field textarea::placeholder{color:var(--paper-dim);}
-.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--lime);}
-.field-hint{font-size:11.5px;color:var(--paper-dim);}
-.form-status{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--lime);min-height:18px;margin-top:10px;}
+.field input::placeholder, .field textarea::placeholder{color:var(--ink-dim);}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--teal);}
+.field-hint{font-size:11.5px;color:var(--ink-dim);}
+.form-status{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--teal);min-height:18px;margin-top:10px;}
 
 .btn-primary{
-  background:var(--lime);color:var(--ink);padding:16px 24px;font-weight:800;text-transform:uppercase;
+  background:var(--teal);color:var(--bg);padding:16px 24px;font-weight:800;text-transform:uppercase;
   letter-spacing:.04em;font-size:13.5px;border:none;border-radius:2px;cursor:pointer;width:100%;
   transition:transform .15s, box-shadow .15s;
 }
-.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(159,232,112,0.25);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(15,76,92,0.25);}
 .btn-primary:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none;}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 @media(max-width:520px){.grid2{grid-template-columns:1fr;}}
 
 .auth-links{display:flex;justify-content:center;margin-top:18px;font-size:12.5px;}
-.auth-links button{color:var(--paper-dim);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:12.5px;font-family:'Archivo',sans-serif;padding:0;}
-.auth-links button:hover{color:var(--lime);}
+.auth-links button{color:var(--ink-dim);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:12.5px;font-family:'Poppins',sans-serif;padding:0;}
+.auth-links button:hover{color:var(--teal);}
 
-.back-link{display:flex;align-items:center;gap:8px;color:var(--paper-dim);text-decoration:none;font-size:12.5px;margin-bottom:22px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.05em;}
-.back-link:hover{color:var(--lime);}
+.back-link{display:flex;align-items:center;gap:8px;color:var(--ink-dim);text-decoration:none;font-size:12.5px;margin-bottom:22px;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.05em;}
+.back-link:hover{color:var(--teal);}
 
 .mail-icon{
-  width:56px;height:56px;border-radius:50%;background:rgba(159,232,112,0.12);border:1px solid var(--lime);
+  width:56px;height:56px;border-radius:50%;background:rgba(15,76,92,0.12);border:1px solid var(--teal);
   display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 20px;
 }
 .center{text-align:center;}
 .logo-upload-row{display:flex;align-items:center;gap:16px;}
 .logo-preview{
-  width:56px;height:56px;border-radius:50%;background:var(--ink);border:1px dashed var(--line);flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;font-family:'Archivo Black',sans-serif;color:var(--gold);
+  width:56px;height:56px;border-radius:50%;background:var(--bg);border:1px dashed var(--line);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;color:var(--gold);
   font-size:18px;overflow:hidden;
 }
 .logo-preview img{width:100%;height:100%;object-fit:cover;}
@@ -122,7 +122,7 @@ h1,h2{font-family:'Archivo Black',sans-serif;line-height:1.02;margin:0;text-tran
           <div class="center">
             <div class="mail-icon">✉</div>
             <h2>Check your email</h2>
-            <p class="sub">We sent a login link to <b id="emailDisplay" style="color:var(--paper);"></b>. Open it on this device to continue, this tab will pick it up automatically.</p>
+            <p class="sub">We sent a login link to <b id="emailDisplay" style="color:var(--ink);"></b>. Open it on this device to continue, this tab will pick it up automatically.</p>
           </div>
           <div class="form-status center" id="waitingStatus"></div>
           <div class="auth-links">
@@ -185,7 +185,7 @@ h1,h2{font-family:'Archivo Black',sans-serif;line-height:1.02;margin:0;text-tran
               <div class="logo-upload-row">
                 <div class="logo-preview" id="logoPreview">B</div>
                 <div style="flex:1;">
-                  <input type="file" id="pLogo" accept="image/*" style="font-size:12.5px;color:var(--paper-dim);">
+                  <input type="file" id="pLogo" accept="image/*" style="font-size:12.5px;color:var(--ink-dim);">
                   <span class="field-hint" style="display:block;margin-top:6px;">Shows on your directory card and any spotlight feature. Skip for now and add it later if you like.</span>
                 </div>
               </div>
@@ -198,7 +198,7 @@ h1,h2{font-family:'Archivo Black',sans-serif;line-height:1.02;margin:0;text-tran
             <button type="submit" class="btn-primary" id="saveProfileBtn">Enter Business Growth Series &rarr;</button>
           </form>
           <div class="form-status" id="profileStatus"></div>
-          <p style="font-size:11.5px;color:var(--paper-dim);margin-top:16px;text-align:center;">By joining you agree to our <a href="privacy.html" style="color:var(--lime);">Privacy Policy &amp; Terms</a>. Your struggle and email stay private, only visible to you and BYINFORGH.</p>
+          <p style="font-size:11.5px;color:var(--ink-dim);margin-top:16px;text-align:center;">By joining you agree to our <a href="privacy.html" style="color:var(--teal);">Privacy Policy &amp; Terms</a>. Your struggle and email stay private, only visible to you and BYINFORGH.</p>
         </div>
 
       </div>
