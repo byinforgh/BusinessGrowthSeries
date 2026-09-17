@@ -82,6 +82,9 @@ nav{
   font-size:13px;text-transform:uppercase;letter-spacing:.03em;border-radius:var(--radius);background:none;cursor:pointer;
 }
 .nav-mobile-toggle{display:none;background:none;border:1px solid var(--line);color:var(--ink);padding:8px 12px;font-size:20px;cursor:pointer;}
+.nav-actions{display:flex;align-items:center;gap:18px;}
+.nav-login-link{color:var(--ink);text-decoration:none;font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.03em;transition:color .15s;}
+.nav-login-link:hover{color:var(--teal);}
 
 section{padding:72px 0;position:relative;}
 section:not(:first-of-type)::before{
@@ -294,7 +297,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
       <a href="#ai-assistant">AI Assistant</a>
       <a href="#membership">Membership</a>
     </div>
-    <a href="auth.html" class="nav-cta">Join Free</a>
+    <div class="nav-actions">
+      <a href="auth.html" class="nav-login-link">Log In</a>
+      <a href="auth.html" class="nav-cta">Join Free</a>
+    </div>
   </div>
 </nav>
 
