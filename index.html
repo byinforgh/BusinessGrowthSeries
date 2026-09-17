@@ -129,7 +129,21 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 .footer-col a{display:block;font-size:14px;color:var(--ink);text-decoration:none;margin-bottom:10px;opacity:.85;}
 .footer-col a:hover{color:var(--teal);}
 .footer-pillars{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);margin-bottom:32px;}
-.pillar{background:var(--bg);flex:1;text-align:center;padding:18px 10px;font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
+.pillar{background:var(--bg);flex:1;text-align:center;padding:18px 10px;font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);text-decoration:none;cursor:pointer;transition:color .15s,background .15s;}
+.pillar:hover{color:var(--teal);background:var(--surface-2);}
+
+.join-modal-overlay{
+  position:fixed;inset:0;background:rgba(10,54,63,0.55);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;
+}
+.join-modal-overlay.open{display:flex;}
+.join-modal-box{background:var(--surface);border:1px solid var(--line);max-width:420px;width:100%;overflow:hidden;position:relative;box-shadow:0 24px 60px rgba(10,54,63,0.25);}
+.join-modal-close{
+  position:absolute;top:14px;right:14px;background:none;border:none;font-size:22px;color:var(--ink-dim);cursor:pointer;line-height:1;padding:4px;z-index:1;
+}
+.join-modal-close:hover{color:var(--ink);}
+.join-modal-body{padding:40px 32px 32px;text-align:center;}
+.join-modal-body h3{font-family:'Inter',sans-serif;font-weight:800;font-size:22px;margin:14px 0 10px;text-transform:none;letter-spacing:0;}
+.join-modal-body p{font-size:14.5px;color:var(--ink-dim);line-height:1.6;margin:0 0 24px;}
 .footer-bottom{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);border-top:1px solid var(--line);padding-top:24px;flex-wrap:wrap;gap:12px;}
 
 @media(max-width:860px){
@@ -185,8 +199,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .teaser-desc{font-size:14px;color:var(--ink-dim);line-height:1.55;}
   .teaser-lock{
     margin-top:18px;font-family:'Inter',sans-serif;font-size:11px;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--gold);display:flex;align-items:center;gap:8px;
+    color:var(--gold);display:flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer;width:fit-content;
+    transition:opacity .15s;
   }
+  .teaser-lock:hover{opacity:.7;}
 
   .locked-preview{position:relative;border:1px solid var(--line);background:var(--surface-2);overflow:hidden;min-height:280px;}
   .locked-preview-kente{height:4px;display:flex;}
@@ -271,7 +287,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 <nav>
 <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="nav-inner">
-    <a href="landing.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <a href="index.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
     <div class="nav-links">
       <a href="#curriculum">Curriculum</a>
       <a href="#community">Community</a>
@@ -334,28 +350,28 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
         <h3>Business Foundations</h3>
         <div class="teaser-lessons">Lessons 1 to 20</div>
         <p class="teaser-desc">How to think like a business owner: mindset, discipline, and the difference between a hustle and a business.</p>
-        <div class="teaser-lock">🔒 Join to unlock</div>
+        <a href="auth.html" class="teaser-lock">🔒 Join to unlock</a>
       </div>
       <div class="teaser-card">
         <div class="teaser-top"><span class="teaser-num">MODULE 03</span><span class="teaser-dot" style="background:var(--m3);"></span></div>
         <h3>Business Money</h3>
         <div class="teaser-lessons">Lessons 41 to 73</div>
         <p class="teaser-desc">Finance and wealth: revenue, profit, pricing, cash flow, and the numbers every owner must actually understand.</p>
-        <div class="teaser-lock">🔒 Join to unlock</div>
+        <a href="auth.html" class="teaser-lock">🔒 Join to unlock</a>
       </div>
       <div class="teaser-card">
         <div class="teaser-top"><span class="teaser-num">MODULE 05</span><span class="teaser-dot" style="background:var(--m5);"></span></div>
         <h3>Visibility &amp; Marketing</h3>
         <div class="teaser-lessons">Lessons 99 to 123</div>
         <p class="teaser-desc">Brand and authority: getting found online and building a reputation that sells for you.</p>
-        <div class="teaser-lock">🔒 Join to unlock</div>
+        <a href="auth.html" class="teaser-lock">🔒 Join to unlock</a>
       </div>
       <div class="teaser-card">
         <div class="teaser-top"><span class="teaser-num">MODULE 08</span><span class="teaser-dot" style="background:var(--m8);"></span></div>
         <h3>Leadership &amp; Growth</h3>
         <div class="teaser-lessons">Lessons 174 to 203</div>
         <p class="teaser-desc">Strategy and long term growth: leading a team, scaling, and building something that outlasts you.</p>
-        <div class="teaser-lock">🔒 Join to unlock</div>
+        <a href="auth.html" class="teaser-lock">🔒 Join to unlock</a>
       </div>
     </div>
   </div>
@@ -509,10 +525,10 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 <footer>
   <div class="wrap">
     <div class="footer-pillars">
-      <div class="pillar">Get Visible</div>
-      <div class="pillar">Get Customers</div>
-      <div class="pillar">Get Growing</div>
-      <div class="pillar">Get Systemised</div>
+      <a href="https://business-health-visibility-audit-scan.netlify.app/" target="_blank" rel="noopener" class="pillar">Get Visible</a>
+      <a href="https://business-health-visibility-audit-scan.netlify.app/" target="_blank" rel="noopener" class="pillar">Get Customers</a>
+      <a href="https://business-health-visibility-audit-scan.netlify.app/" target="_blank" rel="noopener" class="pillar">Get Growing</a>
+      <a href="https://business-health-visibility-audit-scan.netlify.app/" target="_blank" rel="noopener" class="pillar">Get Systemised</a>
     </div>
     <div class="footer-top">
       <div>
@@ -604,7 +620,44 @@ if (aiTeaserForm) {
     location.href = 'auth.html';
   });
 }
+
+// =====================================================================
+// JOIN PROMPT: after 30 seconds on the page, show a soft prompt to join.
+// Once per browser session, dismissible without forcing them to leave.
+// =====================================================================
+function showJoinPrompt(){
+  if (sessionStorage.getItem('byg_join_prompt_shown')) return;
+  sessionStorage.setItem('byg_join_prompt_shown', '1');
+  const overlay = document.getElementById('joinModalOverlay');
+  if (overlay) overlay.classList.add('open');
+}
+function closeJoinPrompt(){
+  const overlay = document.getElementById('joinModalOverlay');
+  if (overlay) overlay.classList.remove('open');
+}
+window.addEventListener('load', () => {
+  if (!sessionStorage.getItem('byg_join_prompt_shown')) {
+    setTimeout(showJoinPrompt, 30000);
+  }
+});
+document.getElementById('joinModalClose')?.addEventListener('click', closeJoinPrompt);
+document.getElementById('joinModalOverlay')?.addEventListener('click', (e) => {
+  if (e.target.id === 'joinModalOverlay') closeJoinPrompt();
+});
 </script>
+
+<div class="join-modal-overlay" id="joinModalOverlay">
+  <div class="join-modal-box">
+    <button class="join-modal-close" id="joinModalClose" aria-label="Close">&times;</button>
+    <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="join-modal-body">
+      <span class="eyebrow">Still looking around?</span>
+      <h3>Join free and unlock all 203 lessons</h3>
+      <p>No card, no cost. Create your business profile in two minutes and everything opens up, the curriculum, the community, the AI assistant, all of it.</p>
+      <a href="auth.html" class="btn-primary" style="width:100%;">Join Free &rarr;</a>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
