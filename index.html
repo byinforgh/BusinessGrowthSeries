@@ -298,8 +298,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
       <a href="#membership">Membership</a>
     </div>
     <div class="nav-actions">
-      <a href="auth.html" class="nav-login-link">Log In</a>
-      <a href="auth.html" class="nav-cta">Join Free</a>
+      <a href="auth.html?mode=login" class="nav-login-link" id="navLoginLink">Log In</a>
+      <a href="auth.html" class="nav-cta" id="navJoinCta">Join Free</a>
     </div>
   </div>
 </nav>
@@ -550,8 +550,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
         </div>
         <div class="footer-col">
           <h5>Get started</h5>
-          <a href="auth.html">Join Free</a>
-          <a href="auth.html">Log In</a>
+          <a href="auth.html" id="footerJoinLink">Join Free</a>
+          <a href="auth.html?mode=login" id="footerLoginLink">Log In</a>
         </div>
         <div class="footer-col">
           <h5>Legal</h5>
@@ -646,10 +646,39 @@ window.addEventListener('load', () => {
     setTimeout(showJoinPrompt, 30000);
   }
 });
-document.getElementById('joinModalClose')?.addEventListener('click', closeJoinPrompt);
-document.getElementById('joinModalOverlay')?.addEventListener('click', (e) => {
-  if (e.target.id === 'joinModalOverlay') closeJoinPrompt();
+// Delegated on document instead of getElementById() at script-parse time:
+// the modal markup sits further down the page than this <script> tag, so
+// looking the button up here directly found nothing and silently attached
+// no listener at all, which is why the X did nothing. Delegation works
+// regardless of where in the document the elements are defined.
+document.addEventListener('click', (e) => {
+  if (e.target.id === 'joinModalClose' || e.target.id === 'joinModalOverlay') closeJoinPrompt();
 });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeJoinPrompt();
+});
+
+// =====================================================================
+// SESSION AWARENESS: a member who is already logged in on this device
+// shouldn't be sent back through the join/login flow at all, every
+// "Join Free" / "Log In" link on the page becomes a direct route into
+// the app instead.
+// =====================================================================
+async function reflectSessionState(){
+  if (!sb) return;
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) return;
+  document.querySelectorAll('a[href="auth.html"], a[href^="auth.html?"]').forEach(a => { a.href = 'app.html'; });
+  const navLogin = document.getElementById('navLoginLink');
+  const navJoin = document.getElementById('navJoinCta');
+  const footerJoin = document.getElementById('footerJoinLink');
+  const footerLogin = document.getElementById('footerLoginLink');
+  if (navLogin) navLogin.textContent = 'Dashboard';
+  if (navJoin) navJoin.textContent = 'Go to Dashboard';
+  if (footerJoin) footerJoin.textContent = 'Go to Dashboard';
+  if (footerLogin) footerLogin.remove();
+}
+window.addEventListener('load', () => setTimeout(reflectSessionState, 50));
 </script>
 
 <div class="join-modal-overlay" id="joinModalOverlay">
