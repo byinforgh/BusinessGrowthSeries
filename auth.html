@@ -89,6 +89,8 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
   font-size:18px;overflow:hidden;
 }
 .logo-preview img{width:100%;height:100%;object-fit:cover;}
+.spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;margin:0 auto 18px;animation:byg-spin .8s linear infinite;}
+@keyframes byg-spin{to{transform:rotate(360deg);}}
 </style>
 </head>
 <body>
@@ -102,10 +104,19 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
       <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
       <div class="auth-box-inner">
 
+        <!-- STEP 0: checking for an existing session first, so a member
+             who is already logged in never sees the email step at all -->
+        <div class="auth-step active" id="stepChecking">
+          <div class="center">
+            <div class="spinner"></div>
+            <p class="sub" style="margin-bottom:0;">Checking your session&hellip;</p>
+          </div>
+        </div>
+
         <!-- STEP 1: email -->
-        <div class="auth-step active" id="stepEmail">
-          <h2>Join or log in</h2>
-          <p class="sub">Enter your email. We'll send you a magic link, no password to remember, completely free.</p>
+        <div class="auth-step" id="stepEmail">
+          <h2 id="emailStepTitle">Join or log in</h2>
+          <p class="sub" id="emailStepSub">Enter your email. We'll send you a magic link, no password to remember, completely free.</p>
           <form id="emailForm">
             <div class="field">
               <label>Email address</label>
@@ -228,6 +239,26 @@ function showStep(id){
 
 function currentRedirectUrl(){
   return location.origin + location.pathname;
+}
+
+// ---- "Join Free" and "Log In" land on the same passwordless email
+// step (that's how magic links work, there's no separate password
+// screen), but the wording should match what the member actually
+// clicked so it never feels like the same generic page every time ----
+const urlMode = new URLSearchParams(location.search).get('mode');
+function applyModeCopy(){
+  const title = document.getElementById('emailStepTitle');
+  const sub = document.getElementById('emailStepSub');
+  const btn = document.getElementById('sendLinkBtn');
+  if (urlMode === 'login') {
+    title.textContent = 'Log in';
+    sub.textContent = "Enter the email you joined with. We'll send a fresh login link straight to your inbox.";
+    btn.textContent = 'Send Login Link';
+  } else {
+    title.textContent = 'Join or log in';
+    sub.textContent = "Enter your email. We'll send you a magic link, no password to remember, completely free.";
+    btn.textContent = 'Send Magic Link';
+  }
 }
 
 // ---- Step 1: send magic link ----
@@ -358,12 +389,23 @@ function goToApp(){
   location.href = redirect && redirect.endsWith('.html') ? redirect : 'app.html';
 }
 
-// ---- On load: handle magic link return, or an already active session ----
-async function checkSession(){
-  if (!sb) return;
-  const { data: { session } } = await sb.auth.getSession();
-  if (!session) return;
+// ---- On load: handle an already active session, or a magic link return ----
+// This is what makes a returning member skip the email step entirely,
+// once they've logged in once on a device, they stay logged in on it
+// (same as any normal site), they only ever need a fresh magic link
+// again if that browser session is gone (signed out, cleared data, or
+// a different device). The email/link step is never optional for a
+// *new* device or after signing out, that's simply what "no password"
+// login means, but it should never reappear for a device that's
+// already signed in.
+let sessionRouted = false;
+async function routeForSession(session){
+  if (!session) {
+    if (!sessionRouted) { sessionRouted = true; showStep('stepEmail'); applyModeCopy(); }
+    return;
+  }
   const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  sessionRouted = true;
   if (profile && profile.sells) {
     goToApp();
   } else {
@@ -371,13 +413,38 @@ async function checkSession(){
   }
 }
 
-// supabase-js needs a moment to parse the magic link tokens from the URL
-window.addEventListener('load', () => setTimeout(checkSession, 300));
+// A magic link lands back here with tokens in the URL (hash or PKCE
+// "code" param) that supabase-js needs a moment to parse before a
+// session exists. Detect that case so the spinner stays up instead of
+// briefly flashing the email form while that parsing finishes.
+const hasIncomingAuthParams = /access_token=|refresh_token=|type=magiclink|type=recovery|[?&]code=/.test(location.hash + location.search);
+
 if (sb) {
-  sb.auth.onAuthStateChange((event) => {
-    if (event === 'SIGNED_IN') checkSession();
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'INITIAL_SESSION') {
+      if (session || !hasIncomingAuthParams) routeForSession(session);
+      // else: tokens are present in the URL but not parsed yet, wait for SIGNED_IN below
+    } else if (event === 'SIGNED_IN') {
+      routeForSession(session);
+    }
   });
+} else {
+  showStep('stepEmail');
+  applyModeCopy();
+  emailStatus.textContent = 'Supabase is not connected yet.';
 }
+
+// Safety net: if nothing has resolved after a few seconds (slow
+// network, an expired or already-used link, or a blocked script),
+// fall back to the email step instead of leaving the spinner running
+// forever with no way forward.
+setTimeout(() => {
+  if (!sessionRouted && document.getElementById('stepChecking').classList.contains('active')) {
+    sessionRouted = true;
+    showStep('stepEmail');
+    applyModeCopy();
+  }
+}, 5000);
 </script>
 
 </body>
