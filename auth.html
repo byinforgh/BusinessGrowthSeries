@@ -270,6 +270,26 @@ function isValidEmail(email){
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
+// Supabase's own auth server returns a handful of generic strings when
+// something on its side fails, they're accurate but not something a
+// business owner trying to log in should have to decode. This turns
+// them into plain language, and always logs the real error to the
+// console so it's still fully debuggable.
+function friendlyAuthError(error){
+  console.error('Auth error:', error);
+  const msg = (error && error.message) || '';
+  if (/error sending .*email/i.test(msg) || /error sending confirmation/i.test(msg)) {
+    return "We couldn't get that email out just now, this is a setup issue on our side, not your address. Please try again in a minute, or reach us on WhatsApp if it keeps happening.";
+  }
+  if (/rate limit/i.test(msg)) {
+    return "That's one too many requests in a short time. Please wait a minute and try again.";
+  }
+  if (/invalid/i.test(msg) && /email/i.test(msg)) {
+    return "That email address doesn't look right, check it and try again.";
+  }
+  return msg || 'Something went wrong sending that link, please try again.';
+}
+
 emailForm.addEventListener('submit', async function(e){
   e.preventDefault();
   const email = document.getElementById('emailInput').value.trim();
@@ -283,7 +303,7 @@ emailForm.addEventListener('submit', async function(e){
     options: { emailRedirectTo: currentRedirectUrl() }
   });
   document.getElementById('sendLinkBtn').disabled = false;
-  if (error) { emailStatus.textContent = error.message; return; }
+  if (error) { emailStatus.textContent = friendlyAuthError(error); return; }
   pendingEmail = email;
   document.getElementById('emailDisplay').textContent = email;
   emailStatus.textContent = '';
@@ -318,7 +338,7 @@ document.getElementById('resendBtn').addEventListener('click', async () => {
   const statusEl = document.getElementById('waitingStatus');
   statusEl.textContent = 'Resending...';
   const { error } = await sb.auth.signInWithOtp({ email: pendingEmail, options: { emailRedirectTo: currentRedirectUrl() } });
-  statusEl.textContent = error ? error.message : 'Link resent, check your inbox.';
+  statusEl.textContent = error ? friendlyAuthError(error) : 'Link resent, check your inbox.';
   startResendCooldown();
 });
 document.getElementById('changeEmailBtn').addEventListener('click', () => {
