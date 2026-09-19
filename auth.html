@@ -39,7 +39,8 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
   background:radial-gradient(ellipse 900px 560px at 50% -10%, rgba(15,76,92,0.10), transparent 60%),
              radial-gradient(ellipse 600px 400px at 100% 100%, rgba(176,141,63,0.06), transparent 60%);
 }
-.auth-card{width:100%;max-width:480px;}
+.auth-card{width:100%;max-width:480px;transition:max-width .2s;}
+.auth-card.wide{max-width:760px;}
 .auth-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:32px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;letter-spacing:.02em;}
 .auth-box{border:1px solid var(--line);background:var(--surface-2);overflow:hidden;}
 .auth-box-inner{padding:40px;}
@@ -96,7 +97,7 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
 <body>
 
 <div class="auth-shell">
-  <div class="auth-card">
+  <div class="auth-card" id="authCard">
     <a href="index.html" class="back-link">&larr; Back to byinforgh.com</a>
     <div class="auth-brand"><div class="brand-mark">B</div>BYINFORGH BUSINESS GROWTH SERIES</div>
 
@@ -235,6 +236,10 @@ let pendingEmail = '';
 function showStep(id){
   document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
+  // The profile step has far more fields than a single email input, so it
+  // gets a wider card on larger screens instead of the same narrow column
+  // used for the one-field login step, where a wide card would look odd.
+  document.getElementById('authCard').classList.toggle('wide', id === 'stepProfile');
 }
 
 function currentRedirectUrl(){
@@ -399,7 +404,19 @@ profileForm.addEventListener('submit', async function(e){
     last_seen: new Date().toISOString(),
   }).eq('id', user.id);
   document.getElementById('saveProfileBtn').disabled = false;
-  if (error) { profileStatus.textContent = 'Something went wrong, please try again.'; console.error(error); return; }
+  if (error) {
+    console.error('Profile save error:', error);
+    if (error.code === '23505') {
+      profileStatus.textContent = "That phone number or detail is already in use on another profile, please check and try again.";
+    } else if (error.code === '42501' || /row-level security/i.test(error.message || '')) {
+      profileStatus.textContent = "Your session expired while filling this in, please log in again and it'll be quick the second time.";
+    } else if (error.message) {
+      profileStatus.textContent = error.message;
+    } else {
+      profileStatus.textContent = 'Something went wrong saving that, please try again.';
+    }
+    return;
+  }
   goToApp();
 });
 
