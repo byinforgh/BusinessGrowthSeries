@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connections: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+.btn-primary{background:var(--teal);color:var(--bg);border:none;padding:10px 16px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.empty-note{color:var(--ink-dim);padding:24px;font-size:13px;border:1px dashed var(--line);text-align:center;}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:56px 0;scroll-margin-top:96px;}
+.section-head{max-width:640px;margin-bottom:32px;}
+.section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+.section-head p{color:var(--ink-dim);font-size:15px;line-height:1.6;margin-top:14px;}
+
+.pill-toggle{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);margin-bottom:24px;flex-wrap:wrap;}
+.pill-toggle button{background:var(--surface);border:none;color:var(--ink-dim);padding:10px 16px;font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;}
+.pill-toggle button.active{background:var(--teal);color:var(--bg);font-weight:700;}
+.pill-toggle button .count-badge{margin-left:6px;opacity:.7;}
+
+.conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+.conn-card{background:var(--bg);padding:20px;display:flex;flex-direction:column;gap:10px;}
+.conn-card-top{display:flex;gap:12px;align-items:center;}
+.conn-avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);flex-shrink:0;overflow:hidden;}
+.conn-avatar img{width:100%;height:100%;object-fit:cover;}
+.conn-name{font-size:13.5px;font-weight:700;}
+.conn-meta{font-size:11px;color:var(--ink-dim);}
+.conn-why{font-size:11.5px;color:var(--teal-deep);line-height:1.5;}
+.conn-actions{display:flex;gap:8px;margin-top:auto;}
+.conn-actions button{flex:1;}
+@media(max-width:860px){.conn-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="pageShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="directory.html" class="btn-ghost">Directory</a>
+      <a href="messages.html" class="btn-ghost">Messages</a>
+      <a href="app.html" class="btn-ghost">Back to dashboard</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<section id="connections">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Your network</span>
+      <h2>Build real connections, not just contacts.</h2>
+      <p>Connect with other business owners here. Once you're connected, you can message each other directly.</p>
+    </div>
+    <div class="pill-toggle" id="connTabs">
+      <button class="active" data-tab="suggested">Suggested</button>
+      <button data-tab="accepted">My Connections <span class="count-badge" id="connAcceptedCount"></span></button>
+      <button data-tab="incoming">Requests <span class="count-badge" id="connIncomingCount"></span></button>
+      <button data-tab="outgoing">Sent</button>
+    </div>
+    <div class="conn-grid" id="connGrid"></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with every other BYINFORGH page.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function memberSinceLabel(createdAt){
+  if (!createdAt) return '';
+  const d = new Date(createdAt);
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  const label = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  if (days < 7) return `New member · joined this week`;
+  return `Member since ${label}`;
+}
+
+let currentUser = null;
+let currentProfile = null;
+
+async function initPage(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('pageShell').style.display = 'block';
+  loadConnections();
+}
+window.addEventListener('load', () => setTimeout(initPage, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// CONNECTIONS
+// =====================================================================
+let allConnections = [];
+let profileDirectory = {};
+let activeConnTab = 'suggested';
+
+async function loadConnections(){
+  if (!sb || !currentUser) return;
+  const [{ data: profiles }, { data: conns }] = await Promise.all([
+    sb.from('public_profiles').select('*'),
+    sb.from('connections').select('*').or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`),
+  ]);
+  profileDirectory = {};
+  (profiles || []).forEach(p => { profileDirectory[p.id] = p; });
+  allConnections = conns || [];
+  renderConnections();
+}
+
+function computeSuggestedConnections(){
+  const mine = currentProfile || {};
+  const connectedOrPendingIds = new Set(
+    allConnections.map(c => c.requester_id === currentUser.id ? c.addressee_id : c.requester_id)
+  );
+  const mySells = (mine.sells || '').toLowerCase();
+  const myLooking = (mine.looking_for || '').toLowerCase();
+  const scored = Object.values(profileDirectory)
+    .filter(p => p.id !== currentUser.id && !connectedOrPendingIds.has(p.id) && p.sells)
+    .map(p => {
+      let score = 0, reasons = [];
+      if (p.category && mine.category && p.category === mine.category) { score += 3; reasons.push(`Same category: ${p.category}`); }
+      if (p.location && mine.location && p.location.toLowerCase() === mine.location.toLowerCase()) { score += 2; reasons.push(`Also based in ${p.location}`); }
+      if (p.is_diaspora && !mine.is_diaspora) { score += 1; reasons.push(`Based abroad in ${p.diaspora_country || 'the diaspora'}, open to networking with Ghana businesses`); }
+      if (mine.is_diaspora && !p.is_diaspora) { score += 1; reasons.push('A Ghana-based business you could connect with directly'); }
+      const theirLooking = (p.looking_for || '').toLowerCase();
+      const theirSells = (p.sells || '').toLowerCase();
+      if (mySells && theirLooking && theirLooking.split(/\W+/).some(w => w.length > 3 && mySells.includes(w))) { score += 3; reasons.push('They may be looking for what you sell'); }
+      if (myLooking && theirSells && theirSells.split(/\W+/).some(w => w.length > 3 && myLooking.includes(w))) { score += 3; reasons.push('They may sell what you\'re looking for'); }
+      if (!reasons.length) { score += 1; reasons.push('New in the directory'); }
+      return { p, score, reason: reasons[0] };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 12);
+  return scored;
+}
+
+function renderConnections(){
+  document.getElementById('connAcceptedCount').textContent = allConnections.filter(c => c.status === 'accepted').length || '';
+  document.getElementById('connIncomingCount').textContent = allConnections.filter(c => c.status === 'pending' && c.addressee_id === currentUser.id).length || '';
+
+  const grid = document.getElementById('connGrid');
+  let items = [];
+
+  if (activeConnTab === 'suggested') {
+    items = computeSuggestedConnections().map(({ p, reason }) => `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}${p.location ? ' · ' + esc(p.location) : ''}</div><div class="conn-meta">${esc(memberSinceLabel(p.created_at))}</div></div>
+        </div>
+        <div class="conn-why">${esc(reason)}</div>
+        <div class="conn-actions"><button class="btn-primary conn-request-btn" data-id="${esc(p.id)}">Connect</button></div>
+      </div>`).join('') || '<p class="empty-note">No suggestions yet, more will appear as more members join.</p>';
+  } else if (activeConnTab === 'accepted') {
+    items = allConnections.filter(c => c.status === 'accepted').map(c => {
+      const otherId = c.requester_id === currentUser.id ? c.addressee_id : c.requester_id;
+      const p = profileDirectory[otherId]; if (!p) return '';
+      return `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}</div></div>
+        </div>
+        <div class="conn-actions">
+          <a class="btn-primary" style="text-decoration:none;text-align:center;" href="messages.html?with=${esc(otherId)}">Message</a>
+          <button class="btn-ghost conn-remove-btn" data-id="${esc(c.id)}">Remove</button>
+        </div>
+      </div>`;
+    }).join('') || '<p class="empty-note">No connections yet, try Suggested to find your first ones.</p>';
+  } else if (activeConnTab === 'incoming') {
+    items = allConnections.filter(c => c.status === 'pending' && c.addressee_id === currentUser.id).map(c => {
+      const p = profileDirectory[c.requester_id]; if (!p) return '';
+      return `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">wants to connect · ${esc(memberSinceLabel(p.created_at))}</div></div>
+        </div>
+        <div class="conn-actions">
+          <button class="btn-primary conn-accept-btn" data-id="${esc(c.id)}">Accept</button>
+          <button class="btn-ghost conn-decline-btn" data-id="${esc(c.id)}">Decline</button>
+        </div>
+      </div>`;
+    }).join('') || '<p class="empty-note">No pending requests.</p>';
+  } else if (activeConnTab === 'outgoing') {
+    items = allConnections.filter(c => c.status === 'pending' && c.requester_id === currentUser.id).map(c => {
+      const p = profileDirectory[c.addressee_id]; if (!p) return '';
+      return `
+      <div class="conn-card">
+        <div class="conn-card-top">
+          <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">Request sent, awaiting reply</div></div>
+        </div>
+        <div class="conn-actions"><button class="btn-ghost conn-remove-btn" data-id="${esc(c.id)}">Cancel</button></div>
+      </div>`;
+    }).join('') || '<p class="empty-note">No outstanding requests.</p>';
+  }
+  grid.innerHTML = items;
+}
+
+document.querySelectorAll('#connTabs button').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#connTabs button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeConnTab = this.getAttribute('data-tab');
+    renderConnections();
+  });
+});
+
+document.getElementById('connGrid').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button');
+  if (!btn || !sb || !currentUser) return;
+  if (btn.classList.contains('conn-request-btn')) {
+    btn.disabled = true; btn.textContent = 'Sending...';
+    const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: btn.dataset.id, status: 'pending' });
+    if (error) { btn.disabled = false; btn.textContent = 'Connect'; alert(error.message || 'Could not send request.'); }
+    else loadConnections();
+  } else if (btn.classList.contains('conn-accept-btn')) {
+    await sb.from('connections').update({ status: 'accepted', responded_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadConnections();
+  } else if (btn.classList.contains('conn-decline-btn')) {
+    await sb.from('connections').update({ status: 'declined', responded_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadConnections();
+  } else if (btn.classList.contains('conn-remove-btn')) {
+    await sb.from('connections').update({ status: 'removed', responded_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadConnections();
+  }
+});
+</script>
+
+</body>
+</html>
