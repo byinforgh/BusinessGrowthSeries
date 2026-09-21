@@ -136,7 +136,6 @@ select.field-select{background:var(--surface-2);border:1px solid var(--line);col
       <div class="dir-filter" data-cat="Food">Food</div>
       <div class="dir-filter" data-cat="Retail">Retail</div>
       <div class="dir-filter" data-cat="Services">Services</div>
-      <div class="dir-filter" id="dirDiasporaFilter">🌍 Diaspora</div>
     </div>
     <div class="directory-grid" id="directoryGrid"></div>
   </div>
@@ -264,7 +263,6 @@ function connectionStatusWith(otherId){
 // =====================================================================
 let directoryData = [];
 let activeCat = 'all';
-let diasporaOnly = false;
 async function loadDirectory(){
   if (!sb) return;
   const { data, error } = await sb.from('public_profiles').select('*').not('sells', 'is', null).order('created_at', { ascending: false });
@@ -273,7 +271,6 @@ async function loadDirectory(){
   directoryData = (data || []).map(p => ({
     id: p.id, name: p.business_name || p.name, cat: p.category, loc: p.location, landmark: p.landmark,
     sells: p.sells, looking: p.looking_for, verified: p.verified, logo: p.logo_url,
-    isDiaspora: p.is_diaspora, diasporaCountry: p.diaspora_country,
     memberSince: p.created_at,
     online: p.last_seen && (now - new Date(p.last_seen).getTime()) < 5*60*1000,
   }));
@@ -284,7 +281,6 @@ function renderDirectory(){
   const query = (document.getElementById('dirSearch').value || '').toLowerCase();
   const filtered = directoryData
     .filter(d => activeCat === 'all' || d.cat === activeCat)
-    .filter(d => !diasporaOnly || d.isDiaspora)
     .filter(d => `${d.name} ${d.cat} ${d.loc}`.toLowerCase().includes(query));
   grid.innerHTML = filtered.map(d => `
     <div class="dir-card">
@@ -295,7 +291,6 @@ function renderDirectory(){
       <h4>${esc(d.name)}</h4>
       <div class="cat">${esc(d.cat || '')}</div>
       <div class="loc">📍 ${esc(d.loc || '')}${d.landmark ? ', ' + esc(d.landmark) : ''}</div>
-      ${d.isDiaspora ? `<div class="loc" style="color:var(--gold);">🌍 Based in ${esc(d.diasporaCountry || 'the diaspora')}</div>` : ''}
       <div class="member-since${(Date.now() - new Date(d.memberSince).getTime()) < 7*86400000 ? ' new' : ''}">${esc(memberSinceLabel(d.memberSince))}</div>
       <div class="sells">${esc(d.sells || '')}</div>
       ${d.looking ? `<div class="looking">Looking for: ${esc(d.looking)}</div>` : ''}
@@ -308,15 +303,9 @@ function renderDirectory(){
   `).join('') || '<p style="color:var(--ink-dim);padding:20px;">No businesses match yet.</p>';
 }
 document.getElementById('dirSearch').addEventListener('input', renderDirectory);
-document.getElementById('dirDiasporaFilter').addEventListener('click', function(){
-  diasporaOnly = !diasporaOnly;
-  this.classList.toggle('active', diasporaOnly);
-  renderDirectory();
-});
 document.querySelectorAll('.dir-filter').forEach(btn => {
   btn.addEventListener('click', function(){
-    if (this.id === 'dirDiasporaFilter') return;
-    document.querySelectorAll('.dir-filter').forEach(b=>{ if (b.id !== 'dirDiasporaFilter') b.classList.remove('active'); });
+    document.querySelectorAll('.dir-filter').forEach(b=>b.classList.remove('active'));
     this.classList.add('active');
     activeCat = this.getAttribute('data-cat');
     renderDirectory();
