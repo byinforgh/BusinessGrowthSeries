@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Groups: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2,h3,h4{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:56px 0;scroll-margin-top:96px;}
+.section-head{max-width:640px;margin-bottom:40px;}
+.section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+.section-head p{color:var(--ink-dim);font-size:15px;line-height:1.6;margin-top:14px;}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
+.field input, .field textarea{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:14.5px;outline:none;border-radius:2px;}
+.field input::placeholder, .field textarea::placeholder{color:var(--ink-dim);}
+.field input:focus, .field textarea:focus{border-color:var(--teal);}
+
+.pill-toggle{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);flex-wrap:wrap;}
+.pill-toggle button{background:var(--surface);border:none;color:var(--ink-dim);padding:10px 16px;font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;}
+.pill-toggle button.active{background:var(--teal);color:var(--bg);font-weight:700;}
+.btn-primary{background:var(--teal);color:var(--bg);border:none;padding:10px 16px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.btn-primary:disabled{background:var(--surface-2);color:var(--ink-dim);cursor:default;}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+.btn-danger{background:transparent;color:var(--m7);border:1px solid var(--m7);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.empty-note{color:var(--ink-dim);padding:24px;font-size:13px;border:1px dashed var(--line);text-align:center;}
+
+.groups-toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:24px;flex-wrap:wrap;}
+.groups-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+.group-card{background:var(--bg);padding:22px;display:flex;flex-direction:column;gap:10px;cursor:pointer;}
+.group-card:hover{background:var(--surface-2);}
+.group-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+.group-card h4{font-size:15px;text-transform:none;letter-spacing:0;margin:0;}
+.group-lock{font-family:'Inter',sans-serif;font-size:9.5px;text-transform:uppercase;color:var(--ink-dim);border:1px solid var(--line);padding:3px 8px;border-radius:20px;white-space:nowrap;}
+.group-card p{font-size:12.5px;color:var(--ink-dim);line-height:1.5;margin:0;}
+.group-card-meta{font-family:'Inter',sans-serif;font-size:10.5px;color:var(--teal-deep);}
+@media(max-width:860px){.groups-grid{grid-template-columns:1fr;}}
+.group-create-form{border:1px solid var(--line);background:var(--surface-2);padding:22px;margin:24px 0;display:none;}
+.group-create-form.open{display:block;}
+.checkbox-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;}
+.checkbox-row label{font-size:12.5px;color:var(--ink-dim);}
+.group-detail{display:none;border:1px solid var(--line);background:var(--bg);margin-top:28px;}
+.group-detail.open{display:block;}
+.group-detail-head{padding:22px 26px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+.group-detail-head h3{font-size:20px;text-transform:none;letter-spacing:0;margin:0 0 6px;}
+.group-detail-head p{font-size:12.5px;color:var(--ink-dim);margin:0;max-width:480px;}
+.group-detail-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.group-back-btn{background:none;border:none;color:var(--ink-dim);font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;cursor:pointer;padding:0;margin-bottom:14px;}
+.group-body{display:grid;grid-template-columns:1fr 260px;}
+@media(max-width:860px){.group-body{grid-template-columns:1fr;}}
+.group-chat-col{padding:20px 26px;border-right:1px solid var(--line);}
+.group-chat-feed{display:flex;flex-direction:column;gap:12px;height:340px;overflow-y:auto;margin-bottom:14px;padding-right:6px;}
+.group-msg{max-width:80%;}
+.group-msg-name{font-family:'Inter',sans-serif;font-size:10px;color:var(--ink-dim);margin-bottom:3px;}
+.group-msg-body{background:var(--surface-2);border:1px solid var(--line);padding:10px 13px;font-size:13px;line-height:1.5;border-radius:2px;}
+.group-chat-composer{display:flex;gap:8px;}
+.group-chat-composer input{flex:1;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:11px 13px;font-family:'Poppins',sans-serif;font-size:13px;outline:none;}
+.group-side-col{padding:20px;}
+.group-side-label{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;color:var(--ink-dim);margin-bottom:12px;}
+.group-member-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:12.5px;border-top:1px solid var(--line);}
+.group-member-row:first-child{border-top:none;}
+.group-member-admin{font-family:'Inter',sans-serif;font-size:9px;color:var(--gold);}
+.group-pending-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:12px;border-top:1px solid var(--line);}
+.group-pending-row button{font-size:9.5px;padding:5px 8px;}
+.filter-warning{color:var(--m7);font-size:11.5px;margin-top:6px;display:none;}
+.filter-warning.show{display:block;}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="pageShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="app.html" class="btn-ghost" style="text-decoration:none;display:inline-block;">Back to dashboard</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<section id="groups">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Business groups</span>
+      <h2>Join a room built around what you do.</h2>
+      <p>Group chats for business, nothing else. Join a group, leave whenever you like, download the conversation if you need it later. Share a link straight to this page, or to any group on it, since <code>?group=</code> in the URL opens that group directly.</p>
+    </div>
+    <div class="groups-toolbar">
+      <div class="pill-toggle" id="groupTabs">
+        <button class="active" data-tab="all">All Groups</button>
+        <button data-tab="mine">My Groups</button>
+      </div>
+      <button class="btn-primary" id="groupCreateToggle">+ Create a group</button>
+    </div>
+    <form class="group-create-form" id="groupCreateForm">
+      <div class="field">
+        <label>Group name</label>
+        <input type="text" id="grpName" placeholder="e.g. Fashion &amp; Textile Owners Accra" required maxlength="80">
+      </div>
+      <div class="field">
+        <label>What's it for</label>
+        <textarea id="grpDesc" rows="2" placeholder="What should members expect in here?"></textarea>
+      </div>
+      <div class="field">
+        <label>Category</label>
+        <input type="text" id="grpCategory" placeholder="e.g. Fashion, Food, Funding, Export">
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="grpPrivate">
+        <label for="grpPrivate">Private, new members must be approved to join</label>
+      </div>
+      <button type="submit" class="btn-primary">Create group</button>
+      <div id="groupCreateStatus" style="margin-top:10px;font-family:'Inter',sans-serif;font-size:10.5px;color:var(--teal);"></div>
+    </form>
+    <div class="groups-grid" id="groupsGrid"></div>
+
+    <div class="group-detail" id="groupDetail">
+      <button class="group-back-btn" id="groupBackBtn" style="margin:20px 0 0 26px;">← Back to all groups</button>
+      <div class="group-detail-head">
+        <div>
+          <h3 id="grpDetailName"></h3>
+          <p id="grpDetailDesc"></p>
+        </div>
+        <div class="group-detail-actions" id="grpDetailActions"></div>
+      </div>
+      <div class="group-body">
+        <div class="group-chat-col">
+          <div class="group-chat-feed" id="grpChatFeed"></div>
+          <div class="group-chat-composer">
+            <input type="text" id="grpChatInput" placeholder="Message the group about business...">
+            <button class="btn-primary" id="grpChatSend">Send</button>
+          </div>
+          <div class="filter-warning" id="grpFilterWarning">Keep it respectful, no foul language, threats, or harassment. Rewrite your message.</div>
+        </div>
+        <div class="group-side-col">
+          <div class="group-side-label">Members</div>
+          <div id="grpMembersList"></div>
+          <div id="grpPendingWrap" style="display:none;margin-top:18px;">
+            <div class="group-side-label">Join requests</div>
+            <div id="grpPendingList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with the same two lines in
+// index.html, auth.html, app.html, and admin.html.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+// =====================================================================
+// RESPECT FILTER (duplicated from app.html on purpose, see that file's
+// copy for the full note: first line of defense, not full moderation,
+// backed by the report + 3-strike system, not meant to catch everything)
+// =====================================================================
+const FORBIDDEN_TERMS = [
+  'fuck','fucking','fucker','shit','bitch','asshole','bastard','cunt','dick','pussy','whore','slut',
+  'nigger','nigga','faggot','retard','stupid idiot',
+  'kill you','i will kill','i will hurt you','i will beat you','i will deal with you','watch your back',
+  'you will regret','i know where you live','come and die','i go kill you','i go beat you','i go deal with you'
+];
+function hasForbiddenLanguage(text){
+  const t = (text || '').toLowerCase();
+  return FORBIDDEN_TERMS.some(term => t.includes(term));
+}
+
+let currentUser = null;
+let currentProfile = null;
+// Resolved on demand from public_profiles, same pattern as admin.html,
+// this page has no reason to preload the whole member directory.
+let profileCache = {};
+async function preloadNamesFor(ids){
+  const missing = [...new Set(ids)].filter(id => id && !profileCache[id]);
+  if (!missing.length) return;
+  const { data } = await sb.from('public_profiles').select('id, name, business_name').in('id', missing);
+  (data || []).forEach(p => { profileCache[p.id] = p; });
+}
+function nameFor(userId){
+  const p = profileCache[userId];
+  return p ? (p.business_name || p.name) : 'Member';
+}
+
+// =====================================================================
+// SESSION GUARD: same check as every other member page. A signed out
+// visitor bounces to auth.html, a banned member sees the suspension
+// notice and nothing else, same as app.html.
+// =====================================================================
+async function initPage(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('pageShell').style.display = 'block';
+  loadGroups();
+}
+window.addEventListener('load', () => setTimeout(initPage, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// GROUPS
+// =====================================================================
+let groupsData = [];
+let myGroupMemberships = {}; // group_id -> {status, role}
+let activeGroupTab = 'all';
+let currentGroupId = null;
+let groupChatChannel = null;
+
+async function loadGroups(){
+  if (!sb || !currentUser) return;
+  const [{ data: groups }, { data: myMemberships }] = await Promise.all([
+    sb.from('groups').select('*').order('created_at', { ascending: false }),
+    sb.from('group_members').select('*').eq('user_id', currentUser.id),
+  ]);
+  groupsData = groups || [];
+  myGroupMemberships = {};
+  (myMemberships || []).forEach(m => { myGroupMemberships[m.group_id] = m; });
+  const { data: counts } = await sb.from('group_members').select('group_id').eq('status', 'active');
+  const countMap = {};
+  (counts || []).forEach(r => { countMap[r.group_id] = (countMap[r.group_id] || 0) + 1; });
+  groupsData.forEach(g => { g.memberCount = countMap[g.id] || 0; });
+  renderGroupsGrid();
+
+  // deep link: ?group=<id> opens straight into that group's chat
+  const params = new URLSearchParams(location.search);
+  const wanted = params.get('group');
+  if (wanted && groupsData.some(g => g.id === wanted) && currentGroupId !== wanted) {
+    openGroup(wanted);
+  }
+}
+function renderGroupsGrid(){
+  const grid = document.getElementById('groupsGrid');
+  const list = activeGroupTab === 'mine'
+    ? groupsData.filter(g => myGroupMemberships[g.id] && myGroupMemberships[g.id].status === 'active')
+    : groupsData;
+  grid.innerHTML = list.map(g => {
+    const membership = myGroupMemberships[g.id];
+    const label = membership?.status === 'active' ? 'Joined' : membership?.status === 'pending' ? 'Request pending' : g.is_private ? '🔒 Private' : 'Open';
+    return `
+    <div class="group-card" data-id="${esc(g.id)}">
+      <div class="group-card-top"><h4>${esc(g.name)}</h4><span class="group-lock">${label}</span></div>
+      <p>${esc(g.description || '')}</p>
+      <div class="group-card-meta">${esc(g.category || 'General')} · ${g.memberCount} member${g.memberCount === 1 ? '' : 's'}</div>
+    </div>`;
+  }).join('') || '<p class="empty-note">No groups yet, be the first to create one.</p>';
+}
+document.querySelectorAll('#groupTabs button').forEach(btn => {
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('#groupTabs button').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    activeGroupTab = this.getAttribute('data-tab');
+    renderGroupsGrid();
+  });
+});
+document.getElementById('groupCreateToggle').addEventListener('click', () => {
+  document.getElementById('groupCreateForm').classList.toggle('open');
+});
+document.getElementById('groupCreateForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!sb || !currentUser) return;
+  const name = document.getElementById('grpName').value.trim();
+  const description = document.getElementById('grpDesc').value.trim();
+  const category = document.getElementById('grpCategory').value.trim();
+  const is_private = document.getElementById('grpPrivate').checked;
+  const statusEl = document.getElementById('groupCreateStatus');
+  if (!name) return;
+  statusEl.textContent = 'Creating...';
+  const { error } = await sb.from('groups').insert({ name, description, category, is_private, created_by: currentUser.id });
+  statusEl.textContent = error ? 'Something went wrong.' : 'Group created.';
+  if (!error) {
+    e.target.reset();
+    document.getElementById('groupCreateForm').classList.remove('open');
+    loadGroups();
+  }
+});
+document.getElementById('groupsGrid').addEventListener('click', (e) => {
+  const card = e.target.closest('.group-card');
+  if (card) openGroup(card.dataset.id);
+});
+document.getElementById('groupBackBtn').addEventListener('click', () => {
+  document.getElementById('groupDetail').classList.remove('open');
+  currentGroupId = null;
+  if (groupChatChannel) { sb.removeChannel(groupChatChannel); groupChatChannel = null; }
+  history.replaceState(null, '', location.pathname);
+});
+
+async function openGroup(groupId){
+  currentGroupId = groupId;
+  const g = groupsData.find(x => x.id === groupId);
+  if (!g) return;
+  document.getElementById('grpDetailName').textContent = g.name;
+  document.getElementById('grpDetailDesc').textContent = g.description || '';
+  document.getElementById('groupDetail').classList.add('open');
+  document.getElementById('groupDetail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  history.replaceState(null, '', `?group=${groupId}`);
+
+  await renderGroupDetailActions(groupId, g);
+  await loadGroupMembers(groupId);
+  await loadGroupChat(groupId);
+}
+
+async function renderGroupDetailActions(groupId, g){
+  const membership = myGroupMemberships[groupId];
+  const actionsEl = document.getElementById('grpDetailActions');
+  let html = '';
+  if (!membership || membership.status === 'left') {
+    html = `<button class="btn-primary" id="grpJoinBtn">${g.is_private ? 'Request to join' : 'Join group'}</button>`;
+  } else if (membership.status === 'pending') {
+    html = `<button class="btn-ghost" disabled>Request pending</button>`;
+  } else if (membership.status === 'active') {
+    html = `<button class="btn-ghost" id="grpDownloadBtn">Download chat</button><button class="btn-danger" id="grpLeaveBtn">Leave group</button>`;
+  }
+  actionsEl.innerHTML = html;
+  const joinBtn = document.getElementById('grpJoinBtn');
+  if (joinBtn) joinBtn.addEventListener('click', async () => {
+    joinBtn.disabled = true;
+    const { error } = await sb.from('group_members').insert({ group_id: groupId, user_id: currentUser.id, status: g.is_private ? 'pending' : 'active' });
+    if (!error) { await loadGroups(); await openGroup(groupId); } else joinBtn.disabled = false;
+  });
+  const leaveBtn = document.getElementById('grpLeaveBtn');
+  if (leaveBtn) leaveBtn.addEventListener('click', async () => {
+    await sb.from('group_members').update({ status: 'left' }).eq('group_id', groupId).eq('user_id', currentUser.id);
+    await loadGroups();
+    document.getElementById('groupDetail').classList.remove('open');
+  });
+  const downloadBtn = document.getElementById('grpDownloadBtn');
+  if (downloadBtn) downloadBtn.addEventListener('click', () => downloadGroupChat(groupId, g.name));
+}
+
+async function loadGroupMembers(groupId){
+  const { data: members } = await sb.from('group_members').select('*').eq('group_id', groupId).eq('status', 'active');
+  await preloadNamesFor((members || []).map(m => m.user_id));
+  const membersList = document.getElementById('grpMembersList');
+  membersList.innerHTML = (members || []).map(m => {
+    return `<div class="group-member-row"><span>${esc(nameFor(m.user_id))}</span>${m.role === 'admin' ? '<span class="group-member-admin">ADMIN</span>' : ''}</div>`;
+  }).join('') || '<p class="empty-note">No members yet.</p>';
+
+  const myMembership = (members || []).find(m => m.user_id === currentUser.id);
+  const pendingWrap = document.getElementById('grpPendingWrap');
+  if (myMembership && myMembership.role === 'admin') {
+    const { data: pending } = await sb.from('group_members').select('*').eq('group_id', groupId).eq('status', 'pending');
+    if (pending && pending.length) {
+      await preloadNamesFor(pending.map(m => m.user_id));
+      pendingWrap.style.display = 'block';
+      document.getElementById('grpPendingList').innerHTML = pending.map(m => {
+        return `<div class="group-pending-row"><span>${esc(nameFor(m.user_id))}</span><button class="btn-primary grp-approve-btn" data-id="${esc(m.id)}">Approve</button></div>`;
+      }).join('');
+    } else pendingWrap.style.display = 'none';
+  } else pendingWrap.style.display = 'none';
+}
+document.getElementById('grpPendingList').addEventListener('click', async (e) => {
+  const btn = e.target.closest('.grp-approve-btn');
+  if (!btn) return;
+  await sb.from('group_members').update({ status: 'active' }).eq('id', btn.dataset.id);
+  loadGroupMembers(currentGroupId);
+});
+
+async function loadGroupChat(groupId){
+  const { data } = await sb.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true }).limit(200);
+  await preloadNamesFor((data || []).map(m => m.sender_id));
+  renderGroupChat(data || []);
+  if (groupChatChannel) sb.removeChannel(groupChatChannel);
+  groupChatChannel = sb.channel('group_' + groupId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'group_messages', filter: `group_id=eq.${groupId}` }, () => loadGroupChat(groupId))
+    .subscribe();
+}
+function renderGroupChat(messages){
+  const feed = document.getElementById('grpChatFeed');
+  feed.innerHTML = messages.map(m => {
+    return `<div class="group-msg"><div class="group-msg-name">${esc(nameFor(m.sender_id))} · ${new Date(m.created_at).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</div><div class="group-msg-body">${esc(m.body)}</div></div>`;
+  }).join('') || '<p class="empty-note">No messages yet, start the conversation.</p>';
+  feed.scrollTop = feed.scrollHeight;
+}
+document.getElementById('grpChatSend').addEventListener('click', sendGroupMessage);
+document.getElementById('grpChatInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendGroupMessage(); });
+async function sendGroupMessage(){
+  const input = document.getElementById('grpChatInput');
+  const warn = document.getElementById('grpFilterWarning');
+  const body = input.value.trim();
+  if (!body || !currentGroupId || !sb || !currentUser) return;
+  if (hasForbiddenLanguage(body)) { warn.classList.add('show'); return; }
+  warn.classList.remove('show');
+  input.value = '';
+  const { error } = await sb.from('group_messages').insert({ group_id: currentGroupId, sender_id: currentUser.id, body });
+  if (error) alert('Message could not be sent. ' + (error.message || ''));
+}
+function downloadGroupChat(groupId, groupName){
+  sb.from('group_messages').select('*').eq('group_id', groupId).order('created_at', { ascending: true }).then(async ({ data }) => {
+    await preloadNamesFor((data || []).map(m => m.sender_id));
+    const lines = (data || []).map(m => `[${new Date(m.created_at).toLocaleString('en-GB')}] ${nameFor(m.sender_id)}: ${m.body}`);
+    const blob = new Blob([`${groupName}, group chat export\n\n${lines.join('\n')}`], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `${groupName.replace(/[^a-z0-9]+/gi, '_')}_chat.txt`;
+    a.click();
+  });
+}
+</script>
+
+</body>
+</html>
