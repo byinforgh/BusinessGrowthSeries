@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Q&amp;A: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:56px 0;scroll-margin-top:96px;}
+.section-head{max-width:640px;margin-bottom:32px;}
+.section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+.section-head p{color:var(--ink-dim);font-size:15px;line-height:1.6;margin-top:14px;}
+
+.form-status{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--teal);min-height:18px;margin-top:10px;}
+.qa-shell{border:1px solid var(--line);background:var(--bg);}
+.qa-card{border-bottom:1px solid var(--line);padding:22px 26px;}
+.qa-card:last-child{border-bottom:none;}
+.qa-card.linked{background:rgba(15,76,92,0.05);}
+.qa-q-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px;}
+.qa-tag{font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;color:var(--teal);}
+.qa-replies{font-family:'Inter',sans-serif;font-size:10.5px;color:var(--ink-dim);}
+.qa-q{font-family:'Inter',sans-serif;font-weight:800;text-transform:none;letter-spacing:0;font-size:16px;line-height:1.4;}
+.qa-a-toggle{margin-top:12px;font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;color:var(--gold);cursor:pointer;}
+.qa-a{max-height:0;overflow:hidden;transition:max-height .35s ease;}
+.qa-card.open .qa-a{max-height:400px;}
+.qa-a p{margin:14px 0 0;padding:14px 16px;background:var(--surface-2);border-left:2px solid var(--teal);font-size:13.5px;color:var(--ink-dim);line-height:1.6;}
+.qa-share{font-family:'Inter',sans-serif;font-size:10px;color:var(--ink-dim);cursor:pointer;text-decoration:underline;margin-left:10px;}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="pageShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="app.html" class="btn-ghost">Back to dashboard</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<section id="qa">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Ask BYINFORGH</span>
+      <h2>Real questions, answered in public.</h2>
+      <p>Share a link straight to this page, or to any question on it: <code>?question=</code> in the URL opens and expands that question directly.</p>
+    </div>
+    <div class="qa-shell">
+      <form style="display:flex;border-bottom:1px solid var(--line);" id="qaForm">
+        <input type="text" id="qaInput" placeholder="Ask a business question..." required style="flex:1;background:transparent;border:none;padding:18px 22px;color:var(--ink);font-family:'Poppins',sans-serif;font-size:14px;outline:none;">
+        <button type="submit" style="background:var(--gold);color:var(--bg);border:none;padding:0 26px;font-weight:800;text-transform:uppercase;font-size:12px;cursor:pointer;">Ask</button>
+      </form>
+      <div class="form-status" id="qaStatus" style="padding:0 22px;"></div>
+      <div id="qaFeed"></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with the same two lines in
+// index.html, auth.html, app.html, admin.html, and groups.html.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+let currentUser = null;
+let currentProfile = null;
+
+async function initPage(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('pageShell').style.display = 'block';
+  loadQA();
+}
+window.addEventListener('load', () => setTimeout(initPage, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// Q&A
+// =====================================================================
+async function loadQA(){
+  const feed = document.getElementById('qaFeed');
+  const { data, error } = await sb.from('qa_questions').select('*, qa_answers(*)').order('created_at', { ascending: false }).limit(20);
+  if (error) { console.error(error); return; }
+  if (!data || !data.length) { feed.innerHTML = '<p style="color:var(--ink-dim);padding:20px;">No questions yet, ask the first one above.</p>'; return; }
+  const ids = [...new Set(data.map(q => q.user_id).filter(Boolean))];
+  const { data: profs } = await sb.from('public_profiles').select('id, name').in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000']);
+  const profMap = {};
+  (profs || []).forEach(p => profMap[p.id] = p);
+  feed.innerHTML = '';
+  const wanted = new URLSearchParams(location.search).get('question');
+  data.forEach(item => {
+    const el = document.createElement('div');
+    el.className = 'qa-card';
+    el.id = `q-${item.id}`;
+    const answers = item.qa_answers || [];
+    const answersHtml = answers.length
+      ? answers.map(a => `<p>${esc(a.answer)}</p>`).join('')
+      : '<p>No answer yet.</p>';
+    const askerName = profMap[item.user_id]?.name || 'A member';
+    el.innerHTML = `
+      <div class="qa-q-row"><span class="qa-tag">${esc(askerName)}</span><span class="qa-replies">${answers.length} repl${answers.length===1?'y':'ies'}</span></div>
+      <div class="qa-q">${esc(item.question)}</div>
+      <div class="qa-a-toggle">Show answer → <span class="qa-share" data-id="${esc(item.id)}">Copy link</span></div>
+      <div class="qa-a">${answersHtml}</div>
+    `;
+    el.querySelector('.qa-a-toggle').addEventListener('click', (e) => {
+      if (e.target.classList.contains('qa-share')) return;
+      el.classList.toggle('open');
+    });
+    feed.appendChild(el);
+    if (wanted && wanted === item.id) {
+      el.classList.add('open', 'linked');
+      setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+    }
+  });
+  feed.querySelectorAll('.qa-share').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const url = `${location.origin}${location.pathname}?question=${link.dataset.id}`;
+      navigator.clipboard?.writeText(url).then(() => { link.textContent = 'Copied'; setTimeout(() => link.textContent = 'Copy link', 1500); });
+    });
+  });
+}
+document.getElementById('qaForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const input = document.getElementById('qaInput');
+  const question = input.value.trim();
+  const statusEl = document.getElementById('qaStatus');
+  if (!question || !sb || !currentUser) return;
+  statusEl.textContent = 'Posting...';
+  const { error } = await sb.from('qa_questions').insert({ user_id: currentUser.id, question });
+  statusEl.textContent = error ? 'Something went wrong.' : 'Posted.';
+  if (!error) { input.value = ''; loadQA(); }
+});
+</script>
+
+</body>
+</html>
