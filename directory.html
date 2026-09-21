@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Directory: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2,h4{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+.btn-primary{background:var(--teal);color:var(--bg);border:none;padding:10px 16px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.btn-danger{background:transparent;color:var(--m7);border:1px solid var(--m7);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:56px 0;scroll-margin-top:96px;}
+.section-head{max-width:640px;margin-bottom:32px;}
+.section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
+.field input, .field textarea{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:14.5px;outline:none;border-radius:2px;width:100%;}
+.field-hint{font-size:11.5px;color:var(--ink-dim);}
+
+.directory-controls{display:flex;gap:10px;margin-bottom:24px;flex-wrap:wrap;}
+.dir-search{flex:1;min-width:200px;border:1px solid var(--line);background:var(--surface-2);padding:12px 16px;color:var(--ink);font-family:'Poppins',sans-serif;font-size:13.5px;outline:none;}
+.dir-filter{border:1px solid var(--line);background:var(--surface-2);color:var(--ink-dim);padding:12px 16px;font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;cursor:pointer;}
+.dir-filter.active{border-color:var(--teal);color:var(--teal);}
+.directory-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
+.dir-card{background:var(--bg);padding:20px;}
+.dir-card.hidden{display:none;}
+.dir-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.dir-avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);position:relative;overflow:hidden;}
+.dir-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.dir-avatar.online::after{content:'';position:absolute;bottom:0;right:0;width:9px;height:9px;border-radius:50%;background:var(--teal);border:2px solid var(--bg);}
+.dir-card h4{font-size:14.5px;text-transform:none;letter-spacing:0;margin-bottom:4px;}
+.dir-card .cat{font-size:11.5px;color:var(--ink-dim);margin-bottom:10px;}
+.dir-card .loc{font-family:'Inter',sans-serif;font-size:10.5px;color:var(--ink-dim);margin-bottom:10px;}
+.dir-card .member-since{font-family:'Inter',sans-serif;font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;color:var(--ink-dim);margin-bottom:10px;}
+.dir-card .member-since.new{color:var(--gold);}
+.dir-card .sells{font-size:12px;color:var(--ink);line-height:1.5;margin-bottom:6px;}
+.dir-card .looking{font-size:11.5px;color:var(--teal-deep);line-height:1.5;}
+.dir-actions{display:flex;gap:8px;margin-top:14px;}
+.dir-connect-btn{flex:1;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:9px 10px;font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;cursor:pointer;}
+.dir-connect-btn:hover{border-color:var(--teal);color:var(--teal);}
+.dir-report-btn{background:transparent;border:1px solid var(--line);color:var(--ink-dim);padding:9px 10px;cursor:pointer;font-size:12px;}
+.dir-report-btn:hover{border-color:var(--m7);color:var(--m7);}
+@media(max-width:860px){.directory-grid{grid-template-columns:1fr;}}
+
+.verify-panel{border:1px solid var(--line);background:var(--surface-2);padding:20px 24px;margin-bottom:24px;}
+.verify-panel.verified{border-color:var(--teal);}
+.verify-row{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;}
+.verify-title{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+.verify-desc{font-size:11.5px;color:var(--ink-dim);max-width:480px;line-height:1.5;}
+.verify-status-badge{font-family:'Inter',sans-serif;font-size:9.5px;text-transform:uppercase;padding:4px 10px;border-radius:20px;border:1px solid var(--line);white-space:nowrap;}
+.verify-status-badge.approved{color:var(--teal);border-color:var(--teal);}
+.verify-status-badge.pending{color:var(--gold);border-color:var(--gold);}
+.verify-status-badge.rejected{color:var(--m7);border-color:var(--m7);}
+.verify-form{margin-top:16px;display:none;}
+.verify-form.open{display:block;}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,23,0.55);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--line);padding:28px;max-width:420px;width:100%;}
+.modal-box h4{font-size:16px;text-transform:none;letter-spacing:0;margin:0 0 6px;}
+.modal-box p{font-size:12.5px;color:var(--ink-dim);margin:0 0 18px;}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-actions button{flex:1;}
+select.field-select{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:12px 14px;font-family:'Poppins',sans-serif;font-size:13.5px;outline:none;border-radius:2px;width:100%;}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="pageShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="connections.html" class="btn-ghost">Connections</a>
+      <a href="app.html" class="btn-ghost">Back to dashboard</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<section id="directory">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Business directory</span>
+      <h2>Find owners to trade, partner, or support.</h2>
+    </div>
+    <div class="verify-panel" id="verifyPanel"></div>
+    <div class="directory-controls">
+      <input type="text" class="dir-search" id="dirSearch" placeholder="Search by name, category, or location...">
+      <div class="dir-filter active" data-cat="all">All</div>
+      <div class="dir-filter" data-cat="Fashion">Fashion</div>
+      <div class="dir-filter" data-cat="Food">Food</div>
+      <div class="dir-filter" data-cat="Retail">Retail</div>
+      <div class="dir-filter" data-cat="Services">Services</div>
+      <div class="dir-filter" id="dirDiasporaFilter">🌍 Diaspora</div>
+    </div>
+    <div class="directory-grid" id="directoryGrid"></div>
+  </div>
+</section>
+
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box">
+    <h4>Report this member</h4>
+    <p id="reportModalTarget">Reports are reviewed by BYINFORGH. Repeated violations lead to a suspension.</p>
+    <div class="field">
+      <label>Reason</label>
+      <select class="field-select" id="reportReason">
+        <option value="foul_language">Foul language</option>
+        <option value="harassment_or_threats">Harassment, aggression, or threats</option>
+        <option value="spam">Spam</option>
+        <option value="scam_or_fraud">Scam or fraud</option>
+        <option value="impersonation">Impersonation</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Details (optional)</label>
+      <textarea id="reportDetails" rows="3" placeholder="Anything that helps us understand what happened"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="reportCancelBtn" type="button">Cancel</button>
+      <button class="btn-danger" id="reportSubmitBtn" type="button">Submit report</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with every other BYINFORGH page.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function memberSinceLabel(createdAt){
+  if (!createdAt) return '';
+  const d = new Date(createdAt);
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  const label = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  if (days < 7) return `New member · joined this week`;
+  return `Member since ${label}`;
+}
+
+let currentUser = null;
+let currentProfile = null;
+
+async function initPage(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('pageShell').style.display = 'block';
+  loadDirectory();
+  loadMyConnectionStatuses();
+  loadVerifyPanel();
+}
+window.addEventListener('load', () => setTimeout(initPage, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// LIGHTWEIGHT CONNECTION STATUS
+// Directory only needs to know, for each card, whether the viewer has
+// no connection, a pending one, or an accepted one with this person,
+// and needs to be able to send a new request. Full request management
+// (accept/decline/remove, the suggested/incoming/outgoing tabs) lives
+// on connections.html, this page does not duplicate that.
+// =====================================================================
+let myConnections = [];
+async function loadMyConnectionStatuses(){
+  if (!sb || !currentUser) return;
+  const { data } = await sb.from('connections').select('*').or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`);
+  myConnections = data || [];
+  renderDirectory();
+}
+function connectionStatusWith(otherId){
+  const c = myConnections.find(c => c.requester_id === otherId || c.addressee_id === otherId);
+  if (!c) return 'none';
+  if (c.status === 'accepted') return 'accepted';
+  if (c.status === 'pending') return 'pending';
+  return 'none';
+}
+
+// =====================================================================
+// DIRECTORY
+// =====================================================================
+let directoryData = [];
+let activeCat = 'all';
+let diasporaOnly = false;
+async function loadDirectory(){
+  if (!sb) return;
+  const { data, error } = await sb.from('public_profiles').select('*').not('sells', 'is', null).order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
+  const now = Date.now();
+  directoryData = (data || []).map(p => ({
+    id: p.id, name: p.business_name || p.name, cat: p.category, loc: p.location, landmark: p.landmark,
+    sells: p.sells, looking: p.looking_for, verified: p.verified, logo: p.logo_url,
+    isDiaspora: p.is_diaspora, diasporaCountry: p.diaspora_country,
+    memberSince: p.created_at,
+    online: p.last_seen && (now - new Date(p.last_seen).getTime()) < 5*60*1000,
+  }));
+  renderDirectory();
+}
+function renderDirectory(){
+  const grid = document.getElementById('directoryGrid');
+  const query = (document.getElementById('dirSearch').value || '').toLowerCase();
+  const filtered = directoryData
+    .filter(d => activeCat === 'all' || d.cat === activeCat)
+    .filter(d => !diasporaOnly || d.isDiaspora)
+    .filter(d => `${d.name} ${d.cat} ${d.loc}`.toLowerCase().includes(query));
+  grid.innerHTML = filtered.map(d => `
+    <div class="dir-card">
+      <div class="dir-top">
+        <div class="dir-avatar${d.online ? ' online' : ''}">${d.logo ? `<img src="${esc(d.logo)}" alt="${esc(d.name)}">` : ''}</div>
+        ${d.verified ? '<span style="font-family:Inter,sans-serif;font-size:9px;color:var(--teal);border:1px solid var(--teal);padding:3px 7px;border-radius:20px;">Verified</span>' : ''}
+      </div>
+      <h4>${esc(d.name)}</h4>
+      <div class="cat">${esc(d.cat || '')}</div>
+      <div class="loc">📍 ${esc(d.loc || '')}${d.landmark ? ', ' + esc(d.landmark) : ''}</div>
+      ${d.isDiaspora ? `<div class="loc" style="color:var(--gold);">🌍 Based in ${esc(d.diasporaCountry || 'the diaspora')}</div>` : ''}
+      <div class="member-since${(Date.now() - new Date(d.memberSince).getTime()) < 7*86400000 ? ' new' : ''}">${esc(memberSinceLabel(d.memberSince))}</div>
+      <div class="sells">${esc(d.sells || '')}</div>
+      ${d.looking ? `<div class="looking">Looking for: ${esc(d.looking)}</div>` : ''}
+      ${d.id && d.id !== currentUser?.id ? `
+      <div class="dir-actions">
+        <button class="dir-connect-btn" data-id="${esc(d.id)}">${connectionStatusWith(d.id) === 'accepted' ? 'Message' : connectionStatusWith(d.id) === 'pending' ? 'Pending' : 'Connect'}</button>
+        <button class="dir-report-btn" data-id="${esc(d.id)}" data-name="${esc(d.name)}" title="Report">⚑</button>
+      </div>` : ''}
+    </div>
+  `).join('') || '<p style="color:var(--ink-dim);padding:20px;">No businesses match yet.</p>';
+}
+document.getElementById('dirSearch').addEventListener('input', renderDirectory);
+document.getElementById('dirDiasporaFilter').addEventListener('click', function(){
+  diasporaOnly = !diasporaOnly;
+  this.classList.toggle('active', diasporaOnly);
+  renderDirectory();
+});
+document.querySelectorAll('.dir-filter').forEach(btn => {
+  btn.addEventListener('click', function(){
+    if (this.id === 'dirDiasporaFilter') return;
+    document.querySelectorAll('.dir-filter').forEach(b=>{ if (b.id !== 'dirDiasporaFilter') b.classList.remove('active'); });
+    this.classList.add('active');
+    activeCat = this.getAttribute('data-cat');
+    renderDirectory();
+  });
+});
+document.getElementById('directoryGrid').addEventListener('click', async (e) => {
+  const connBtn = e.target.closest('.dir-connect-btn');
+  const reportBtn = e.target.closest('.dir-report-btn');
+  if (connBtn && sb && currentUser) {
+    const otherId = connBtn.dataset.id;
+    const status = connectionStatusWith(otherId);
+    if (status === 'accepted') { location.href = `messages.html?with=${otherId}`; }
+    else if (status === 'none') {
+      connBtn.disabled = true; connBtn.textContent = 'Sending...';
+      const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: otherId, status: 'pending' });
+      if (!error) loadMyConnectionStatuses(); else { connBtn.disabled = false; connBtn.textContent = 'Connect'; }
+    }
+  } else if (reportBtn) {
+    openReportModal(reportBtn.dataset.id, reportBtn.dataset.name, 'profile', null);
+  }
+});
+
+// =====================================================================
+// REPORTING (duplicated from app.html on purpose, same as every other
+// split page's shared pieces, see LAUNCH_GUIDE.md's note on why)
+// =====================================================================
+let reportContext = null;
+function openReportModal(reportedUserId, reportedName, contextType, contextId){
+  reportContext = { reportedUserId, contextType, contextId: contextId || null };
+  document.getElementById('reportModalTarget').textContent = `Reporting ${reportedName || 'this member'}. Reviewed by BYINFORGH. Repeated violations lead to a suspension.`;
+  document.getElementById('reportModal').classList.add('open');
+}
+document.getElementById('reportCancelBtn').addEventListener('click', () => {
+  document.getElementById('reportModal').classList.remove('open');
+  reportContext = null;
+});
+document.getElementById('reportSubmitBtn').addEventListener('click', async () => {
+  if (!sb || !currentUser || !reportContext) return;
+  const reason = document.getElementById('reportReason').value;
+  const details = document.getElementById('reportDetails').value.trim();
+  const { error } = await sb.from('reports').insert({
+    reporter_id: currentUser.id,
+    reported_user_id: reportContext.reportedUserId,
+    context_type: reportContext.contextType,
+    context_id: reportContext.contextId,
+    reason, details: details || null,
+  });
+  document.getElementById('reportModal').classList.remove('open');
+  document.getElementById('reportDetails').value = '';
+  reportContext = null;
+  alert(error ? 'Could not submit the report, please try again.' : 'Report submitted. BYINFORGH will review it.');
+});
+
+// =====================================================================
+// VERIFICATION
+// The "Verified" badge is only trustworthy if it costs something to
+// get. This panel is the only way a member can request it, submitting
+// a real document to a private bucket only you can review, never
+// self-granted, never automatic.
+// =====================================================================
+async function loadVerifyPanel(){
+  if (!sb || !currentUser || !currentProfile) return;
+  const panel = document.getElementById('verifyPanel');
+
+  if (currentProfile.verified) {
+    panel.className = 'verify-panel verified';
+    panel.innerHTML = `
+      <div class="verify-row">
+        <div><div class="verify-title">✅ Your business is verified</div><div class="verify-desc">Other members see your Verified badge everywhere your profile appears.</div></div>
+      </div>`;
+    return;
+  }
+
+  const { data: requests } = await sb.from('verification_requests').select('*').eq('user_id', currentUser.id).order('submitted_at', { ascending: false }).limit(1);
+  const latest = requests && requests[0];
+
+  if (latest && latest.status === 'pending') {
+    panel.className = 'verify-panel pending';
+    panel.innerHTML = `
+      <div class="verify-row">
+        <div><div class="verify-title">Verification submitted</div><div class="verify-desc">Your document is being reviewed. This usually takes a few days.</div></div>
+        <span class="verify-status-badge pending">Pending review</span>
+      </div>`;
+    return;
+  }
+
+  panel.className = 'verify-panel';
+  panel.innerHTML = `
+    <div class="verify-row">
+      <div><div class="verify-title">Get a Verified badge</div><div class="verify-desc">Show us this is a real, active business: a photo of it, a screenshot of what you sell, and a social media handle if you have one. A real person reviews it privately, nobody else ever sees what you submit here.${latest && latest.status === 'rejected' ? " Your last submission wasn't approved, you can try again below." : ''}</div></div>
+      <button class="btn-primary" id="verifyToggleBtn">${latest && latest.status === 'rejected' ? 'Resubmit' : 'Request verification'}</button>
+    </div>
+    <form class="verify-form" id="verifyForm">
+      <div class="field">
+        <label>A real photo of your business</label>
+        <input type="file" id="verifyPhotoFile" accept="image/*" required>
+        <span class="field-hint">Your shop, stall, workspace, stock, or you at work, anything that shows this is a real, active business.</span>
+      </div>
+      <div class="field">
+        <label>A screenshot of what you sell</label>
+        <input type="file" id="verifyProductFile" accept="image/*" required>
+        <span class="field-hint">A WhatsApp catalogue, a price list, a product photo you've already posted, anything showing what you actually offer.</span>
+      </div>
+      <div class="field">
+        <label>Social media handle or business page (optional, but it helps)</label>
+        <input type="text" id="verifySocial" placeholder="e.g. @yourbusiness on Instagram, or your Facebook page name">
+      </div>
+      <div class="field">
+        <label>Anything else that helps us confirm this (optional)</label>
+        <textarea id="verifyNotes" rows="2" placeholder="e.g. how long you've been trading, where you're based"></textarea>
+      </div>
+      <button type="submit" class="btn-primary">Submit for review</button>
+      <div id="verifySubmitStatus" style="margin-top:10px;font-family:'Inter',sans-serif;font-size:10.5px;color:var(--teal);"></div>
+    </form>
+  `;
+  document.getElementById('verifyToggleBtn').addEventListener('click', () => {
+    document.getElementById('verifyForm').classList.toggle('open');
+  });
+  document.getElementById('verifyForm').addEventListener('submit', submitVerification);
+}
+
+async function submitVerification(e){
+  e.preventDefault();
+  const statusEl = document.getElementById('verifySubmitStatus');
+  const photoFile = document.getElementById('verifyPhotoFile').files[0];
+  const productFile = document.getElementById('verifyProductFile').files[0];
+  const social = document.getElementById('verifySocial').value.trim();
+  const notes = document.getElementById('verifyNotes').value.trim();
+  if (!photoFile || !productFile || !sb || !currentUser) return;
+
+  statusEl.textContent = 'Uploading...';
+  const safe = (name) => name.replace(/[^a-z0-9.]+/gi, '_');
+  const photoPath = `${currentUser.id}/${Date.now()}_photo_${safe(photoFile.name)}`;
+  const productPath = `${currentUser.id}/${Date.now()}_product_${safe(productFile.name)}`;
+
+  const { error: photoErr } = await sb.storage.from('verification-documents').upload(photoPath, photoFile);
+  if (photoErr) { statusEl.textContent = 'Upload failed, please try again.'; return; }
+  const { error: productErr } = await sb.storage.from('verification-documents').upload(productPath, productFile);
+  if (productErr) { statusEl.textContent = 'Upload failed, please try again.'; return; }
+
+  const { error } = await sb.from('verification_requests').insert({
+    user_id: currentUser.id, photo_url: photoPath, product_url: productPath,
+    social_handle: social || null, notes: notes || null,
+  });
+  statusEl.textContent = error ? 'Something went wrong, please try again.' : 'Submitted. Thanks, someone will review this soon.';
+  if (!error) setTimeout(loadVerifyPanel, 1200);
+}
+</script>
+
+</body>
+</html>
