@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Community: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:56px 0;scroll-margin-top:96px;}
+.section-head{max-width:640px;margin-bottom:32px;}
+.section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+
+.feed-shell{border:1px solid var(--line);background:var(--bg);padding:24px;}
+.comm-post{border:1px solid var(--line);padding:16px;margin-bottom:12px;border-radius:4px;}
+.comm-post-user{font-size:13px;font-weight:700;margin-bottom:8px;}
+.comm-post p{font-size:13px;color:var(--ink-dim);line-height:1.55;margin:0;}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="pageShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="app.html" class="btn-ghost">Back to dashboard</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<section id="community">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Community</span>
+      <h2>Post a win, a question, or something to collaborate on.</h2>
+    </div>
+    <div class="feed-shell">
+      <form id="postForm" style="display:flex;flex-direction:column;gap:10px;margin-bottom:22px;padding-bottom:22px;border-bottom:1px solid var(--line);">
+        <textarea id="postContent" placeholder="Share something with the community..." required rows="2" style="background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:12px 14px;font-family:'Poppins',sans-serif;font-size:13.5px;outline:none;resize:vertical;"></textarea>
+        <button type="submit" style="align-self:flex-end;background:var(--teal);color:var(--bg);border:none;padding:10px 20px;font-weight:800;text-transform:uppercase;font-size:11.5px;cursor:pointer;">Post</button>
+      </form>
+      <div id="communityFeed"></div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with the same two lines in
+// index.html, auth.html, app.html, admin.html, groups.html, and qa.html.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+let currentUser = null;
+let currentProfile = null;
+
+async function initPage(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('pageShell').style.display = 'block';
+  loadCommunity();
+}
+window.addEventListener('load', () => setTimeout(initPage, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// COMMUNITY
+// =====================================================================
+async function loadCommunity(){
+  const feed = document.getElementById('communityFeed');
+  if (!sb) return;
+  const { data: posts, error } = await sb.from('community_posts').select('*').order('created_at', { ascending: false }).limit(20);
+  if (error) { console.error(error); return; }
+  if (!posts || !posts.length) { feed.innerHTML = '<p style="color:var(--ink-dim);">No posts yet, be the first to share something.</p>'; return; }
+  const ids = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
+  const { data: profs } = await sb.from('public_profiles').select('id, name, business_name').in('id', ids.length ? ids : ['00000000-0000-0000-0000-000000000000']);
+  const profMap = {};
+  (profs || []).forEach(p => profMap[p.id] = p);
+  feed.innerHTML = posts.map(p => {
+    const prof = profMap[p.user_id];
+    return `
+    <div class="comm-post">
+      <div class="comm-post-user">${esc(prof?.name || 'A member')}${prof?.business_name ? ' · ' + esc(prof.business_name) : ''}</div>
+      <p>${esc(p.content)}</p>
+    </div>`;
+  }).join('');
+}
+document.getElementById('postForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const content = document.getElementById('postContent').value.trim();
+  if (!content || !sb || !currentUser) return;
+  const { error } = await sb.from('community_posts').insert({ user_id: currentUser.id, content });
+  if (!error) { document.getElementById('postContent').value = ''; loadCommunity(); }
+});
+</script>
+
+</body>
+</html>
