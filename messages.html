@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messages: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+.btn-primary{background:var(--teal);color:var(--bg);border:none;padding:10px 16px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.btn-danger{background:transparent;color:var(--m7);border:1px solid var(--m7);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.empty-note{color:var(--ink-dim);padding:24px;font-size:13px;border:1px dashed var(--line);text-align:center;}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:56px 0;scroll-margin-top:96px;}
+.section-head{max-width:640px;margin-bottom:24px;}
+.section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+.section-head p{color:var(--ink-dim);font-size:15px;line-height:1.6;margin-top:14px;}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
+.field textarea{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:14.5px;outline:none;border-radius:2px;width:100%;}
+
+.conn-avatar{width:38px;height:38px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);flex-shrink:0;overflow:hidden;}
+.conn-avatar img{width:100%;height:100%;object-fit:cover;}
+
+.safety-notice{border:1px solid var(--line);background:var(--surface-2);padding:14px 18px;font-size:11.5px;color:var(--ink-dim);line-height:1.6;margin-bottom:20px;}
+.safety-notice b{color:var(--ink);}
+.filter-warning{color:var(--m7);font-size:11.5px;margin-top:6px;display:none;}
+.filter-warning.show{display:block;}
+
+.messages-shell{display:grid;grid-template-columns:280px 1fr;border:1px solid var(--line);background:var(--bg);min-height:480px;}
+@media(max-width:860px){.messages-shell{grid-template-columns:1fr;}}
+.convo-list{border-right:1px solid var(--line);}
+@media(max-width:860px){.convo-list{border-right:none;border-bottom:1px solid var(--line);}}
+.convo-row{display:flex;gap:10px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;}
+.convo-row:hover,.convo-row.active{background:var(--surface-2);}
+.convo-row .conn-avatar{position:relative;}
+.convo-name{font-size:13px;font-weight:700;}
+.convo-preview{font-size:11px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:170px;}
+.thread-col{display:flex;flex-direction:column;}
+.thread-head{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;}
+.thread-head-name{font-size:14px;font-weight:700;}
+.thread-feed{flex:1;padding:20px 22px;display:flex;flex-direction:column;gap:10px;min-height:340px;max-height:420px;overflow-y:auto;}
+.thread-msg{max-width:65%;padding:10px 13px;border-radius:2px;font-size:13px;line-height:1.5;}
+.thread-msg.mine{align-self:flex-end;background:rgba(15,76,92,0.14);border:1px solid var(--teal-deep);}
+.thread-msg.theirs{align-self:flex-start;background:var(--surface-2);border:1px solid var(--line);}
+.thread-msg-time{font-family:'Inter',sans-serif;font-size:9px;color:var(--ink-dim);margin-top:4px;}
+.thread-composer{display:flex;gap:8px;padding:16px 22px;border-top:1px solid var(--line);}
+.thread-composer input{flex:1;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:11px 13px;font-family:'Poppins',sans-serif;font-size:13px;outline:none;}
+.thread-empty{flex:1;display:flex;align-items:center;justify-content:center;color:var(--ink-dim);font-size:13px;padding:40px;text-align:center;}
+.dir-report-btn{background:transparent;border:1px solid var(--line);color:var(--ink-dim);padding:9px 10px;cursor:pointer;font-size:12px;}
+.dir-report-btn:hover{border-color:var(--m7);color:var(--m7);}
+
+.modal-overlay{position:fixed;inset:0;background:rgba(10,20,23,0.55);z-index:100;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal-box{background:var(--surface);border:1px solid var(--line);padding:28px;max-width:420px;width:100%;}
+.modal-box h4{font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-transform:none;letter-spacing:0;margin:0 0 6px;}
+.modal-box p{font-size:12.5px;color:var(--ink-dim);margin:0 0 18px;}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.modal-actions button{flex:1;}
+select.field-select{background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:12px 14px;font-family:'Poppins',sans-serif;font-size:13.5px;outline:none;border-radius:2px;width:100%;}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="pageShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="connections.html" class="btn-ghost">Connections</a>
+      <a href="app.html" class="btn-ghost">Back to dashboard</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<section id="messages">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Direct messages</span>
+      <h2>Talk directly with your connections.</h2>
+      <p>You can only message people you're connected with, this keeps messaging for real business relationships, not strangers.</p>
+    </div>
+    <div class="safety-notice"><b>Keep it respectful.</b> No foul language, aggressive behaviour, or intimidation. Members who break this get a strike, three strikes and the account is suspended. Use the ⚑ button to report anything that crosses the line. <b>Before you trust a business opportunity:</b> check how long they've been a member and whether they carry a Verified badge, shown on every profile. A real partner never asks for money upfront, a fee to "unlock" an opportunity, or pressure to decide fast.</div>
+    <div class="messages-shell">
+      <div class="convo-list" id="convoList"></div>
+      <div class="thread-col" id="threadCol">
+        <div class="thread-empty">Pick a connection on the left to start messaging.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<div class="modal-overlay" id="reportModal">
+  <div class="modal-box">
+    <h4>Report this member</h4>
+    <p id="reportModalTarget">Reports are reviewed by BYINFORGH. Repeated violations lead to a suspension.</p>
+    <div class="field">
+      <label>Reason</label>
+      <select class="field-select" id="reportReason">
+        <option value="foul_language">Foul language</option>
+        <option value="harassment_or_threats">Harassment, aggression, or threats</option>
+        <option value="spam">Spam</option>
+        <option value="scam_or_fraud">Scam or fraud</option>
+        <option value="impersonation">Impersonation</option>
+        <option value="other">Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Details (optional)</label>
+      <textarea id="reportDetails" rows="3" placeholder="Anything that helps us understand what happened"></textarea>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" id="reportCancelBtn" type="button">Cancel</button>
+      <button class="btn-danger" id="reportSubmitBtn" type="button">Submit report</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with every other BYINFORGH page.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+function memberSinceLabel(createdAt){
+  if (!createdAt) return '';
+  const d = new Date(createdAt);
+  const days = Math.floor((Date.now() - d.getTime()) / 86400000);
+  const label = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+  if (days < 7) return `New member · joined this week`;
+  return `Member since ${label}`;
+}
+
+let currentUser = null;
+let currentProfile = null;
+
+async function initPage(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('pageShell').style.display = 'block';
+  loadConversations();
+}
+window.addEventListener('load', () => setTimeout(initPage, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// RESPECT FILTER (duplicated on purpose, see groups.html's copy for
+// the full note on why this isn't shared across pages)
+// =====================================================================
+const FORBIDDEN_TERMS = [
+  'fuck','fucking','fucker','shit','bitch','asshole','bastard','cunt','dick','pussy','whore','slut',
+  'nigger','nigga','faggot','retard','stupid idiot',
+  'kill you','i will kill','i will hurt you','i will beat you','i will deal with you','watch your back',
+  'you will regret','i know where you live','come and die','i go kill you','i go beat you','i go deal with you'
+];
+function hasForbiddenLanguage(text){
+  const t = (text || '').toLowerCase();
+  return FORBIDDEN_TERMS.some(term => t.includes(term));
+}
+
+// =====================================================================
+// REPORTING (duplicated on purpose, same as directory.html's copy)
+// =====================================================================
+let reportContext = null;
+function openReportModal(reportedUserId, reportedName, contextType, contextId){
+  reportContext = { reportedUserId, contextType, contextId: contextId || null };
+  document.getElementById('reportModalTarget').textContent = `Reporting ${reportedName || 'this member'}. Reviewed by BYINFORGH. Repeated violations lead to a suspension.`;
+  document.getElementById('reportModal').classList.add('open');
+}
+document.getElementById('reportCancelBtn').addEventListener('click', () => {
+  document.getElementById('reportModal').classList.remove('open');
+  reportContext = null;
+});
+document.getElementById('reportSubmitBtn').addEventListener('click', async () => {
+  if (!sb || !currentUser || !reportContext) return;
+  const reason = document.getElementById('reportReason').value;
+  const details = document.getElementById('reportDetails').value.trim();
+  const { error } = await sb.from('reports').insert({
+    reporter_id: currentUser.id,
+    reported_user_id: reportContext.reportedUserId,
+    context_type: reportContext.contextType,
+    context_id: reportContext.contextId,
+    reason, details: details || null,
+  });
+  document.getElementById('reportModal').classList.remove('open');
+  document.getElementById('reportDetails').value = '';
+  reportContext = null;
+  alert(error ? 'Could not submit the report, please try again.' : 'Report submitted. BYINFORGH will review it.');
+});
+
+// =====================================================================
+// MESSAGES
+// Deep link: messages.html?with=<user-id> opens straight into that
+// connection's thread, this is what Connections and the directory's
+// Message button both link to now.
+// =====================================================================
+let allConnections = [];
+let profileDirectory = {};
+let activeConvoUserId = null;
+let dmChannel = null;
+
+async function loadConversations(){
+  if (!sb || !currentUser) return;
+  const [{ data: profiles }, { data: conns }] = await Promise.all([
+    sb.from('public_profiles').select('*'),
+    sb.from('connections').select('*').eq('status', 'accepted').or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`),
+  ]);
+  profileDirectory = {};
+  (profiles || []).forEach(p => { profileDirectory[p.id] = p; });
+  allConnections = conns || [];
+  renderConversationList();
+
+  const wanted = new URLSearchParams(location.search).get('with');
+  if (wanted && profileDirectory[wanted]) openConversation(wanted);
+}
+
+function renderConversationList(){
+  const list = document.getElementById('convoList');
+  if (!allConnections.length) { list.innerHTML = '<p class="empty-note" style="margin:16px;">Connect with someone first, then message them here.</p>'; return; }
+  list.innerHTML = allConnections.map(c => {
+    const otherId = c.requester_id === currentUser.id ? c.addressee_id : c.requester_id;
+    const p = profileDirectory[otherId];
+    if (!p) return '';
+    return `
+    <div class="convo-row${activeConvoUserId === otherId ? ' active' : ''}" data-id="${esc(otherId)}">
+      <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
+      <div style="min-width:0;">
+        <div class="convo-name">${esc(p.business_name || p.name)}</div>
+        <div class="convo-preview">${esc(p.category || '')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+document.getElementById('convoList').addEventListener('click', (e) => {
+  const row = e.target.closest('.convo-row');
+  if (row) openConversation(row.dataset.id);
+});
+
+async function openConversation(otherId){
+  activeConvoUserId = otherId;
+  renderConversationList();
+  history.replaceState(null, '', `?with=${otherId}`);
+  const p = profileDirectory[otherId];
+  const col = document.getElementById('threadCol');
+  col.innerHTML = `
+    <div class="thread-head">
+      <div><div class="thread-head-name">${esc(p ? (p.business_name || p.name) : 'Member')}${p && p.verified ? ' <span style="font-family:Inter,sans-serif;font-size:9px;color:var(--teal);border:1px solid var(--teal);padding:2px 6px;border-radius:20px;vertical-align:middle;">Verified</span>' : ''}</div><div class="convo-preview">${esc(memberSinceLabel(p ? p.created_at : null))}</div></div>
+      <button class="dir-report-btn" id="threadReportBtn" title="Report">⚑</button>
+    </div>
+    <div class="thread-feed" id="threadFeed"></div>
+    <div class="thread-composer">
+      <input type="text" id="threadInput" placeholder="Write a message...">
+      <button class="btn-primary" id="threadSendBtn">Send</button>
+    </div>
+    <div class="filter-warning" id="threadFilterWarning">Keep it respectful, no foul language, threats, or harassment. Rewrite your message.</div>
+  `;
+  document.getElementById('threadReportBtn').addEventListener('click', () => openReportModal(otherId, p ? (p.business_name || p.name) : 'this member', 'dm_message', null));
+  document.getElementById('threadSendBtn').addEventListener('click', sendDM);
+  document.getElementById('threadInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') sendDM(); });
+
+  await loadThread(otherId);
+  subscribeToDMs(otherId);
+}
+
+async function loadThread(otherId){
+  const { data } = await sb.from('dm_messages').select('*')
+    .or(`and(sender_id.eq.${currentUser.id},recipient_id.eq.${otherId}),and(sender_id.eq.${otherId},recipient_id.eq.${currentUser.id})`)
+    .order('created_at', { ascending: true });
+  renderThread(data || []);
+  sb.from('dm_messages').update({ read_at: new Date().toISOString() }).eq('sender_id', otherId).eq('recipient_id', currentUser.id).is('read_at', null).then(()=>{});
+}
+function renderThread(messages){
+  const feed = document.getElementById('threadFeed');
+  if (!feed) return;
+  feed.innerHTML = messages.map(m => `
+    <div class="thread-msg ${m.sender_id === currentUser.id ? 'mine' : 'theirs'}">
+      ${esc(m.body)}
+      <div class="thread-msg-time">${new Date(m.created_at).toLocaleString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</div>
+    </div>`).join('') || '<div class="thread-empty">No messages yet, say hello.</div>';
+  feed.scrollTop = feed.scrollHeight;
+}
+async function sendDM(){
+  const input = document.getElementById('threadInput');
+  const warn = document.getElementById('threadFilterWarning');
+  const body = input.value.trim();
+  if (!body || !activeConvoUserId || !sb || !currentUser) return;
+  if (hasForbiddenLanguage(body)) { warn.classList.add('show'); return; }
+  warn.classList.remove('show');
+  input.value = '';
+  const { error } = await sb.from('dm_messages').insert({ sender_id: currentUser.id, recipient_id: activeConvoUserId, body });
+  if (error) { alert('Message could not be sent. ' + (error.message || '')); return; }
+  loadThread(activeConvoUserId);
+}
+function subscribeToDMs(otherId){
+  if (dmChannel) sb.removeChannel(dmChannel);
+  dmChannel = sb.channel('dm_' + otherId)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_messages' }, (payload) => {
+      const m = payload.new;
+      if ((m.sender_id === otherId && m.recipient_id === currentUser.id) || (m.sender_id === currentUser.id && m.recipient_id === otherId)) {
+        loadThread(otherId);
+      }
+    }).subscribe();
+}
+</script>
+
+</body>
+</html>
