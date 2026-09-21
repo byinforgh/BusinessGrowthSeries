@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Console: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:56px 0;scroll-margin-top:96px;}
+.section-head{max-width:640px;margin-bottom:40px;}
+.section-head h2{font-size:clamp(26px,4vw,38px);margin-top:10px;}
+.section-head p{color:var(--ink-dim);font-size:15px;line-height:1.6;margin-top:14px;}
+
+.pill-toggle{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);margin-bottom:24px;flex-wrap:wrap;}
+.pill-toggle button{background:var(--surface);border:none;color:var(--ink-dim);padding:10px 16px;font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;cursor:pointer;}
+.pill-toggle button.active{background:var(--teal);color:var(--bg);font-weight:700;}
+.pill-toggle button .count-badge{margin-left:6px;opacity:.7;}
+.btn-primary{background:var(--teal);color:var(--bg);border:none;padding:10px 16px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+.btn-danger{background:transparent;color:var(--m7);border:1px solid var(--m7);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
+.empty-note{color:var(--ink-dim);padding:24px;font-size:13px;border:1px dashed var(--line);text-align:center;}
+
+.admin-queue-item{border:1px solid var(--line);background:var(--surface-2);padding:18px 20px;margin-bottom:2px;display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;}
+.admin-queue-main{flex:1;min-width:220px;}
+.admin-queue-name{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+.admin-queue-meta{font-family:'Inter',sans-serif;font-size:10px;color:var(--ink-dim);margin-bottom:8px;}
+.admin-queue-body{font-size:12.5px;color:var(--ink);line-height:1.5;white-space:pre-wrap;}
+.admin-queue-actions{display:flex;gap:8px;flex-wrap:wrap;}
+.admin-queue-actions button{white-space:nowrap;}
+.admin-doc-link{color:var(--teal);font-size:11px;text-decoration:underline;cursor:pointer;}
+.admin-doc-links{display:flex;gap:18px;margin-top:6px;}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking admin access...</p></div>
+<div id="deniedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Admin access only</h2>
+    <p>This page is restricted to BYINFORGH admin accounts. If you believe this is a mistake, check your <code>is_admin</code> flag in Table Editor.</p>
+    <p style="margin-top:16px;"><a href="app.html" style="color:var(--teal);text-decoration:underline;">Back to the member app</a></p>
+  </div>
+</div>
+
+<div id="adminShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH Admin</a>
+    <div style="display:flex;gap:16px;align-items:center;">
+      <a href="app.html" class="btn-ghost" style="text-decoration:none;display:inline-block;">Back to app</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+
+<section id="admin">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Admin console</span>
+      <h2>One screen for everything waiting on you.</h2>
+      <p>Verification, reports, and content approvals, in one place instead of three Table Editor tabs. This page loads only for accounts with <code>is_admin</code> set, and admin code no longer ships to any other member's browser.</p>
+    </div>
+    <div class="pill-toggle" id="adminTabs">
+      <button class="active" data-tab="verification">Verification <span class="count-badge" id="adminVerifyCount"></span></button>
+      <button data-tab="reports">Reports <span class="count-badge" id="adminReportsCount"></span></button>
+      <button data-tab="content">Content <span class="count-badge" id="adminContentCount"></span></button>
+    </div>
+    <div id="adminPanelBody"></div>
+  </div>
+</section>
+
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with the same two lines in
+// index.html, auth.html, and app.html.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+let currentUser = null;
+let currentProfile = null;
+// Resolved on demand from public_profiles as ids show up in queue rows,
+// this page has no reason to preload the whole member directory the
+// way app.html's Connections tab does.
+let profileCache = {};
+async function resolveProfileName(userId){
+  if (!userId) return 'Unknown member';
+  if (profileCache[userId]) return profileCache[userId].business_name || profileCache[userId].name;
+  const { data } = await sb.from('public_profiles').select('name, business_name').eq('id', userId).single();
+  if (data) { profileCache[userId] = data; return data.business_name || data.name; }
+  return userId;
+}
+async function preloadNamesFor(ids){
+  const missing = [...new Set(ids)].filter(id => id && !profileCache[id]);
+  if (!missing.length) return;
+  const { data } = await sb.from('public_profiles').select('id, name, business_name').in('id', missing);
+  (data || []).forEach(p => { profileCache[p.id] = p; });
+}
+function nameFor(userId){
+  const p = profileCache[userId];
+  return p ? (p.business_name || p.name) : (userId || 'Unknown member');
+}
+
+// =====================================================================
+// SESSION + ADMIN GUARD: every visit re-checks both. A member who is
+// not an admin never sees this page render, and this file never loads
+// inside app.html's own bundle, so the admin queue queries and actions
+// below are not present in a regular member's downloaded code at all.
+// =====================================================================
+async function initAdmin(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (!profile.is_admin) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('deniedGate').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('adminShell').style.display = 'block';
+  loadAdminConsole();
+}
+window.addEventListener('load', () => setTimeout(initAdmin, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// ADMIN CONSOLE
+// Verification, reports, and pending content approvals, all in one
+// screen instead of three separate Table Editor tabs.
+// =====================================================================
+let activeAdminTab = 'verification';
+
+async function loadAdminConsole(){
+  const [{ data: verifs }, { data: reports }, { data: spotlights }, { data: testimonials }, { data: aiDocs }] = await Promise.all([
+    sb.from('verification_requests').select('*').eq('status', 'pending').order('submitted_at', { ascending: true }),
+    sb.from('reports').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+    sb.from('spotlights').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+    sb.from('testimonials').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+    sb.from('ai_documents').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+  ]);
+  window._adminData = { verifs: verifs || [], reports: reports || [], content: [
+    ...(spotlights || []).map(s => ({ ...s, kind: 'spotlight' })),
+    ...(testimonials || []).map(t => ({ ...t, kind: 'testimonial' })),
+    ...(aiDocs || []).map(a => ({ ...a, kind: 'ai_document' })),
+  ]};
+
+  const allIds = [
+    ...window._adminData.verifs.map(v => v.user_id),
+    ...window._adminData.reports.map(r => r.reported_user_id),
+    ...window._adminData.content.map(c => c.user_id),
+  ];
+  await preloadNamesFor(allIds);
+
+  document.getElementById('adminVerifyCount').textContent = window._adminData.verifs.length || '';
+  document.getElementById('adminReportsCount').textContent = window._adminData.reports.length || '';
+  document.getElementById('adminContentCount').textContent = window._adminData.content.length || '';
+  renderAdminPanel();
+}
+
+function renderAdminPanel(){
+  const body = document.getElementById('adminPanelBody');
+  const d = window._adminData;
+  if (activeAdminTab === 'verification') {
+    body.innerHTML = d.verifs.map(v => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(nameFor(v.user_id))}</div>
+          <div class="admin-queue-meta">submitted ${new Date(v.submitted_at).toLocaleDateString('en-GB')}${v.social_handle ? ' · ' + esc(v.social_handle) : ''}</div>
+          <div class="admin-queue-body">${esc(v.notes || 'No notes provided.')}</div>
+          <div class="admin-doc-links">
+            <a class="admin-doc-link" data-path="${esc(v.photo_url)}">View business photo →</a>
+            <a class="admin-doc-link" data-path="${esc(v.product_url)}">View product screenshot →</a>
+          </div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-primary admin-verify-approve" data-id="${esc(v.id)}" data-user="${esc(v.user_id)}">Approve</button>
+          <button class="btn-danger admin-verify-reject" data-id="${esc(v.id)}">Reject</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No pending verification requests.</p>';
+  } else if (activeAdminTab === 'reports') {
+    body.innerHTML = d.reports.map(r => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">Report against ${esc(nameFor(r.reported_user_id))}</div>
+          <div class="admin-queue-meta">${esc(r.reason)} · ${esc(r.context_type)} · filed ${new Date(r.created_at).toLocaleDateString('en-GB')}</div>
+          <div class="admin-queue-body">${esc(r.details || 'No further details provided.')}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-danger admin-report-strike" data-id="${esc(r.id)}" data-user="${esc(r.reported_user_id)}">Issue strike</button>
+          <button class="btn-ghost admin-report-dismiss" data-id="${esc(r.id)}">Dismiss</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No pending reports.</p>';
+  } else if (activeAdminTab === 'content') {
+    body.innerHTML = d.content.map(c => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(c.kind.replace('_',' '))} from ${esc(nameFor(c.user_id))}</div>
+          <div class="admin-queue-meta">submitted ${new Date(c.created_at).toLocaleDateString('en-GB')}</div>
+          <div class="admin-queue-body">${esc((c.kind === 'spotlight' ? `${c.business_name}: ${c.what_they_do}` : c.kind === 'ai_document' ? `${c.title}: ${c.content}` : c.content || '').toString().slice(0, 400))}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-primary admin-content-approve" data-id="${esc(c.id)}" data-kind="${esc(c.kind)}">Approve</button>
+          <button class="btn-danger admin-content-reject" data-id="${esc(c.id)}" data-kind="${esc(c.kind)}">Reject</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">Nothing pending.</p>';
+  }
+}
+document.getElementById('adminTabs').addEventListener('click', (e) => {
+  const btn = e.target.closest('button');
+  if (!btn) return;
+  document.querySelectorAll('#adminTabs button').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeAdminTab = btn.getAttribute('data-tab');
+  renderAdminPanel();
+});
+
+document.getElementById('adminPanelBody').addEventListener('click', async (e) => {
+  const docLink = e.target.closest('.admin-doc-link');
+  if (docLink) {
+    const { data, error } = await sb.storage.from('verification-documents').createSignedUrl(docLink.dataset.path, 3600);
+    if (data && data.signedUrl) window.open(data.signedUrl, '_blank');
+    else alert('Could not open document.');
+    return;
+  }
+  const btn = e.target.closest('button');
+  if (!btn) return;
+
+  if (btn.classList.contains('admin-verify-approve')) {
+    await sb.from('verification_requests').update({ status: 'approved', reviewed_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    await sb.from('profiles').update({ verified: true }).eq('id', btn.dataset.user);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-verify-reject')) {
+    await sb.from('verification_requests').update({ status: 'rejected', reviewed_at: new Date().toISOString() }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-report-dismiss')) {
+    await sb.from('reports').update({ status: 'dismissed' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-report-strike')) {
+    if (!confirm('Issue a strike to this member? Three strikes suspends their account automatically.')) return;
+    await sb.from('strikes').insert({ user_id: btn.dataset.user, report_id: btn.dataset.id, reason: 'Reported and reviewed by admin' });
+    await sb.from('reports').update({ status: 'actioned' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-content-approve')) {
+    await sb.from(btn.dataset.kind === 'ai_document' ? 'ai_documents' : btn.dataset.kind + 's').update({ status: 'approved' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  } else if (btn.classList.contains('admin-content-reject')) {
+    await sb.from(btn.dataset.kind === 'ai_document' ? 'ai_documents' : btn.dataset.kind + 's').update({ status: 'rejected' }).eq('id', btn.dataset.id);
+    loadAdminConsole();
+  }
+});
+</script>
+
+</body>
+</html>
