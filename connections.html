@@ -205,8 +205,6 @@ function computeSuggestedConnections(){
       let score = 0, reasons = [];
       if (p.category && mine.category && p.category === mine.category) { score += 3; reasons.push(`Same category: ${p.category}`); }
       if (p.location && mine.location && p.location.toLowerCase() === mine.location.toLowerCase()) { score += 2; reasons.push(`Also based in ${p.location}`); }
-      if (p.is_diaspora && !mine.is_diaspora) { score += 1; reasons.push(`Based abroad in ${p.diaspora_country || 'the diaspora'}, open to networking with Ghana businesses`); }
-      if (mine.is_diaspora && !p.is_diaspora) { score += 1; reasons.push('A Ghana-based business you could connect with directly'); }
       const theirLooking = (p.looking_for || '').toLowerCase();
       const theirSells = (p.sells || '').toLowerCase();
       if (mySells && theirLooking && theirLooking.split(/\W+/).some(w => w.length > 3 && mySells.includes(w))) { score += 3; reasons.push('They may be looking for what you sell'); }
