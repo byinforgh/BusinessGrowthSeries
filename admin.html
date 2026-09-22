@@ -89,8 +89,9 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="app-topbar-inner">
     <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH Admin</a>
-    <div style="display:flex;gap:16px;align-items:center;">
+    <div style="display:flex;gap:6px;align-items:center;overflow-x:auto;">
       <a href="app.html" class="btn-ghost" style="text-decoration:none;display:inline-block;">Back to app</a>
+      <a href="lounge.html" class="btn-ghost" style="text-decoration:none;display:inline-block;">Live Lounge</a>
       <button class="btn-ghost" id="logoutBtn">Log out</button>
     </div>
   </div>
@@ -107,6 +108,8 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       <button class="active" data-tab="verification">Verification <span class="count-badge" id="adminVerifyCount"></span></button>
       <button data-tab="reports">Reports <span class="count-badge" id="adminReportsCount"></span></button>
       <button data-tab="content">Content <span class="count-badge" id="adminContentCount"></span></button>
+      <button data-tab="community">Community &amp; Q&amp;A <span class="count-badge" id="adminCommunityCount"></span></button>
+      <button data-tab="lounge">Live Lounge <span class="count-badge" id="adminLoungeCount"></span></button>
     </div>
     <div id="adminPanelBody"></div>
   </div>
@@ -219,29 +222,37 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 let activeAdminTab = 'verification';
 
 async function loadAdminConsole(){
-  const [{ data: verifs }, { data: reports }, { data: spotlights }, { data: testimonials }, { data: aiDocs }] = await Promise.all([
+  const [{ data: verifs }, { data: reports }, { data: spotlights }, { data: testimonials }, { data: aiDocs }, { data: posts }, { data: questions }, { data: loungeMsgs }] = await Promise.all([
     sb.from('verification_requests').select('*').eq('status', 'pending').order('submitted_at', { ascending: true }),
     sb.from('reports').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
     sb.from('spotlights').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
     sb.from('testimonials').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
     sb.from('ai_documents').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
+    sb.from('community_posts').select('*').order('created_at', { ascending: false }).limit(50),
+    sb.from('qa_questions').select('*, qa_answers(*)').order('created_at', { ascending: false }).limit(50),
+    sb.from('live_chat_messages').select('*').order('created_at', { ascending: false }).limit(80),
   ]);
   window._adminData = { verifs: verifs || [], reports: reports || [], content: [
     ...(spotlights || []).map(s => ({ ...s, kind: 'spotlight' })),
     ...(testimonials || []).map(t => ({ ...t, kind: 'testimonial' })),
     ...(aiDocs || []).map(a => ({ ...a, kind: 'ai_document' })),
-  ]};
+  ], posts: posts || [], questions: questions || [], loungeMsgs: loungeMsgs || [] };
 
   const allIds = [
     ...window._adminData.verifs.map(v => v.user_id),
     ...window._adminData.reports.map(r => r.reported_user_id),
     ...window._adminData.content.map(c => c.user_id),
+    ...window._adminData.posts.map(p => p.user_id),
+    ...window._adminData.questions.map(q => q.user_id),
+    ...window._adminData.loungeMsgs.map(m => m.user_id),
   ];
   await preloadNamesFor(allIds);
 
   document.getElementById('adminVerifyCount').textContent = window._adminData.verifs.length || '';
   document.getElementById('adminReportsCount').textContent = window._adminData.reports.length || '';
   document.getElementById('adminContentCount').textContent = window._adminData.content.length || '';
+  document.getElementById('adminCommunityCount').textContent = (window._adminData.posts.length + window._adminData.questions.length) || '';
+  document.getElementById('adminLoungeCount').textContent = window._adminData.loungeMsgs.length || '';
   renderAdminPanel();
 }
 
@@ -291,6 +302,53 @@ function renderAdminPanel(){
           <button class="btn-danger admin-content-reject" data-id="${esc(c.id)}" data-kind="${esc(c.kind)}">Reject</button>
         </div>
       </div>`).join('') || '<p class="empty-note">Nothing pending.</p>';
+  } else if (activeAdminTab === 'community') {
+    const postsHtml = d.posts.map(p => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">Community post — ${esc(nameFor(p.user_id))}</div>
+          <div class="admin-queue-meta">posted ${new Date(p.created_at).toLocaleDateString('en-GB')}</div>
+          <div class="admin-queue-body">${esc((p.content || '').slice(0, 500))}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-danger admin-post-delete" data-id="${esc(p.id)}">Delete post</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No community posts yet.</p>';
+    const questionsHtml = d.questions.map(q => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">Question — ${esc(nameFor(q.user_id))}</div>
+          <div class="admin-queue-meta">asked ${new Date(q.created_at).toLocaleDateString('en-GB')}${q.tag ? ' · ' + esc(q.tag) : ''}</div>
+          <div class="admin-queue-body">${esc(q.question)}</div>
+          ${(q.qa_answers || []).map(a => `
+            <div style="margin-top:10px;padding:10px 12px;background:var(--surface);border-left:2px solid var(--teal);display:flex;justify-content:space-between;gap:10px;align-items:flex-start;">
+              <span style="font-size:12px;color:var(--ink-dim);flex:1;">${esc(a.answer)}</span>
+              <button class="btn-danger admin-answer-delete" data-id="${esc(a.id)}" style="padding:4px 8px;font-size:9.5px;">Delete</button>
+            </div>`).join('')}
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-danger admin-question-delete" data-id="${esc(q.id)}">Delete question</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No questions yet.</p>';
+    body.innerHTML = `
+      <h3 style="font-family:'Inter',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:.04em;margin:0 0 12px;">Community posts</h3>
+      ${postsHtml}
+      <h3 style="font-family:'Inter',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:.04em;margin:32px 0 12px;">Q&amp;A questions</h3>
+      ${questionsHtml}`;
+  } else if (activeAdminTab === 'lounge') {
+    body.innerHTML = `
+      <p style="font-size:12.5px;color:var(--ink-dim);margin-bottom:16px;">Most recent 80 messages in the Live Lounge, newest first. Deleting here removes the message for everyone in real time.</p>
+      ${d.loungeMsgs.map(m => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(nameFor(m.user_id))}${m.is_akosua ? ' · Akosua' : ''}</div>
+          <div class="admin-queue-meta">${new Date(m.created_at).toLocaleString('en-GB')}</div>
+          <div class="admin-queue-body">${esc(m.body)}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-danger admin-lounge-delete" data-id="${esc(m.id)}">Delete</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No messages yet.</p>'}`;
   }
 }
 document.getElementById('adminTabs').addEventListener('click', (e) => {
@@ -334,6 +392,22 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
   } else if (btn.classList.contains('admin-content-reject')) {
     await sb.from(btn.dataset.kind === 'ai_document' ? 'ai_documents' : btn.dataset.kind + 's').update({ status: 'rejected' }).eq('id', btn.dataset.id);
     loadAdminConsole();
+  } else if (btn.classList.contains('admin-post-delete')) {
+    if (!confirm('Delete this community post? This cannot be undone.')) return;
+    const { error } = await sb.from('community_posts').delete().eq('id', btn.dataset.id);
+    if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
+  } else if (btn.classList.contains('admin-question-delete')) {
+    if (!confirm('Delete this question and all its answers? This cannot be undone.')) return;
+    const { error } = await sb.from('qa_questions').delete().eq('id', btn.dataset.id);
+    if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
+  } else if (btn.classList.contains('admin-answer-delete')) {
+    if (!confirm('Delete this answer?')) return;
+    const { error } = await sb.from('qa_answers').delete().eq('id', btn.dataset.id);
+    if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
+  } else if (btn.classList.contains('admin-lounge-delete')) {
+    if (!confirm('Delete this Live Lounge message for everyone?')) return;
+    const { error } = await sb.from('live_chat_messages').delete().eq('id', btn.dataset.id);
+    if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
   }
 });
 </script>
