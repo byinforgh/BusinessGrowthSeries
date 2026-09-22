@@ -136,7 +136,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .nav-mobile-toggle{display:block;}
 }
 
-
 .kente-stripe{height:6px;display:flex;}
 .kente-stripe span{flex:1;}
 .kente-stripe span:nth-child(4n+1){background:var(--teal);}
@@ -282,7 +281,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 
   section{padding:64px 0;scroll-margin-top:96px;}
   .truth-strip{margin-top:40px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;overflow:hidden;}
-  .truth-strip.inline{margin-top:0;}
   .marquee{display:flex;gap:48px;white-space:nowrap;animation:appscroll 34s linear infinite;width:max-content;}
   .marquee span{font-family:'Inter',sans-serif;font-size:13px;color:var(--ink-dim);letter-spacing:.02em;}
   .marquee span b{color:var(--gold);}
@@ -371,7 +369,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .ai-suggest-chip:hover{border-color:var(--teal);color:var(--teal);}
   @media(max-width:860px){.ai-shell{grid-template-columns:1fr;}.ai-info{border-right:none;border-bottom:1px solid var(--line);}}
 
-
   .accountability-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:2px;background:var(--line);border:1px solid var(--line);}
   .streak-panel{background:var(--bg);padding:30px;}
   .streak-num{font-family:'Inter',sans-serif;font-weight:800;font-size:44px;}
@@ -434,6 +431,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .event-info h4{font-size:14.5px;text-transform:none;letter-spacing:0;font-family:'Inter',sans-serif;font-weight:800;margin-bottom:4px;}
   .event-info p{font-size:12px;color:var(--ink-dim);}
   .event-badge{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;border:1px solid var(--line);padding:6px 12px;color:var(--ink-dim);white-space:nowrap;}
+  .event-join-btn{display:inline-block;margin-top:10px;background:var(--teal);color:var(--bg);padding:8px 16px;font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;border-radius:4px;}
+  .event-join-btn:hover{background:var(--teal-deep);}
 
   @media(max-width:860px){
     .modules-grid,.resource-grid{grid-template-columns:1fr;}
@@ -452,7 +451,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
   .btn-danger{background:transparent;color:var(--m7);border:1px solid var(--m7);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;}
   .empty-note{color:var(--ink-dim);padding:24px;font-size:13px;border:1px dashed var(--line);text-align:center;}
-
 
   /* ============ connections ============ */
   .conn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border:1px solid var(--line);}
@@ -511,7 +509,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .safety-notice b{color:var(--ink);}
   .filter-warning{color:var(--m7);font-size:11.5px;margin-top:6px;display:none;}
   .filter-warning.show{display:block;}
-
 
 </style>
 </head>
@@ -609,26 +606,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     </div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="1"><b>Business Truth #001</b> A business is a system that creates value for customers, not just a shop with a name on it.</span>
-        <span class="marquee-item" data-lesson="5"><b>Business Truth #005</b> Vision is the destination. Goals are the steps that get you there on a deadline.</span>
-        <span class="marquee-item" data-lesson="9"><b>Business Truth #009</b> Risk isn't something to avoid. It's something to measure before you take it.</span>
-        <span class="marquee-item" data-lesson="1"><b>Business Truth #001</b> A business is a system that creates value for customers, not just a shop with a name on it.</span>
-        <span class="marquee-item" data-lesson="5"><b>Business Truth #005</b> Vision is the destination. Goals are the steps that get you there on a deadline.</span>
-        <span class="marquee-item" data-lesson="9"><b>Business Truth #009</b> Risk isn't something to avoid. It's something to measure before you take it.</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="12"><b>Business Truth #012</b> Decide today's price, hire, and deal by asking what it costs you in three years.</span>
-        <span class="marquee-item" data-lesson="16"><b>Business Truth #016</b> A slow wrong decision costs more than a fast good one.</span>
-        <span class="marquee-item" data-lesson="20"><b>Business Truth #020</b> Trust is built in the gap between what you promised and what you delivered.</span>
-        <span class="marquee-item" data-lesson="12"><b>Business Truth #012</b> Decide today's price, hire, and deal by asking what it costs you in three years.</span>
-        <span class="marquee-item" data-lesson="16"><b>Business Truth #016</b> A slow wrong decision costs more than a fast good one.</span>
-        <span class="marquee-item" data-lesson="20"><b>Business Truth #020</b> Trust is built in the gap between what you promised and what you delivered.</span>
-      </div></div></div>
-
-
 <section id="ai-assistant">
   <div class="wrap">
     <div class="section-head">
@@ -668,76 +645,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     </div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="24"><b>Business Truth #024</b> Your week should have a repeatable rhythm, not a new plan every Monday.</span>
-        <span class="marquee-item" data-lesson="28"><b>Business Truth #028</b> Review every 90 days: what worked, what didn't, and what changes next quarter.</span>
-        <span class="marquee-item" data-lesson="32"><b>Business Truth #032</b> A deadline without a consequence is just a suggestion.</span>
-        <span class="marquee-item" data-lesson="24"><b>Business Truth #024</b> Your week should have a repeatable rhythm, not a new plan every Monday.</span>
-        <span class="marquee-item" data-lesson="28"><b>Business Truth #028</b> Review every 90 days: what worked, what didn't, and what changes next quarter.</span>
-        <span class="marquee-item" data-lesson="32"><b>Business Truth #032</b> A deadline without a consequence is just a suggestion.</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="36"><b>Business Truth #036</b> Busy is not the same as productive. Measure output, not hours.</span>
-        <span class="marquee-item" data-lesson="40"><b>Business Truth #040</b> A good plan executed today beats a perfect plan executed never.</span>
-        <span class="marquee-item" data-lesson="44"><b>Business Truth #044</b> Every expense should answer one question: does this bring in more than it costs?</span>
-        <span class="marquee-item" data-lesson="36"><b>Business Truth #036</b> Busy is not the same as productive. Measure output, not hours.</span>
-        <span class="marquee-item" data-lesson="40"><b>Business Truth #040</b> A good plan executed today beats a perfect plan executed never.</span>
-        <span class="marquee-item" data-lesson="44"><b>Business Truth #044</b> Every expense should answer one question: does this bring in more than it costs?</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="48"><b>Business Truth #048</b> Price on value delivered, not on what feels comfortable to say out loud.</span>
-        <span class="marquee-item" data-lesson="52"><b>Business Truth #052</b> A budget is a plan for your money before the month spends it for you.</span>
-        <span class="marquee-item" data-lesson="56"><b>Business Truth #056</b> Fixed costs don't care how many sales you made this month. Know them cold.</span>
-        <span class="marquee-item" data-lesson="48"><b>Business Truth #048</b> Price on value delivered, not on what feels comfortable to say out loud.</span>
-        <span class="marquee-item" data-lesson="52"><b>Business Truth #052</b> A budget is a plan for your money before the month spends it for you.</span>
-        <span class="marquee-item" data-lesson="56"><b>Business Truth #056</b> Fixed costs don't care how many sales you made this month. Know them cold.</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="60"><b>Business Truth #060</b> A liability takes money out of your pocket, whether it's used or not.</span>
-        <span class="marquee-item" data-lesson="64"><b>Business Truth #064</b> Stock sitting on a shelf for a year isn't inventory, it's frozen cash.</span>
-        <span class="marquee-item" data-lesson="68"><b>Business Truth #068</b> Track every mobile money transaction like it's a bank statement, because it is.</span>
-        <span class="marquee-item" data-lesson="60"><b>Business Truth #060</b> A liability takes money out of your pocket, whether it's used or not.</span>
-        <span class="marquee-item" data-lesson="64"><b>Business Truth #064</b> Stock sitting on a shelf for a year isn't inventory, it's frozen cash.</span>
-        <span class="marquee-item" data-lesson="68"><b>Business Truth #068</b> Track every mobile money transaction like it's a bank statement, because it is.</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="72"><b>Business Truth #072</b> Financial discipline is spending like the business depends on it, because it does.</span>
-        <span class="marquee-item" data-lesson="76"><b>Business Truth #076</b> A customer paid once. The work of business starts after that, not before.</span>
-        <span class="marquee-item" data-lesson="80"><b>Business Truth #080</b> Every customer moves through stranger, lead, buyer, and repeat buyer. Know where yours are stuck.</span>
-        <span class="marquee-item" data-lesson="72"><b>Business Truth #072</b> Financial discipline is spending like the business depends on it, because it does.</span>
-        <span class="marquee-item" data-lesson="76"><b>Business Truth #076</b> A customer paid once. The work of business starts after that, not before.</span>
-        <span class="marquee-item" data-lesson="80"><b>Business Truth #080</b> Every customer moves through stranger, lead, buyer, and repeat buyer. Know where yours are stuck.</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="84"><b>Business Truth #084</b> Service is remembered longer than price, good or bad.</span>
-        <span class="marquee-item" data-lesson="88"><b>Business Truth #088</b> State your price once, clearly, without apologizing for it.</span>
-        <span class="marquee-item" data-lesson="92"><b>Business Truth #092</b> Offer the better option before the customer settles for the smaller one.</span>
-        <span class="marquee-item" data-lesson="84"><b>Business Truth #084</b> Service is remembered longer than price, good or bad.</span>
-        <span class="marquee-item" data-lesson="88"><b>Business Truth #088</b> State your price once, clearly, without apologizing for it.</span>
-        <span class="marquee-item" data-lesson="92"><b>Business Truth #092</b> Offer the better option before the customer settles for the smaller one.</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="96"><b>Business Truth #096</b> It costs less to keep a customer than to find a new one.</span>
-        <span class="marquee-item" data-lesson="100"><b>Business Truth #100</b> A brand is the promise customers remember before they remember your name.</span>
-        <span class="marquee-item" data-lesson="104"><b>Business Truth #104</b> If your business isn't on Google Maps, it doesn't exist to half your customers.</span>
-        <span class="marquee-item" data-lesson="96"><b>Business Truth #096</b> It costs less to keep a customer than to find a new one.</span>
-        <span class="marquee-item" data-lesson="100"><b>Business Truth #100</b> A brand is the promise customers remember before they remember your name.</span>
-        <span class="marquee-item" data-lesson="104"><b>Business Truth #104</b> If your business isn't on Google Maps, it doesn't exist to half your customers.</span>
-      </div></div></div>
-
-
 <section id="accountability">
   <div class="wrap">
     <div class="section-head">
@@ -763,16 +670,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     </div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="108"><b>Business Truth #108</b> A WhatsApp Business profile with hours, catalog, and quick replies converts more than a personal number.</span>
-        <span class="marquee-item" data-lesson="112"><b>Business Truth #112</b> LinkedIn builds authority with suppliers, partners, and B2B customers.</span>
-        <span class="marquee-item" data-lesson="116"><b>Business Truth #116</b> A 30 second video answering who, where, what builds more trust than paragraphs of text.</span>
-        <span class="marquee-item" data-lesson="108"><b>Business Truth #108</b> A WhatsApp Business profile with hours, catalog, and quick replies converts more than a personal number.</span>
-        <span class="marquee-item" data-lesson="112"><b>Business Truth #112</b> LinkedIn builds authority with suppliers, partners, and B2B customers.</span>
-        <span class="marquee-item" data-lesson="116"><b>Business Truth #116</b> A 30 second video answering who, where, what builds more trust than paragraphs of text.</span>
-      </div></div></div>
-
-
 <section id="badges">
   <div class="wrap">
     <div class="section-head">
@@ -783,16 +680,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     <div class="badges-grid" id="badgesGrid"></div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="120"><b>Business Truth #120</b> Show up in your customers' community before asking them to show up in yours.</span>
-        <span class="marquee-item" data-lesson="124"><b>Business Truth #124</b> A system is anything that works the same way when you're not there.</span>
-        <span class="marquee-item" data-lesson="128"><b>Business Truth #128</b> Automate the repetitive task before you hire someone to do it manually.</span>
-        <span class="marquee-item" data-lesson="120"><b>Business Truth #120</b> Show up in your customers' community before asking them to show up in yours.</span>
-        <span class="marquee-item" data-lesson="124"><b>Business Truth #124</b> A system is anything that works the same way when you're not there.</span>
-        <span class="marquee-item" data-lesson="128"><b>Business Truth #128</b> Automate the repetitive task before you hire someone to do it manually.</span>
-      </div></div></div>
-
-
 <section id="wins">
   <div class="wrap">
     <div class="section-head">
@@ -823,26 +710,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     </div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="132"><b>Business Truth #132</b> Draw out how work actually flows before you try to fix it.</span>
-        <span class="marquee-item" data-lesson="136"><b>Business Truth #136</b> Pick three numbers that tell you if the week went well, and check them weekly.</span>
-        <span class="marquee-item" data-lesson="140"><b>Business Truth #140</b> What gets tracked and reviewed gets taken seriously.</span>
-        <span class="marquee-item" data-lesson="132"><b>Business Truth #132</b> Draw out how work actually flows before you try to fix it.</span>
-        <span class="marquee-item" data-lesson="136"><b>Business Truth #136</b> Pick three numbers that tell you if the week went well, and check them weekly.</span>
-        <span class="marquee-item" data-lesson="140"><b>Business Truth #140</b> What gets tracked and reviewed gets taken seriously.</span>
-      </div></div></div>
-
-
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="144"><b>Business Truth #144</b> Marketing that runs on a calendar outperforms marketing that runs on inspiration.</span>
-        <span class="marquee-item" data-lesson="148"><b>Business Truth #148</b> Back up anywhere but the one phone that could get lost tomorrow.</span>
-        <span class="marquee-item" data-lesson="152"><b>Business Truth #152</b> Infrastructure is boring until the day it saves your business.</span>
-        <span class="marquee-item" data-lesson="144"><b>Business Truth #144</b> Marketing that runs on a calendar outperforms marketing that runs on inspiration.</span>
-        <span class="marquee-item" data-lesson="148"><b>Business Truth #148</b> Back up anywhere but the one phone that could get lost tomorrow.</span>
-        <span class="marquee-item" data-lesson="152"><b>Business Truth #152</b> Infrastructure is boring until the day it saves your business.</span>
-      </div></div></div>
-
-
 <section id="spotlight">
   <div class="wrap">
     <div class="section-head">
@@ -891,16 +758,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     <div class="spotlight-feed" id="spotlightFeed"></div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="156"><b>Business Truth #156</b> Count your stock regularly, or discover the shortage after it's too late.</span>
-        <span class="marquee-item" data-lesson="160"><b>Business Truth #160</b> A written schedule prevents the daily argument about who's doing what.</span>
-        <span class="marquee-item" data-lesson="164"><b>Business Truth #164</b> A short daily huddle prevents the long weekly cleanup.</span>
-        <span class="marquee-item" data-lesson="156"><b>Business Truth #156</b> Count your stock regularly, or discover the shortage after it's too late.</span>
-        <span class="marquee-item" data-lesson="160"><b>Business Truth #160</b> A written schedule prevents the daily argument about who's doing what.</span>
-        <span class="marquee-item" data-lesson="164"><b>Business Truth #164</b> A short daily huddle prevents the long weekly cleanup.</span>
-      </div></div></div>
-
-
 <section id="testimonials">
   <div class="wrap">
     <div class="section-head">
@@ -928,16 +785,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     <div class="testimonial-feed" id="testimonialFeed"></div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="168"><b>Business Truth #168</b> Do the same work in less time, not more work in the same time.</span>
-        <span class="marquee-item" data-lesson="172"><b>Business Truth #172</b> Check on the business often enough to catch small problems before they're big ones.</span>
-        <span class="marquee-item" data-lesson="176"><b>Business Truth #176</b> The owner who delegates nothing builds a job, not a business.</span>
-        <span class="marquee-item" data-lesson="168"><b>Business Truth #168</b> Do the same work in less time, not more work in the same time.</span>
-        <span class="marquee-item" data-lesson="172"><b>Business Truth #172</b> Check on the business often enough to catch small problems before they're big ones.</span>
-        <span class="marquee-item" data-lesson="176"><b>Business Truth #176</b> The owner who delegates nothing builds a job, not a business.</span>
-      </div></div></div>
-
-
 <section id="resources">
   <div class="wrap">
     <div class="section-head">
@@ -948,16 +795,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     <div class="resource-grid" id="resourceGrid"></div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="180"><b>Business Truth #180</b> People stay motivated by progress they can see, not speeches they hear.</span>
-        <span class="marquee-item" data-lesson="184"><b>Business Truth #184</b> A team without a shared goal is just a group of people showing up.</span>
-        <span class="marquee-item" data-lesson="188"><b>Business Truth #188</b> Scale the system first, then scale the size.</span>
-        <span class="marquee-item" data-lesson="180"><b>Business Truth #180</b> People stay motivated by progress they can see, not speeches they hear.</span>
-        <span class="marquee-item" data-lesson="184"><b>Business Truth #184</b> A team without a shared goal is just a group of people showing up.</span>
-        <span class="marquee-item" data-lesson="188"><b>Business Truth #188</b> Scale the system first, then scale the size.</span>
-      </div></div></div>
-
-
 <div class="modal-overlay" id="resourceModal">
   <div class="modal-box resource-modal-box">
     <div class="resource-modal-head">
@@ -978,17 +815,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     <div class="events-list" id="eventsList"></div>
   </div>
 </section>
-  <div class="truth-strip inline"><div class="wrap"><div class="marquee">
-        <span class="marquee-item" data-lesson="192"><b>Business Truth #192</b> Confidence is built by preparation, not by pretending.</span>
-        <span class="marquee-item" data-lesson="196"><b>Business Truth #196</b> Build decisions today that your business will thank you for in five years.</span>
-        <span class="marquee-item" data-lesson="200"><b>Business Truth #200</b> Find someone ahead of you, and become that person for someone behind you.</span>
-        <span class="marquee-item" data-lesson="192"><b>Business Truth #192</b> Confidence is built by preparation, not by pretending.</span>
-        <span class="marquee-item" data-lesson="196"><b>Business Truth #196</b> Build decisions today that your business will thank you for in five years.</span>
-        <span class="marquee-item" data-lesson="200"><b>Business Truth #200</b> Find someone ahead of you, and become that person for someone behind you.</span>
-      </div></div></div>
-
-
-<section id="suggestions" style="padding:48px 0;">
+<section id="suggestions">
   <div class="wrap">
     <div class="suggestion-strip">
       <div>
@@ -1004,12 +831,18 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   </div>
 </section>
 
-
 <footer>
   <div class="wrap">
+    <div class="footer-social" style="display:flex;gap:18px;flex-wrap:wrap;justify-content:center;margin-bottom:16px;">
+      <a href="https://facebook.com/BYINFORGH" target="_blank" rel="noopener" style="font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);text-decoration:none;">Facebook</a>
+      <a href="https://tiktok.com/@BYINFORGH" target="_blank" rel="noopener" style="font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);text-decoration:none;">TikTok</a>
+      <a href="https://instagram.com/BYINFORGH" target="_blank" rel="noopener" style="font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);text-decoration:none;">Instagram</a>
+      <a href="https://youtube.com/@BYINFORGH" target="_blank" rel="noopener" style="font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);text-decoration:none;">YouTube</a>
+      <a href="https://wa.me/233509960980" target="_blank" rel="noopener" style="font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);text-decoration:none;">WhatsApp</a>
+    </div>
     <div class="footer-bottom">
       <span>© 2026 BYINFORGH. Business Growth Series.</span>
-      <span><a href="privacy.html" style="color:var(--ink-dim);text-decoration:underline;">Privacy &amp; Terms</a> &nbsp;&middot;&nbsp; Visible · Trusted · Local</span>
+      <span><a href="https://businessgrowthseries.byinforgh.com/privacy.html" style="color:var(--ink-dim);text-decoration:underline;">Privacy &amp; Terms</a> &nbsp;&middot;&nbsp; Visible · Trusted · Local</span>
     </div>
   </div>
 </footer>
@@ -1409,7 +1242,11 @@ async function loadEvents(){
   list.innerHTML = (data || []).map(ev => `
     <div class="event-row">
       <div class="event-day">${esc(ev.day_label)}<b>${esc(ev.title)}</b></div>
-      <div class="event-info"><h4>${esc(ev.title)}</h4><p>${esc(ev.description || '')}</p></div>
+      <div class="event-info">
+        <h4>${esc(ev.title)}</h4>
+        <p>${esc(ev.description || '')}</p>
+        ${ev.meet_url ? `<a href="${esc(ev.meet_url)}" target="_blank" rel="noopener" class="event-join-btn">Join on Google Meet →</a>` : ''}
+      </div>
       <div class="event-badge">${esc(ev.time_label)}</div>
     </div>
   `).join('');
