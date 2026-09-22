@@ -34,6 +34,10 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
 .brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
 .btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
 .btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+.jump-nav{display:flex;gap:6px;align-items:center;overflow-x:auto;max-width:72vw;scrollbar-width:thin;}
+.jump-nav::-webkit-scrollbar{height:4px;}
+.jump-nav a.active{background:var(--teal);color:var(--bg);border-color:var(--teal);}
+@media(max-width:700px){.jump-nav{max-width:60vw;}}
 
 .locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
 .banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
@@ -74,12 +78,29 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="app-topbar-inner">
     <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
-    <div style="display:flex;gap:16px;align-items:center;">
-      <a href="app.html" class="btn-ghost">Back to dashboard</a>
+    <div class="jump-nav" id="jumpNav">
+      <a href="app.html" class="btn-ghost" data-page="app.html">Dashboard</a>
+      <a href="curriculum.html" class="btn-ghost" data-page="curriculum.html">Curriculum</a>
+      <a href="lounge.html" class="btn-ghost" data-page="lounge.html">Live Lounge</a>
+      <a href="community.html" class="btn-ghost" data-page="community.html">Community</a>
+      <a href="directory.html" class="btn-ghost" data-page="directory.html">Directory</a>
+      <a href="connections.html" class="btn-ghost" data-page="connections.html">Connections</a>
+      <a href="groups.html" class="btn-ghost" data-page="groups.html">Groups</a>
+      <a href="messages.html" class="btn-ghost" data-page="messages.html">Messages</a>
+      <a href="qa.html" class="btn-ghost" data-page="qa.html">Q&amp;A</a>
       <button class="btn-ghost" id="logoutBtn">Log out</button>
     </div>
+
   </div>
 </nav>
+<script>
+(function(){
+  var page = location.pathname.split('/').pop() || 'app.html';
+  document.querySelectorAll('#jumpNav a[data-page]').forEach(function(a){
+    if (a.getAttribute('data-page') === page) a.classList.add('active');
+  });
+})();
+</script>
 
 <section id="community">
   <div class="wrap">
