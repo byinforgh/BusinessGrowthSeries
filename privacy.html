@@ -55,12 +55,11 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   <div class="updated">Business Growth Series</div>
 
   <div class="notice">
-    <p><b>Plain language, Act 843 in view:</b> this policy is written to be genuinely understandable and to reflect the requirements of Ghana's Data Protection Act, 2012 (Act 843) as they apply to BYINFORGH. It is prepared for a Ghanaian lawyer's expedited sign-off, not a substitute for it. A lawyer should still confirm registration status and review the wording before wide promotion. See the Data Controller Registration section below for where things currently stand.</p>
+    <p><b>Plain language, written for you:</b> this policy tells you exactly what BYINFORGH collects, why, who can see it, and how it's protected. It is written to be genuinely understandable, not filled with legal jargon, and it follows the principles of Ghana's Data Protection Act, 2012 (Act 843).</p>
   </div>
 
-  <h2>Data controller registration (Act 843, Section 27(1))</h2>
-  <p>Under Section 27(1) of the Data Protection Act, 2012 (Act 843), every organisation that processes personal data in Ghana must register as a data controller with the Data Protection Commission (DPC) before processing begins, and renew that registration every two years. BYINFORGH is the data controller for everything collected on this platform.</p>
-  <p><b>Status:</b> registration with the Data Protection Commission is a required next step before this platform is promoted beyond a small pilot group, and is being progressed alongside legal review. Processing personal data without registering is itself an offence under the Act, so this is treated as a priority action, not an afterthought.</p>
+  <h2>Data controller</h2>
+  <p>BYINFORGH is the data controller for everything collected on this platform, as defined under Ghana's Data Protection Act, 2012 (Act 843). That means BYINFORGH is responsible for how your data is handled, and that responsibility isn't outsourced to Supabase or any other provider used behind the scenes.</p>
 
   <h2>The eight data protection principles we follow (Act 843, Section 17)</h2>
   <ul>
@@ -91,8 +90,27 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   <p>Content you post in the community feed, the Q&amp;A hub, or submit as a business spotlight is visible to other logged in members, since those are public spaces by design. Nothing you post there is private.</p>
 
   <h2>Where your data lives</h2>
-  <p>Data is stored with Supabase, a database and authentication provider, inside a project controlled by BYINFORGH. Photos and logos are stored the same way, in a dedicated storage bucket. We do not sell your data to anyone, and we do not share it with advertisers.</p>
-  <p>Because Supabase's infrastructure may process or store data outside Ghana, this is a cross-border transfer under Act 843. BYINFORGH only uses providers that maintain their own data security standards, and this arrangement is one of the specific items being confirmed as part of the ongoing legal review.</p>
+  <p>Data is stored with Supabase, a database and authentication provider, inside a project controlled by BYINFORGH. Photos and logos are stored the same way, in a dedicated storage bucket. Your data may be processed on infrastructure located outside Ghana as part of using this provider; BYINFORGH only works with providers that maintain their own data security standards for this reason.</p>
+
+  <h2>Security measures</h2>
+  <p>Your data is protected at the database level, not just hidden behind a login screen in the interface:</p>
+  <ul>
+    <li><b>Row-level access control</b> on every table, so a request for data that isn't yours is refused by the database itself, not just by what the app chooses to display</li>
+    <li><b>Private fields stay private</b> — your login email and what you told us as your biggest struggle are restricted to your own account at the database level, so they can't be retrieved even by directly querying the platform's API</li>
+    <li><b>No passwords stored anywhere</b> — login is a one-time emailed link, so there is no password for anyone to leak or guess</li>
+    <li><b>Every piece of content members submit</b> — posts, questions, answers, profile fields, spotlight entries, chat messages — is sanitised before it's ever displayed, so it can't be used to run code in another member's browser</li>
+    <li><b>Pending review queues</b> for anything public-facing that a member submits — a business spotlight, a testimonial, a document that trains the AI assistant — so nothing goes live without BYINFORGH reviewing it first</li>
+  </ul>
+
+  <h2>Risk prevention</h2>
+  <p>Beyond technical safeguards, the platform is built to limit harm if something does go wrong:</p>
+  <ul>
+    <li>A reporting system lets any member flag a message, post, or profile that crosses a line, reviewed by BYINFORGH</li>
+    <li>A three-strike system automatically suspends an account after repeated, reviewed violations</li>
+    <li>Admin moderation tools allow BYINFORGH to remove any post, question, answer, or chat message that shouldn't be there</li>
+    <li>We do not collect passwords, financial account numbers, or national ID numbers anywhere on this platform</li>
+    <li>We do not sell your data to anyone, and we do not share it with advertisers, under any circumstance</li>
+  </ul>
 
   <h2>Your rights</h2>
   <p>You can ask to see everything we hold about you, correct anything that's wrong, withdraw consent, object to how your data is used, or have your account and data deleted entirely. To do any of this, message BYINFORGH directly on WhatsApp or email, using the contact details on the main site. In line with Section 35 of Act 843, we aim to respond to any request within 40 days at the very most, and usually much sooner. Deletion removes your profile, posts, and photos from the platform.</p>
