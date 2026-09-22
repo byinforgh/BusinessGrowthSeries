@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Live Lounge: BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --m7:#A6453B; --radius:6px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:var(--teal);}
+.kente-stripe span:nth-child(4n+2){background:var(--gold);}
+.kente-stripe span:nth-child(4n+3){background:var(--blue);}
+.kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
+
+.app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
+.btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
+.jump-nav{display:flex;gap:6px;align-items:center;overflow-x:auto;max-width:72vw;scrollbar-width:thin;}
+.jump-nav::-webkit-scrollbar{height:4px;}
+.jump-nav a.active{background:var(--teal);color:var(--bg);border-color:var(--teal);}
+@media(max-width:700px){.jump-nav{max-width:60vw;}}
+
+.locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
+.banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
+.banned-gate h2{font-size:24px;margin-bottom:14px;}
+.banned-gate p{color:var(--ink-dim);font-size:14px;line-height:1.6;}
+
+section{padding:40px 0 64px;scroll-margin-top:96px;}
+.section-head{max-width:760px;margin-bottom:24px;}
+.section-head h2{font-size:clamp(24px,4vw,36px);margin-top:10px;}
+.section-head p{color:var(--ink-dim);font-size:14.5px;line-height:1.6;margin-top:12px;}
+.live-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--m7);color:var(--m7);font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:5px 10px;border-radius:20px;margin-bottom:14px;}
+.live-dot{width:6px;height:6px;border-radius:50%;background:var(--m7);animation:pulse 1.4s infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.25;}}
+.private-note{font-size:12.5px;color:var(--ink-dim);margin-top:6px;}
+.private-note a{color:var(--teal);text-decoration:underline;}
+
+.lounge-shell{border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;height:min(72vh,620px);}
+.lounge-feed{flex:1;overflow-y:auto;padding:20px 22px;display:flex;flex-direction:column;gap:14px;}
+.lounge-msg{display:flex;gap:10px;max-width:86%;}
+.lounge-msg.mine{align-self:flex-end;flex-direction:row-reverse;text-align:right;}
+.lounge-msg.akosua{max-width:92%;}
+.lounge-avatar{width:30px;height:30px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:800;background:var(--surface-2);color:var(--teal);border:1px solid var(--line);}
+.lounge-msg.akosua .lounge-avatar{background:var(--teal);color:var(--bg);border-color:var(--teal);}
+.lounge-body{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.lounge-name{font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;color:var(--ink-dim);}
+.lounge-name.akosua-name{color:var(--teal);}
+.lounge-bubble{padding:10px 13px;border-radius:4px;font-size:13.5px;line-height:1.55;background:var(--surface-2);border:1px solid var(--line);word-break:break-word;}
+.lounge-msg.mine .lounge-bubble{background:rgba(15,76,92,0.10);border-color:rgba(15,76,92,0.25);}
+.lounge-msg.akosua .lounge-bubble{background:rgba(15,76,92,0.06);border:1px dashed var(--teal);}
+.lounge-bubble .mention{color:var(--teal);font-weight:700;}
+.lounge-time{font-family:'Inter',sans-serif;font-size:9px;color:var(--ink-dim);opacity:.75;}
+.lounge-del{font-size:10px;color:var(--m7);cursor:pointer;text-decoration:underline;margin-left:8px;}
+
+.lounge-composer-wrap{border-top:1px solid var(--line);padding:14px 18px;position:relative;}
+.mention-suggest{position:absolute;bottom:100%;left:18px;right:18px;background:var(--surface);border:1px solid var(--line);max-height:160px;overflow-y:auto;display:none;z-index:5;}
+.mention-suggest.show{display:block;}
+.mention-suggest-row{padding:9px 14px;font-size:13px;cursor:pointer;}
+.mention-suggest-row:hover, .mention-suggest-row.active{background:var(--surface-2);}
+.lounge-composer{display:flex;gap:10px;}
+.lounge-composer input{flex:1;background:var(--surface-2);border:1px solid var(--line);color:var(--ink);padding:12px 14px;font-family:'Poppins',sans-serif;font-size:13.5px;outline:none;border-radius:2px;}
+.lounge-composer button{background:var(--teal);color:var(--bg);border:none;padding:0 22px;font-weight:800;text-transform:uppercase;font-size:11.5px;cursor:pointer;border-radius:2px;}
+.lounge-hint{font-size:11px;color:var(--ink-dim);margin-top:8px;}
+.lounge-hint b{color:var(--teal);}
+.filter-warning{color:var(--m7);font-size:11.5px;margin-top:8px;display:none;}
+.filter-warning.show{display:block;}
+
+footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface);margin-top:40px;}
+.footer-social{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
+.footer-social a{font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);text-decoration:none;}
+.footer-social a:hover{color:var(--teal);}
+.footer-bottom{display:flex;justify-content:center;gap:8px;font-size:12px;color:var(--ink-dim);flex-wrap:wrap;text-align:center;}
+.footer-bottom a{color:var(--ink-dim);text-decoration:underline;}
+.footer-bottom a:hover{color:var(--teal);}
+</style>
+</head>
+<body>
+
+<div id="loadingGate" class="locked-gate"><p class="eyebrow">Checking your session...</p></div>
+<div id="bannedGate" class="wrap" style="display:none;">
+  <div class="banned-gate">
+    <h2>Account suspended</h2>
+    <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="pageShell" style="display:none;">
+
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-inner">
+    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div class="jump-nav" id="jumpNav">
+      <a href="app.html" class="btn-ghost" data-page="app.html">Dashboard</a>
+      <a href="curriculum.html" class="btn-ghost" data-page="curriculum.html">Curriculum</a>
+      <a href="lounge.html" class="btn-ghost" data-page="lounge.html">Live Lounge</a>
+      <a href="community.html" class="btn-ghost" data-page="community.html">Community</a>
+      <a href="directory.html" class="btn-ghost" data-page="directory.html">Directory</a>
+      <a href="connections.html" class="btn-ghost" data-page="connections.html">Connections</a>
+      <a href="groups.html" class="btn-ghost" data-page="groups.html">Groups</a>
+      <a href="messages.html" class="btn-ghost" data-page="messages.html">Messages</a>
+      <a href="qa.html" class="btn-ghost" data-page="qa.html">Q&amp;A</a>
+      <button class="btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </div>
+</nav>
+<script>
+(function(){
+  var page = location.pathname.split('/').pop() || 'app.html';
+  document.querySelectorAll('#jumpNav a[data-page]').forEach(function(a){
+    if (a.getAttribute('data-page') === page) a.classList.add('active');
+  });
+})();
+</script>
+
+<section id="lounge">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="live-badge"><span class="live-dot"></span>Live now</span>
+      <h2>The Live Lounge</h2>
+      <p>One shared room, open to every logged-in member right now, the same as a live chat under a stream. Ask a question, share a quick win, or tag <b>@Akosua</b> anywhere in your message and she'll jump in with an answer grounded in the 202 lessons and BYINFORGH's playbooks.</p>
+      <p class="private-note">Want to keep a conversation just between a few of you instead? <a href="groups.html">Create or join a private group →</a> or send a <a href="messages.html">direct message</a>.</p>
+    </div>
+
+    <div class="lounge-shell">
+      <div class="lounge-feed" id="loungeFeed"></div>
+      <div class="lounge-composer-wrap">
+        <div class="mention-suggest" id="mentionSuggest"></div>
+        <form class="lounge-composer" id="loungeForm">
+          <input type="text" id="loungeInput" placeholder="Say something to the room... type @ to mention someone, or @Akosua for help" maxlength="1000" autocomplete="off">
+          <button type="submit">Send</button>
+        </form>
+        <div class="filter-warning" id="loungeFilterWarning">Keep it respectful — no foul language, threats, or harassment. Rewrite your message.</div>
+        <div class="lounge-hint">Type <b>@Akosua</b> anywhere in your message to bring her into the conversation. This room is moderated: reported or reviewed messages can be removed by BYINFORGH.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-social">
+      <a href="https://facebook.com/BYINFORGH" target="_blank" rel="noopener">Facebook</a>
+      <a href="https://tiktok.com/@BYINFORGH" target="_blank" rel="noopener">TikTok</a>
+      <a href="https://instagram.com/BYINFORGH" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://youtube.com/@BYINFORGH" target="_blank" rel="noopener">YouTube</a>
+      <a href="https://wa.me/233509960980" target="_blank" rel="noopener">WhatsApp</a>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 BYINFORGH. Business Growth Series.</span>
+      <span><a href="https://businessgrowthseries.byinforgh.com/privacy.html">Privacy &amp; Terms</a> &nbsp;&middot;&nbsp; Visible · Trusted · Local</span>
+    </div>
+  </div>
+</footer>
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with the same two lines in
+// index.html, auth.html, app.html, admin.html, community.html, qa.html.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+let currentUser = null;
+let currentProfile = null;
+let memberDirectory = []; // {id, name, business_name}
+
+// =====================================================================
+// SESSION GUARD
+// =====================================================================
+async function initPage(){
+  if (typeof sb === 'undefined' || !sb) {
+    document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet.</p>';
+    return;
+  }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  currentUser = session.user;
+  currentProfile = profile;
+
+  if (profile.banned) {
+    document.getElementById('loadingGate').style.display = 'none';
+    document.getElementById('banReasonText').textContent = profile.ban_reason ? ` (${profile.ban_reason})` : '';
+    document.getElementById('bannedGate').style.display = 'block';
+    return;
+  }
+
+  sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+
+  document.getElementById('loadingGate').style.display = 'none';
+  document.getElementById('pageShell').style.display = 'block';
+
+  const { data: dir } = await sb.from('public_profiles').select('id, name, business_name');
+  memberDirectory = dir || [];
+
+  await loadLounge();
+  subscribeLounge();
+}
+window.addEventListener('load', () => setTimeout(initPage, 50));
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
+// =====================================================================
+// RESPECT FILTER — same first-line-of-defense word list used for DMs
+// and group chat in app.html. Not a full moderation system: it's a
+// quick client-side block, backed by the Report button on every other
+// content type and now by admin delete rights on this table too.
+// =====================================================================
+const FORBIDDEN_TERMS = [
+  'fuck','fucking','fucker','shit','bitch','asshole','bastard','cunt','dick','pussy','whore','slut',
+  'nigger','nigga','faggot','retard','stupid idiot',
+  'kill you','i will kill','i will hurt you','i will beat you','i will deal with you','watch your back',
+  'you will regret','i know where you live','come and die','i go kill you','i go beat you','i go deal with you'
+];
+function hasForbiddenLanguage(text){
+  const t = (text || '').toLowerCase();
+  return FORBIDDEN_TERMS.some(term => t.includes(term));
+}
+
+// =====================================================================
+// AKOSUA — the same keyword-grounded knowledge already used for the
+// AI Assistant on the dashboard, so an answer given in the Lounge
+// matches an answer she'd give there. Triggered whenever a message
+// contains "@akosua" anywhere, case-insensitive.
+// =====================================================================
+const akosuaKnowledge = [
+  {keys:['price','pricing','charge','cost','how much'], reply:"Price on the value you deliver, not on what feels comfortable to say out loud. Work out your true cost per unit first, then set a margin that covers slow weeks.", cite:"Module 03 · Business Money"},
+  {keys:['supplier','delivery','late','stock','inventory'], reply:"A reliable supplier is worth more than a slightly cheaper one. Line up a backup supplier and build a 3 to 5 day buffer into what you promise customers.", cite:"Module 07 · Operations"},
+  {keys:['trust','online','find me','visibility','google'], reply:"If people can't find you, they can't buy from you. Start with a correct Google Maps pin and a WhatsApp Business profile with real photos and hours.", cite:"Module 05 · Visibility & Marketing"},
+  {keys:['whatsapp','reply','slow','respond','message'], reply:"Speed of reply is a sales strategy, not an accident. Set up WhatsApp Business quick replies for your top five questions.", cite:"Module 04 · Customers & Sales"},
+  {keys:['staff','employee','hire','hiring','team'], reply:"Hire slow, for attitude and trainability, not just for skill. Even one employee needs clear expectations written down.", cite:"Module 08 · Leadership & Growth"},
+  {keys:['profit','cash flow','money','revenue'], reply:"Revenue is everything that comes in. Profit is what's left after every cost is paid, including your own labour. Keep business and personal accounts separate.", cite:"Module 03 · Business Money"},
+  {keys:['marketing','outreach','cold message','new customers','get more customers'], reply:"Never send a wall of text on WhatsApp. Break outreach into three short messages: an honest opening question, a short explanation of what you offer, then a low pressure ask.", cite:"Marketing & Outreach Toolkit"},
+  {keys:['scam','fraud','momo scam','wrong transfer','frozen','account frozen','pin','otp'], reply:"If a text says money was sent, check your own MoMo history first, if nothing landed, there's nothing to send back. No real network support will ever ask for your PIN or OTP.", cite:"Module 03 · Business Money"},
+  {keys:['register','registration','tin','rgd','legal','licence','license','incorporate'], reply:"Get a Tax Identification Number first, for individuals it's the PIN on your Ghana Card. Then reserve your business name and register with the Office of the Registrar of Companies.", cite:"Registering Your Business in Ghana"},
+  {keys:['group','private','dm','message someone'], reply:"For a private conversation, connect with the member first from the Directory, then message them, or start a group from the Groups page if it's more than one person.", cite:"Connections & Groups"},
+];
+function akosuaRespond(question){
+  const qLower = question.toLowerCase();
+  const matched = akosuaKnowledge.find(k => k.keys.some(kw => qLower.includes(kw)));
+  if (!matched) {
+    return "I don't have a grounded answer for that yet, but I've flagged it so BYINFORGH or the community can pick it up — try posting it in the Q&A hub too, it reaches more eyes there.";
+  }
+  return `${matched.reply} (${matched.cite})`;
+}
+
+// =====================================================================
+// MENTIONS
+// =====================================================================
+function renderMentions(text){
+  let out = esc(text);
+  out = out.replace(/@Akosua/gi, '<span class="mention">@Akosua</span>');
+  memberDirectory.forEach(m => {
+    const label = m.business_name || m.name;
+    if (!label) return;
+    const safe = esc(label).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    out = out.replace(new RegExp('@' + safe, 'gi'), `<span class="mention">@${esc(label)}</span>`);
+  });
+  return out;
+}
+
+// =====================================================================
+// FEED
+// =====================================================================
+const loungeFeed = document.getElementById('loungeFeed');
+function renderLoungeMessages(messages){
+  loungeFeed.innerHTML = messages.map(m => {
+    const mine = m.user_id === currentUser?.id;
+    const isAkosua = !!m.is_akosua;
+    const name = isAkosua ? 'Akosua' : (mine ? 'You' : nameForLounge(m.user_id));
+    const initials = isAkosua ? 'AI' : (name || '?').slice(0,2).toUpperCase();
+    const canDelete = mine || currentProfile?.is_admin;
+    return `
+    <div class="lounge-msg${mine ? ' mine' : ''}${isAkosua ? ' akosua' : ''}">
+      <div class="lounge-avatar">${esc(initials)}</div>
+      <div class="lounge-body">
+        <div class="lounge-name${isAkosua ? ' akosua-name' : ''}">${esc(name)}</div>
+        <div class="lounge-bubble">${renderMentions(m.body)}</div>
+        <div class="lounge-time">${new Date(m.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${canDelete ? `<span class="lounge-del" data-id="${esc(m.id)}">delete</span>` : ''}</div>
+      </div>
+    </div>`;
+  }).join('') || '<p style="color:var(--ink-dim);text-align:center;padding:40px;">No one has said anything yet, be the first to say hello.</p>';
+  loungeFeed.scrollTop = loungeFeed.scrollHeight;
+}
+function nameForLounge(userId){
+  const m = memberDirectory.find(x => x.id === userId);
+  return m ? (m.business_name || m.name) : 'A member';
+}
+loungeFeed.addEventListener('click', async (e) => {
+  const del = e.target.closest('.lounge-del');
+  if (!del || !sb) return;
+  if (!confirm('Delete this message?')) return;
+  await sb.from('live_chat_messages').delete().eq('id', del.dataset.id);
+  loadLounge();
+});
+
+async function loadLounge(){
+  const { data, error } = await sb.from('live_chat_messages').select('*').order('created_at', { ascending: true }).limit(150);
+  if (error) { console.error(error); return; }
+  renderLoungeMessages(data || []);
+}
+
+function subscribeLounge(){
+  sb.channel('live_lounge')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'live_chat_messages' }, () => loadLounge())
+    .subscribe();
+}
+
+// =====================================================================
+// COMPOSER + @MENTION SUGGESTIONS
+// =====================================================================
+const loungeInput = document.getElementById('loungeInput');
+const mentionSuggest = document.getElementById('mentionSuggest');
+
+loungeInput.addEventListener('input', () => {
+  const val = loungeInput.value;
+  const at = val.lastIndexOf('@');
+  if (at === -1 || /\s/.test(val.slice(at + 1))) { mentionSuggest.classList.remove('show'); return; }
+  const query = val.slice(at + 1).toLowerCase();
+  const options = [{ id: 'akosua', label: 'Akosua (ask the AI assistant)' }]
+    .concat(memberDirectory
+      .filter(m => (m.business_name || m.name || '').toLowerCase().includes(query))
+      .slice(0, 6)
+      .map(m => ({ id: m.id, label: m.business_name || m.name })));
+  if (!options.length) { mentionSuggest.classList.remove('show'); return; }
+  mentionSuggest.innerHTML = options.map(o => `<div class="mention-suggest-row" data-label="${esc(o.label.replace('Akosua (ask the AI assistant)','Akosua'))}">${esc(o.label)}</div>`).join('');
+  mentionSuggest.classList.add('show');
+  mentionSuggest.querySelectorAll('.mention-suggest-row').forEach(row => {
+    row.addEventListener('click', () => {
+      loungeInput.value = val.slice(0, at) + '@' + row.dataset.label + ' ';
+      mentionSuggest.classList.remove('show');
+      loungeInput.focus();
+    });
+  });
+});
+document.addEventListener('click', (e) => {
+  if (!mentionSuggest.contains(e.target) && e.target !== loungeInput) mentionSuggest.classList.remove('show');
+});
+
+document.getElementById('loungeForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const warn = document.getElementById('loungeFilterWarning');
+  const body = loungeInput.value.trim();
+  if (!body || !sb || !currentUser) return;
+  if (hasForbiddenLanguage(body)) { warn.classList.add('show'); return; }
+  warn.classList.remove('show');
+  loungeInput.value = '';
+  mentionSuggest.classList.remove('show');
+
+  const { error } = await sb.from('live_chat_messages').insert({ user_id: currentUser.id, body });
+  if (error) { alert('Message could not be sent. ' + (error.message || '')); return; }
+  loadLounge();
+
+  if (/@akosua/i.test(body)) {
+    const reply = akosuaRespond(body.replace(/@akosua/i, '').trim() || body);
+    setTimeout(async () => {
+      await sb.from('live_chat_messages').insert({ user_id: null, is_akosua: true, body: reply });
+      loadLounge();
+    }, 700);
+  }
+});
+</script>
+
+</body>
+</html>
