@@ -462,34 +462,8 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
       <span class="eyebrow">Business spotlight</span>
       <h2>Real Ghanaian businesses, real results.</h2>
     </div>
-    <div class="spotlight-grid">
-      <div class="spotlight-card">
-        <div class="spotlight-top" style="background:var(--m3);"></div>
-        <div class="spotlight-body">
-          <div class="spotlight-kicker">Business Money</div>
-          <h4>Ama's Kitchen</h4>
-          <div class="spotlight-loc">Catering · Koforidua</div>
-          <p>Separated personal and business mobile money wallets and found three menu items selling at a loss. Fixed pricing, margin up 22%.</p>
-        </div>
-      </div>
-      <div class="spotlight-card">
-        <div class="spotlight-top" style="background:var(--m5);"></div>
-        <div class="spotlight-body">
-          <div class="spotlight-kicker">Visibility</div>
-          <h4>Kwesi Electronics</h4>
-          <div class="spotlight-loc">Retail · Tema</div>
-          <p>Fixed a wrong Google Maps pin that had misled customers for over a year. Map views up 4x within a month.</p>
-        </div>
-      </div>
-      <div class="spotlight-card">
-        <div class="spotlight-top" style="background:var(--m4);"></div>
-        <div class="spotlight-body">
-          <div class="spotlight-kicker">Customers &amp; Sales</div>
-          <h4>Abena Beauty Bar</h4>
-          <div class="spotlight-loc">Services · Takoradi</div>
-          <p>Set up WhatsApp quick replies for bookings. Average reply time down to 5 minutes, bookings up 30%.</p>
-        </div>
-      </div>
+    <div class="spotlight-grid" id="landingSpotlights">
+      <p style="color:var(--paper-dim,var(--ink-dim));grid-column:1/-1;">Loading real member spotlights...</p>
     </div>
   </div>
 </section>
@@ -623,6 +597,33 @@ async function loadLandingTestimonials(){
   `).join('');
 }
 window.addEventListener('load', () => setTimeout(loadLandingTestimonials, 60));
+
+// Real, approved member businesses only — this section never shows a
+// fictional or example business, even as a placeholder. If nothing has
+// been approved yet, it says so honestly instead of showing a fake one.
+async function loadLandingSpotlights(){
+  const el = document.getElementById('landingSpotlights');
+  if (!el) return;
+  if (typeof sb === 'undefined' || !sb) { el.innerHTML = '<p style="color:var(--paper-dim);grid-column:1/-1;">No spotlights published yet.</p>'; return; }
+  const { data, error } = await sb.from('spotlights').select('business_name, location, what_they_do').eq('status', 'approved').order('created_at', { ascending: false }).limit(3);
+  const colors = ['var(--m3)','var(--m5)','var(--m4)'];
+  if (error || !data || !data.length) {
+    el.innerHTML = '<p style="color:var(--paper-dim);grid-column:1/-1;">No approved business spotlights yet — <a href="auth.html" style="color:var(--lime);">join free</a> and yours could be the first real one featured here.</p>';
+    return;
+  }
+  el.innerHTML = data.map((s, i) => `
+    <div class="spotlight-card">
+      <div class="spotlight-top" style="background:${colors[i % colors.length]};"></div>
+      <div class="spotlight-body">
+        <div class="spotlight-kicker">Verified member</div>
+        <h4>${escLanding(s.business_name)}</h4>
+        <div class="spotlight-loc">${escLanding(s.location || '')}</div>
+        <p>${escLanding(s.what_they_do || '')}</p>
+      </div>
+    </div>
+  `).join('');
+}
+window.addEventListener('load', () => setTimeout(loadLandingSpotlights, 65));
 
 const aiTeaserForm = document.getElementById('aiTeaserForm');
 if (aiTeaserForm) {
