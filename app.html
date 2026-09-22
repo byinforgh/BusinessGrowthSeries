@@ -1017,6 +1017,36 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 </div>
 
 <script>
+// =====================================================================
+// SUPABASE CONFIG: keep this in sync with the same two lines in
+// index.html, auth.html, admin.html, groups.html, qa.html, community.html,
+// connections.html, messages.html, directory.html, and curriculum.html.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+function esc(str){
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+let currentUser = null;
+let currentProfile = null;
+
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  if (sb) await sb.auth.signOut();
+  location.href = 'index.html';
+});
+
 function initStartHereBanner(){
   const banner = document.getElementById('startHereBanner');
   if (!banner) return;
