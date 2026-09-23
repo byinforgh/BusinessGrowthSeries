@@ -26,7 +26,7 @@ p, li{color:var(--ink-dim);font-size:15px;line-height:1.7;}
 .kente-stripe span:nth-child(4n+3){background:var(--blue);}
 .kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;color:var(--ink);margin-bottom:8px;}
-.brand-mark{width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold);}
+.brand-mark{width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold);;overflow:hidden;background:var(--surface);}
 .updated{font-family:'Inter',sans-serif;font-size:12px;color:var(--ink-dim);margin-bottom:40px;}
 .notice{
   border:1px solid var(--gold);background:rgba(176,141,63,0.08);padding:20px 22px;margin-bottom:40px;border-radius:2px;
@@ -43,6 +43,8 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .footer-bottom{display:flex;justify-content:center;gap:8px;font-size:12px;color:var(--ink-dim);flex-wrap:wrap;text-align:center;}
 .footer-bottom a{color:var(--ink-dim);text-decoration:underline;}
 .footer-bottom a:hover{color:var(--teal);}
+
+.brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 </style>
 </head>
 <body>
@@ -50,7 +52,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 
 <div class="wrap">
   <a href="index.html" class="back-link">&larr; Back to byinforgh.com</a>
-  <a href="index.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+  <a href="index.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">B</span></div>BYINFORGH</a>
   <h1 style="font-size:34px;">Privacy Policy &amp; Terms of Use</h1>
   <div class="updated">Business Growth Series</div>
 
