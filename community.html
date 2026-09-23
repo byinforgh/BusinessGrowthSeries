@@ -29,15 +29,20 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
 .kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
 
 .app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
-.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.app-topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1180px;margin:0 auto;gap:12px;}
+.app-topbar-row2{position:relative;border-top:1px solid var(--line);}
+.app-topbar-row2::after{content:'';position:absolute;top:0;right:0;bottom:0;width:28px;pointer-events:none;background:linear-gradient(90deg, transparent, var(--bg));}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
-.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);}
+.brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);;overflow:hidden;background:var(--surface);}
 .btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
 .btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
-.jump-nav{display:flex;gap:6px;align-items:center;overflow-x:auto;max-width:72vw;scrollbar-width:thin;}
-.jump-nav::-webkit-scrollbar{height:4px;}
+.jump-nav{
+  display:flex;gap:10px;align-items:center;overflow-x:auto;white-space:nowrap;
+  max-width:1180px;margin:0 auto;padding:10px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.jump-nav::-webkit-scrollbar{display:none;}
+.jump-nav a{flex-shrink:0;}
 .jump-nav a.active{background:var(--teal);color:var(--bg);border-color:var(--teal);}
-@media(max-width:700px){.jump-nav{max-width:60vw;}}
 
 .locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
 .banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
@@ -60,6 +65,13 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .footer-bottom{display:flex;justify-content:center;gap:8px;font-size:12px;color:var(--ink-dim);flex-wrap:wrap;text-align:center;}
 .footer-bottom a{color:var(--ink-dim);text-decoration:underline;}
 .footer-bottom a:hover{color:var(--teal);}
+
+.brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+
+@media(max-width:700px){
+  section{padding:28px 0;}
+  .section-head{margin-bottom:20px;}
+}
 </style>
 </head>
 <body>
@@ -76,8 +88,11 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 
 <nav class="app-topbar">
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-  <div class="app-topbar-inner">
-    <a href="app.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
+    <div class="app-topbar-row1">
+   <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">B</span></div>BYINFORGH</a>
+   <button class="btn-ghost" id="logoutBtn">Log out</button>
+  </div>
+  <div class="app-topbar-row2">
     <div class="jump-nav" id="jumpNav">
       <a href="app.html" class="btn-ghost" data-page="app.html">Dashboard</a>
       <a href="curriculum.html" class="btn-ghost" data-page="curriculum.html">Curriculum</a>
@@ -88,9 +103,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       <a href="groups.html" class="btn-ghost" data-page="groups.html">Groups</a>
       <a href="messages.html" class="btn-ghost" data-page="messages.html">Messages</a>
       <a href="qa.html" class="btn-ghost" data-page="qa.html">Q&amp;A</a>
-      <button class="btn-ghost" id="logoutBtn">Log out</button>
     </div>
-
   </div>
 </nav>
 <script>
