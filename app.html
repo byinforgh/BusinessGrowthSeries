@@ -67,7 +67,9 @@ nav{
 .brand-mark{
   width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);
   display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);position:relative;flex-shrink:0;
+  overflow:hidden;background:var(--surface);
 }
+.brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
 .brand-mark::after{content:'';position:absolute;bottom:2px;right:2px;width:6px;height:6px;border-radius:50%;background:var(--teal);}
 .nav-links{display:flex;gap:32px;font-size:13px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;}
 .nav-links a{text-decoration:none;color:var(--ink-dim);transition:color .15s;}
@@ -129,7 +131,15 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 .footer-col a:hover{color:var(--teal);}
 .footer-pillars{display:flex;gap:2px;background:var(--line);border:1px solid var(--line);margin-bottom:32px;}
 .pillar{background:var(--bg);flex:1;text-align:center;padding:18px 10px;font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
-.footer-bottom{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);border-top:1px solid var(--line);padding-top:24px;flex-wrap:wrap;gap:12px;}
+.footer-bottom{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-dim);border-top:1px solid var(--line);padding-top:20px;flex-wrap:wrap;gap:12px;}
+@media(max-width:700px){
+  footer{padding:36px 0 28px;}
+  .footer-top{margin-bottom:24px;gap:24px;}
+  .footer-cols{flex-direction:column;gap:24px;width:100%;}
+  .footer-pillars{flex-wrap:wrap;margin-bottom:20px;}
+  .pillar{flex:1 1 45%;padding:14px 8px;font-size:10px;}
+  .footer-bottom{flex-direction:column;align-items:center;text-align:center;gap:6px;padding-top:16px;}
+}
 
 @media(max-width:860px){
   .nav-links{display:none;}
@@ -157,33 +167,40 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   html,body{max-width:100%;}
   body{padding-bottom:60px;}
   .app-topbar{
-    position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);
+    position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.97);
     border-bottom:1px solid var(--line);
   }
-  .app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
-  .app-nav-links{display:flex;gap:24px;font-size:12.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;}
+  .app-topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1180px;margin:0 auto;gap:12px;}
+  .app-topbar-row2{position:relative;border-top:1px solid var(--line);}
+  .app-nav-links{
+    display:flex;gap:22px;font-size:12.5px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;
+    overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+    max-width:1180px;margin:0 auto;padding:12px 20px;
+  }
+  .app-nav-links::-webkit-scrollbar{display:none;}
   .app-nav-links a{text-decoration:none;color:var(--ink-dim);flex-shrink:0;}
-  .app-nav-links a:hover{color:var(--teal);}
+  .app-nav-links a:hover, .app-nav-links a.active{color:var(--teal);}
+  .app-topbar-row2::after{
+    content:'';position:absolute;top:0;right:0;bottom:0;width:28px;pointer-events:none;
+    background:linear-gradient(90deg, transparent, var(--bg));
+  }
   .app-user{display:flex;align-items:center;gap:12px;}
   .app-user-name{font-size:13px;}
   .app-user-name small{display:block;color:var(--ink-dim);font-size:11px;}
   .app-avatar{width:34px;height:34px;border-radius:50%;background:var(--surface-2);border:1px solid var(--line);}
 
-  /* Mobile: the topbar's three groups (brand, nav links, user/logout)
-     stack instead of trying to fit on one line, and the nav links
-     become their own horizontally-scrollable strip rather than
-     overflowing the page. This is the fix for the nav being cut off
-     ("SSAGES", "RESOURCES" running off-screen) on phones. */
+  /* The nav links live on their own row, always horizontally
+     scrollable, never squeezed against the brand or the logout
+     button. This is a structural fix, not a flex-order trick, so it
+     can't silently fail on iOS Safari the way the previous version
+     did (order + width:100% inside a sticky parent is known to
+     misbehave there). */
   @media(max-width:860px){
-    .app-topbar-inner{padding:12px 16px;gap:8px;}
-    .app-nav-links{
-      order:3;width:100%;flex-wrap:nowrap;overflow-x:auto;gap:20px;
-      padding-bottom:6px;-webkit-overflow-scrolling:touch;scrollbar-width:none;
-    }
-    .app-nav-links::-webkit-scrollbar{display:none;}
-    .app-user{order:2;margin-left:auto;}
+    .app-topbar-row1{padding:10px 16px;}
+    .app-nav-links{padding:10px 16px;gap:18px;}
     .app-user-name{display:none;}
   }
+
 
   .locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
 
@@ -511,6 +528,13 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .filter-warning{color:var(--m7);font-size:11.5px;margin-top:6px;display:none;}
   .filter-warning.show{display:block;}
 
+
+@media(max-width:700px){
+  section{padding:32px 0;}
+  section:not(:first-of-type)::before{display:none;}
+  .section-head{margin-bottom:24px;}
+  header{padding:32px 0 24px !important;}
+}
 </style>
 </head>
 <body>
@@ -527,9 +551,15 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 
 <nav class="app-topbar">
 <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-  <div class="app-topbar-inner">
-    <a href="index.html" class="brand"><div class="brand-mark">B</div>BYINFORGH</a>
-    <div class="app-nav-links">
+  <div class="app-topbar-row1">
+    <a href="index.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
+    <div class="app-user">
+      <div class="app-user-name" id="topbarName">Loading...<small id="topbarBiz"></small></div>
+      <button class="nav-ghost" id="logoutBtn">Log Out</button>
+    </div>
+  </div>
+  <div class="app-topbar-row2">
+    <div class="app-nav-links" id="appNavLinks">
       <a href="curriculum.html">Curriculum</a>
       <a href="#ai-assistant">AI</a>
       <a href="lounge.html">Live Lounge</a>
@@ -544,10 +574,6 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
       <a href="qa.html">Q&amp;A</a>
       <a href="#spotlight">Spotlight</a>
       <a href="#resources">Resources</a>
-    </div>
-    <div class="app-user">
-      <div class="app-user-name" id="topbarName">Loading...<small id="topbarBiz"></small></div>
-      <button class="nav-ghost" id="logoutBtn">Log Out</button>
     </div>
   </div>
 </nav>
@@ -916,7 +942,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     </div>
     <div class="footer-bottom">
       <span>© 2026 BYINFORGH. Business Growth Series.</span>
-      <span><a href="https://businessgrowthseries.byinforgh.com/privacy.html" style="color:var(--ink-dim);text-decoration:underline;">Privacy &amp; Terms</a> &nbsp;&middot;&nbsp; Visible · Trusted · Local</span>
+      <span>Visible · Trusted · Local</span>
     </div>
   </div>
 </footer>
