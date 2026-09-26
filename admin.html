@@ -77,6 +77,23 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   section{padding:28px 0;}
   .section-head{margin-bottom:20px;}
 }
+
+/* ===================================================================
+   BYINFORGH BUSINESS HOUR — floating countdown bubble (all app pages)
+   =================================================================== */
+.biz-hour-bubble{position:fixed;top:14px;right:16px;z-index:300;background:var(--teal-deep);color:var(--bg);border-radius:999px;box-shadow:0 8px 22px rgba(10,54,63,0.38);display:none;align-items:center;animation:bizHourIn .4s ease;max-width:calc(100vw - 24px);}
+.biz-hour-bubble.is-live{background:var(--m7);}
+@keyframes bizHourIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.biz-hour-inner{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--bg);padding:9px 14px;border-radius:999px;}
+.biz-hour-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:bizHourPulse 1.6s infinite;}
+.biz-hour-bubble.is-live .biz-hour-dot{background:#fff;}
+@keyframes bizHourPulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.biz-hour-text{display:flex;flex-direction:column;line-height:1.25;}
+.biz-hour-text b{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.85;}
+.biz-hour-text span{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:800;white-space:nowrap;}
+.biz-hour-close{background:transparent;border:none;border-left:1px solid rgba(255,255,255,0.25);color:var(--bg);opacity:.7;font-size:15px;cursor:pointer;padding:6px 12px;align-self:stretch;}
+.biz-hour-close:hover{opacity:1;}
+@media(max-width:700px){.biz-hour-bubble{top:auto;bottom:16px;right:12px;left:12px;justify-content:center;}}
 </style>
 </head>
 <body>
@@ -103,6 +120,13 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
     </div>
   </div>
 </nav>
+<div id="bizHourBubble" class="biz-hour-bubble">
+  <a id="bizHourLink" href="#" target="_blank" rel="noopener" class="biz-hour-inner">
+    <span class="biz-hour-dot"></span>
+    <span class="biz-hour-text"><b>BYINFORGH Business Hour</b><span id="bizHourCountdown">&hellip;</span></span>
+  </a>
+  <button class="biz-hour-close" id="bizHourClose" type="button" aria-label="Dismiss">&times;</button>
+</div>
 
 <section id="admin">
   <div class="wrap">
@@ -112,15 +136,24 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       <p>Verification, reports, and content approvals, in one place instead of three Table Editor tabs. This page loads only for accounts with <code>is_admin</code> set, and admin code no longer ships to any other member's browser.</p>
     </div>
     <div class="pill-toggle" id="adminTabs">
-      <button class="active" data-tab="verification">Verification <span class="count-badge" id="adminVerifyCount"></span></button>
+      <button class="active" data-tab="members">Members <span class="count-badge" id="adminMembersCount"></span></button>
+      <button data-tab="verification">Verification <span class="count-badge" id="adminVerifyCount"></span></button>
       <button data-tab="reports">Reports <span class="count-badge" id="adminReportsCount"></span></button>
       <button data-tab="content">Content <span class="count-badge" id="adminContentCount"></span></button>
       <button data-tab="community">Community &amp; Q&amp;A <span class="count-badge" id="adminCommunityCount"></span></button>
       <button data-tab="lounge">Live Lounge <span class="count-badge" id="adminLoungeCount"></span></button>
+      <button data-tab="events">Business Hour <span class="count-badge" id="adminEventsCount"></span></button>
     </div>
     <div id="adminPanelBody"></div>
   </div>
 </section>
+
+<div class="modal-overlay" id="memberModal" style="display:none;position:fixed;inset:0;background:rgba(28,28,28,0.55);z-index:400;align-items:center;justify-content:center;padding:20px;">
+  <div style="background:var(--bg);max-width:520px;width:100%;max-height:86vh;overflow-y:auto;padding:28px 26px;position:relative;border:1px solid var(--line);">
+    <button id="memberModalClose" aria-label="Close" style="position:absolute;top:14px;right:16px;background:transparent;border:none;font-size:20px;cursor:pointer;color:var(--ink-dim);">&times;</button>
+    <div id="memberModalBody"></div>
+  </div>
+</div>
 
 <footer>
   <div class="wrap">
@@ -226,10 +259,11 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 // Verification, reports, and pending content approvals, all in one
 // screen instead of three separate Table Editor tabs.
 // =====================================================================
-let activeAdminTab = 'verification';
+let activeAdminTab = 'members';
+let memberSearch = '';
 
 async function loadAdminConsole(){
-  const [{ data: verifs }, { data: reports }, { data: spotlights }, { data: testimonials }, { data: aiDocs }, { data: posts }, { data: questions }, { data: loungeMsgs }] = await Promise.all([
+  const [{ data: verifs }, { data: reports }, { data: spotlights }, { data: testimonials }, { data: aiDocs }, { data: posts }, { data: questions }, { data: loungeMsgs }, { data: members }, { data: events }, { data: onlineCount }] = await Promise.all([
     sb.from('verification_requests').select('*').eq('status', 'pending').order('submitted_at', { ascending: true }),
     sb.from('reports').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
     sb.from('spotlights').select('*').eq('status', 'pending').order('created_at', { ascending: true }),
@@ -238,12 +272,19 @@ async function loadAdminConsole(){
     sb.from('community_posts').select('*').order('created_at', { ascending: false }).limit(50),
     sb.from('qa_questions').select('*, qa_answers(*)').order('created_at', { ascending: false }).limit(50),
     sb.from('live_chat_messages').select('*').order('created_at', { ascending: false }).limit(80),
+    // Admin reads the profiles table directly (not public_profiles), so this
+    // is the one place that legitimately sees every field, including the
+    // private ones — email and biggest struggle — for support purposes.
+    sb.from('profiles').select('*').order('last_seen', { ascending: false, nullsFirst: false }),
+    sb.from('events').select('*').order('event_at', { ascending: true, nullsFirst: false }),
+    sb.rpc('online_member_count'),
   ]);
   window._adminData = { verifs: verifs || [], reports: reports || [], content: [
     ...(spotlights || []).map(s => ({ ...s, kind: 'spotlight' })),
     ...(testimonials || []).map(t => ({ ...t, kind: 'testimonial' })),
     ...(aiDocs || []).map(a => ({ ...a, kind: 'ai_document' })),
-  ], posts: posts || [], questions: questions || [], loungeMsgs: loungeMsgs || [] };
+  ], posts: posts || [], questions: questions || [], loungeMsgs: loungeMsgs || [],
+    members: members || [], events: events || [], onlineCount: onlineCount ?? null };
 
   const allIds = [
     ...window._adminData.verifs.map(v => v.user_id),
@@ -255,12 +296,21 @@ async function loadAdminConsole(){
   ];
   await preloadNamesFor(allIds);
 
+  document.getElementById('adminMembersCount').textContent = window._adminData.members.length || '';
   document.getElementById('adminVerifyCount').textContent = window._adminData.verifs.length || '';
   document.getElementById('adminReportsCount').textContent = window._adminData.reports.length || '';
   document.getElementById('adminContentCount').textContent = window._adminData.content.length || '';
   document.getElementById('adminCommunityCount').textContent = (window._adminData.posts.length + window._adminData.questions.length) || '';
   document.getElementById('adminLoungeCount').textContent = window._adminData.loungeMsgs.length || '';
+  document.getElementById('adminEventsCount').textContent = window._adminData.events.length || '';
   renderAdminPanel();
+}
+
+// A member counts as "online" if they were active in the last 5 minutes —
+// keep this window in sync with whatever online_member_count() uses.
+function isOnline(lastSeen){
+  if (!lastSeen) return false;
+  return (Date.now() - new Date(lastSeen).getTime()) < 5 * 60 * 1000;
 }
 
 function renderAdminPanel(){
@@ -356,6 +406,62 @@ function renderAdminPanel(){
           <button class="btn-danger admin-lounge-delete" data-id="${esc(m.id)}">Delete</button>
         </div>
       </div>`).join('') || '<p class="empty-note">No messages yet.</p>'}`;
+  } else if (activeAdminTab === 'members') {
+    const total = d.members.length;
+    const online = d.members.filter(m => isOnline(m.last_seen)).length;
+    const q = memberSearch.trim().toLowerCase();
+    const filtered = !q ? d.members : d.members.filter(m =>
+      [m.name, m.business_name, m.category, m.location, m.phone, m.email].filter(Boolean).join(' ').toLowerCase().includes(q));
+    body.innerHTML = `
+      <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
+        <div style="flex:1;min-width:160px;border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;">
+          <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;">${total.toLocaleString()}</div>
+          <div style="font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);">Registered members</div>
+        </div>
+        <div style="flex:1;min-width:160px;border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;">
+          <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:var(--teal);">${online.toLocaleString()}</div>
+          <div style="font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);">Online right now</div>
+        </div>
+      </div>
+      <input type="text" id="memberSearchInput" placeholder="Search by name, business, category, location, phone, email..." value="${esc(memberSearch)}" style="width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:11px 14px;font-family:'Poppins',sans-serif;font-size:13px;outline:none;margin-bottom:16px;">
+      ${filtered.map(m => `
+      <div class="admin-queue-item admin-member-row" data-user="${esc(m.id)}" style="cursor:pointer;align-items:center;">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">
+            <span style="display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;background:${isOnline(m.last_seen) ? 'var(--teal)' : 'var(--line)'};"></span>
+            ${esc(m.name || 'Unnamed')}${m.business_name ? ' · ' + esc(m.business_name) : ''}
+            ${m.is_admin ? ' <span style="color:var(--gold);">(admin)</span>' : ''}
+            ${m.banned ? ' <span style="color:var(--m7);">(suspended)</span>' : ''}
+          </div>
+          <div class="admin-queue-meta">${esc(m.category || 'No category')} · ${esc(m.location || 'No location')} · last seen ${m.last_seen ? new Date(m.last_seen).toLocaleString('en-GB') : 'never'}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-ghost">View profile →</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No members match that search.</p>'}`;
+  } else if (activeAdminTab === 'events') {
+    body.innerHTML = `
+      <p style="font-size:12.5px;color:var(--ink-dim);margin-bottom:16px;">These are the sessions shown as "Live with BYINFORGH" on the dashboard and in the floating Business Hour bubble on every page. A session only ever appears to members once it has both a date/time and a Google Meet link — delete or fix any session missing one below.</p>
+      <form id="eventAddForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;border:1px solid var(--line);background:var(--surface-2);padding:16px;margin-bottom:20px;">
+        <input type="text" id="evTitle" placeholder="Title (e.g. Weekly Business Hour)" required style="grid-column:span 2;padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="text" id="evDayLabel" placeholder="Day label (e.g. Every Thursday)" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="text" id="evTimeLabel" placeholder="Time label (e.g. 6:00 PM GMT)" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="datetime-local" id="evDateTime" required style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="url" id="evMeetUrl" placeholder="Google Meet link (required)" required style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <textarea id="evDescription" placeholder="Description" rows="2" style="grid-column:span 2;padding:9px 11px;border:1px solid var(--line);font-size:13px;resize:vertical;"></textarea>
+        <button type="submit" class="btn-primary" style="grid-column:span 2;">Add session</button>
+      </form>
+      ${d.events.map(ev => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(ev.title)}${!ev.meet_url ? ' <span style="color:var(--m7);">(no join link — hidden from members)</span>' : ''}</div>
+          <div class="admin-queue-meta">${esc(ev.day_label || '')} ${esc(ev.time_label || '')}${ev.event_at ? ' · ' + new Date(ev.event_at).toLocaleString('en-GB') : ' · no date/time set — countdown bubble skips this one'}</div>
+          <div class="admin-queue-body">${esc(ev.description || '')}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-danger admin-event-delete" data-id="${esc(ev.id)}">Delete</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No sessions yet.</p>'}`;
   }
 }
 document.getElementById('adminTabs').addEventListener('click', (e) => {
@@ -415,8 +521,174 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
     if (!confirm('Delete this Live Lounge message for everyone?')) return;
     const { error } = await sb.from('live_chat_messages').delete().eq('id', btn.dataset.id);
     if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
+  } else if (btn.classList.contains('admin-event-delete')) {
+    if (!confirm('Delete this Business Hour session? This cannot be undone.')) return;
+    const { error } = await sb.from('events').delete().eq('id', btn.dataset.id);
+    if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
+    return;
+  }
+
+  // Clicking anywhere on a member row (but not its own button) opens the profile modal
+  const memberRow = e.target.closest('.admin-member-row');
+  if (memberRow) openMemberModal(memberRow.dataset.user);
+});
+
+// Live search across the member list, without a full reload
+document.getElementById('adminPanelBody').addEventListener('input', (e) => {
+  if (e.target.id === 'memberSearchInput') {
+    memberSearch = e.target.value;
+    renderAdminPanel();
+    // keep focus + cursor position after re-render
+    const input = document.getElementById('memberSearchInput');
+    if (input) { input.focus(); input.setSelectionRange(input.value.length, input.value.length); }
   }
 });
+
+// Add a new Business Hour session
+document.getElementById('adminPanelBody').addEventListener('submit', async (e) => {
+  if (e.target.id !== 'eventAddForm') return;
+  e.preventDefault();
+  const title = document.getElementById('evTitle').value.trim();
+  const dayLabel = document.getElementById('evDayLabel').value.trim();
+  const timeLabel = document.getElementById('evTimeLabel').value.trim();
+  const dateTime = document.getElementById('evDateTime').value;
+  const meetUrl = document.getElementById('evMeetUrl').value.trim();
+  const description = document.getElementById('evDescription').value.trim();
+  if (!title || !dateTime || !meetUrl) return;
+  const { error } = await sb.from('events').insert({
+    title, day_label: dayLabel || null, time_label: timeLabel || null,
+    event_at: new Date(dateTime).toISOString(), meet_url: meetUrl, description: description || null,
+  });
+  if (error) alert('Could not add session: ' + error.message + (error.message.includes('event_at') ? '\n\nYour events table may be missing the event_at column — see the note at the top of the Business Hour tab.' : ''));
+  else loadAdminConsole();
+});
+
+// =====================================================================
+// MEMBER PROFILE MODAL — the full profile, including the private
+// fields (email, biggest struggle) that admin alone can see, for
+// support and tracking purposes.
+// =====================================================================
+function openMemberModal(userId){
+  const m = (window._adminData.members || []).find(x => x.id === userId);
+  if (!m) return;
+  const rows = [
+    ['Name', m.name], ['Business', m.business_name], ['Category', m.category],
+    ['Phone / WhatsApp', m.phone], ['Email (private)', m.email],
+    ['Location', m.location], ['Landmark', m.landmark],
+    ['Sells', m.sells], ['Looking for', m.looking_for],
+    ['Biggest struggle (private)', m.struggle],
+    ['Verified', m.verified ? 'Yes' : 'No'],
+    ['Admin', m.is_admin ? 'Yes' : 'No'],
+    ['Suspended', m.banned ? `Yes — ${m.ban_reason || 'no reason recorded'}` : 'No'],
+    ['Last seen', m.last_seen ? new Date(m.last_seen).toLocaleString('en-GB') : 'Never'],
+    ['Joined', m.created_at ? new Date(m.created_at).toLocaleString('en-GB') : '—'],
+  ];
+  document.getElementById('memberModalBody').innerHTML = `
+    <h3 style="font-family:'Inter',sans-serif;text-transform:uppercase;font-size:18px;margin-bottom:16px;">${esc(m.name || 'Member profile')}</h3>
+    ${rows.map(([label, val]) => `
+      <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13px;">
+        <span style="color:var(--ink-dim);font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.03em;">${label}</span>
+        <span style="text-align:right;">${esc(val || '—')}</span>
+      </div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
+      ${m.banned
+        ? `<button class="btn-primary" id="memberUnbanBtn">Lift suspension</button>`
+        : `<button class="btn-danger" id="memberBanBtn">Suspend member</button>`}
+    </div>`;
+  document.getElementById('memberModal').style.display = 'flex';
+  const banBtn = document.getElementById('memberBanBtn');
+  if (banBtn) banBtn.addEventListener('click', async () => {
+    const reason = prompt('Reason for suspension (shown to the member):');
+    if (reason === null) return;
+    await sb.from('profiles').update({ banned: true, ban_reason: reason || null }).eq('id', m.id);
+    document.getElementById('memberModal').style.display = 'none';
+    loadAdminConsole();
+  });
+  const unbanBtn = document.getElementById('memberUnbanBtn');
+  if (unbanBtn) unbanBtn.addEventListener('click', async () => {
+    await sb.from('profiles').update({ banned: false, ban_reason: null }).eq('id', m.id);
+    document.getElementById('memberModal').style.display = 'none';
+    loadAdminConsole();
+  });
+}
+document.getElementById('memberModalClose').addEventListener('click', () => {
+  document.getElementById('memberModal').style.display = 'none';
+});
+document.getElementById('memberModal').addEventListener('click', (e) => {
+  if (e.target.id === 'memberModal') document.getElementById('memberModal').style.display = 'none';
+});
+</script>
+
+<script>
+// =====================================================================
+// BYINFORGH BUSINESS HOUR — floating countdown bubble shown on every
+// signed-in page. Reads the `events` table (same source as the Live
+// Sessions list). Only ever shows a session that (a) has a meet_url,
+// since a session with no join link is useless to surface, and (b) has
+// an event_at timestamp, needed to actually count down. If your
+// `events` table doesn't have an event_at column yet, add it:
+//   alter table events add column if not exists event_at timestamptz;
+// then set it on each row from the admin console's Business Hour tab.
+// =====================================================================
+(function(){
+  async function initBizHourBubble(){
+    if (typeof sb === 'undefined' || !sb) return;
+    const bubble = document.getElementById('bizHourBubble');
+    if (!bubble) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    let dismissedId = null;
+    try { dismissedId = sessionStorage.getItem('byg_bizhour_dismissed'); } catch(e){}
+
+    const { data, error } = await sb.from('events').select('*')
+      .not('meet_url', 'is', null).not('event_at', 'is', null)
+      .order('event_at', { ascending: true });
+    if (error || !data || !data.length) return;
+
+    const now = new Date();
+    let isLive = false;
+    let target = data.find(ev => {
+      const start = new Date(ev.event_at);
+      const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+      return now >= start && now <= end;
+    });
+    if (target) isLive = true;
+    if (!target) target = data.find(ev => new Date(ev.event_at) > now);
+    if (!target || String(target.id) === dismissedId) return;
+
+    const link = document.getElementById('bizHourLink');
+    const label = document.getElementById('bizHourCountdown');
+    link.href = target.meet_url;
+
+    function render(){
+      const start = new Date(target.event_at);
+      const diff = start - new Date();
+      if (isLive || diff <= 0) {
+        bubble.classList.add('is-live');
+        label.textContent = 'Live now — join →';
+        return;
+      }
+      const mins = Math.floor(diff / 60000);
+      const days = Math.floor(mins / 1440);
+      const hrs = Math.floor((mins % 1440) / 60);
+      const min = mins % 60;
+      label.textContent = 'Starts in ' + (days > 0 ? days + 'd ' : '') + ((hrs > 0 || days > 0) ? hrs + 'h ' : '') + min + 'm';
+    }
+    render();
+    bubble.style.display = 'flex';
+    const timer = setInterval(() => {
+      if (new Date(target.event_at) <= new Date()) isLive = true;
+      render();
+    }, 30000);
+    document.getElementById('bizHourClose').addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      bubble.style.display = 'none';
+      clearInterval(timer);
+      try { sessionStorage.setItem('byg_bizhour_dismissed', String(target.id)); } catch(e){}
+    });
+  }
+  window.addEventListener('load', () => setTimeout(initBizHourBubble, 300));
+})();
 </script>
 
 </body>
