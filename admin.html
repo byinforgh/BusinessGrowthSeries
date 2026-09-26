@@ -261,6 +261,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 // =====================================================================
 let activeAdminTab = 'members';
 let memberSearch = '';
+let editingEventId = null;
 
 async function loadAdminConsole(){
   const [{ data: verifs }, { data: reports }, { data: spotlights }, { data: testimonials }, { data: aiDocs }, { data: posts }, { data: questions }, { data: loungeMsgs }, { data: members }, { data: events }, { data: onlineCount }] = await Promise.all([
@@ -440,16 +441,25 @@ function renderAdminPanel(){
         </div>
       </div>`).join('') || '<p class="empty-note">No members match that search.</p>'}`;
   } else if (activeAdminTab === 'events') {
+    const editing = editingEventId ? d.events.find(ev => ev.id === editingEventId) : null;
+    function toLocalInputValue(iso){
+      if (!iso) return '';
+      const d2 = new Date(iso);
+      const pad = n => String(n).padStart(2, '0');
+      return `${d2.getFullYear()}-${pad(d2.getMonth()+1)}-${pad(d2.getDate())}T${pad(d2.getHours())}:${pad(d2.getMinutes())}`;
+    }
     body.innerHTML = `
-      <p style="font-size:12.5px;color:var(--ink-dim);margin-bottom:16px;">These are the sessions shown as "Live with BYINFORGH" on the dashboard and in the floating Business Hour bubble on every page. A session only ever appears to members once it has both a date/time and a Google Meet link — delete or fix any session missing one below.</p>
+      <p style="font-size:12.5px;color:var(--ink-dim);margin-bottom:16px;">These are the sessions shown as "Live with BYINFORGH" on the dashboard and in the floating Business Hour bubble on every page. A session only ever appears to members once it has both a date/time and a Google Meet link — edit or delete any session below. If saving fails with a row-level security error, run the SQL that adds an admin write policy for the <code>events</code> table.</p>
       <form id="eventAddForm" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;border:1px solid var(--line);background:var(--surface-2);padding:16px;margin-bottom:20px;">
-        <input type="text" id="evTitle" placeholder="Title (e.g. Weekly Business Hour)" required style="grid-column:span 2;padding:9px 11px;border:1px solid var(--line);font-size:13px;">
-        <input type="text" id="evDayLabel" placeholder="Day label (e.g. Every Thursday)" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
-        <input type="text" id="evTimeLabel" placeholder="Time label (e.g. 6:00 PM GMT)" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
-        <input type="datetime-local" id="evDateTime" required style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
-        <input type="url" id="evMeetUrl" placeholder="Google Meet link (required)" required style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
-        <textarea id="evDescription" placeholder="Description" rows="2" style="grid-column:span 2;padding:9px 11px;border:1px solid var(--line);font-size:13px;resize:vertical;"></textarea>
-        <button type="submit" class="btn-primary" style="grid-column:span 2;">Add session</button>
+        ${editing ? `<p style="grid-column:span 2;margin:0 0 4px;font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--teal);">Editing "${esc(editing.title)}"</p>` : ''}
+        <input type="text" id="evTitle" placeholder="Title (e.g. Weekly Business Hour)" required value="${esc(editing?.title || '')}" style="grid-column:span 2;padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="text" id="evDayLabel" placeholder="Day label (e.g. Every Thursday)" value="${esc(editing?.day_label || '')}" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="text" id="evTimeLabel" placeholder="Time label (e.g. 6:00 PM GMT)" value="${esc(editing?.time_label || '')}" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="datetime-local" id="evDateTime" required value="${toLocalInputValue(editing?.event_at)}" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <input type="url" id="evMeetUrl" placeholder="Google Meet link (required)" required value="${esc(editing?.meet_url || '')}" style="padding:9px 11px;border:1px solid var(--line);font-size:13px;">
+        <textarea id="evDescription" placeholder="Description" rows="2" style="grid-column:span 2;padding:9px 11px;border:1px solid var(--line);font-size:13px;resize:vertical;">${esc(editing?.description || '')}</textarea>
+        <button type="submit" class="btn-primary" style="grid-column:span 2;">${editing ? 'Save changes' : 'Add session'}</button>
+        ${editing ? `<button type="button" id="eventCancelEdit" class="btn-ghost" style="grid-column:span 2;">Cancel edit</button>` : ''}
       </form>
       ${d.events.map(ev => `
       <div class="admin-queue-item">
@@ -459,6 +469,7 @@ function renderAdminPanel(){
           <div class="admin-queue-body">${esc(ev.description || '')}</div>
         </div>
         <div class="admin-queue-actions">
+          <button class="btn-ghost admin-event-edit" data-id="${esc(ev.id)}">Edit</button>
           <button class="btn-danger admin-event-delete" data-id="${esc(ev.id)}">Delete</button>
         </div>
       </div>`).join('') || '<p class="empty-note">No sessions yet.</p>'}`;
@@ -524,7 +535,17 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
   } else if (btn.classList.contains('admin-event-delete')) {
     if (!confirm('Delete this Business Hour session? This cannot be undone.')) return;
     const { error } = await sb.from('events').delete().eq('id', btn.dataset.id);
-    if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
+    if (error) alert('Could not delete: ' + error.message + (error.message.includes('row-level security') ? '\n\nYour events table needs an admin write policy — see business-hour-events-rls.sql.' : ''));
+    else loadAdminConsole();
+    return;
+  } else if (btn.classList.contains('admin-event-edit')) {
+    editingEventId = btn.dataset.id;
+    renderAdminPanel();
+    document.getElementById('eventAddForm')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  } else if (btn.id === 'eventCancelEdit') {
+    editingEventId = null;
+    renderAdminPanel();
     return;
   }
 
@@ -544,7 +565,7 @@ document.getElementById('adminPanelBody').addEventListener('input', (e) => {
   }
 });
 
-// Add a new Business Hour session
+// Add or save a Business Hour session
 document.getElementById('adminPanelBody').addEventListener('submit', async (e) => {
   if (e.target.id !== 'eventAddForm') return;
   e.preventDefault();
@@ -555,12 +576,22 @@ document.getElementById('adminPanelBody').addEventListener('submit', async (e) =
   const meetUrl = document.getElementById('evMeetUrl').value.trim();
   const description = document.getElementById('evDescription').value.trim();
   if (!title || !dateTime || !meetUrl) return;
-  const { error } = await sb.from('events').insert({
+  const payload = {
     title, day_label: dayLabel || null, time_label: timeLabel || null,
     event_at: new Date(dateTime).toISOString(), meet_url: meetUrl, description: description || null,
-  });
-  if (error) alert('Could not add session: ' + error.message + (error.message.includes('event_at') ? '\n\nYour events table may be missing the event_at column — see the note at the top of the Business Hour tab.' : ''));
-  else loadAdminConsole();
+  };
+  const { error } = editingEventId
+    ? await sb.from('events').update(payload).eq('id', editingEventId)
+    : await sb.from('events').insert(payload);
+  if (error) {
+    let hint = '';
+    if (error.message.includes('event_at')) hint = '\n\nYour events table may be missing the event_at column — see the note at the top of the Business Hour tab.';
+    if (error.message.includes('row-level security')) hint = '\n\nYour events table needs an admin write policy — run business-hour-events-rls.sql in Supabase, then try again.';
+    alert(`Could not ${editingEventId ? 'save' : 'add'} session: ` + error.message + hint);
+  } else {
+    editingEventId = null;
+    loadAdminConsole();
+  }
 });
 
 // =====================================================================
