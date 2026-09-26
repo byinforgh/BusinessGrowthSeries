@@ -535,6 +535,23 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .section-head{margin-bottom:24px;}
   header{padding:32px 0 24px !important;}
 }
+
+/* ===================================================================
+   BYINFORGH BUSINESS HOUR — floating countdown bubble (all app pages)
+   =================================================================== */
+.biz-hour-bubble{position:fixed;top:14px;right:16px;z-index:300;background:var(--teal-deep);color:var(--bg);border-radius:999px;box-shadow:0 8px 22px rgba(10,54,63,0.38);display:none;align-items:center;animation:bizHourIn .4s ease;max-width:calc(100vw - 24px);}
+.biz-hour-bubble.is-live{background:var(--m7);}
+@keyframes bizHourIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.biz-hour-inner{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--bg);padding:9px 14px;border-radius:999px;}
+.biz-hour-dot{width:8px;height:8px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:bizHourPulse 1.6s infinite;}
+.biz-hour-bubble.is-live .biz-hour-dot{background:#fff;}
+@keyframes bizHourPulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.biz-hour-text{display:flex;flex-direction:column;line-height:1.25;}
+.biz-hour-text b{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.85;}
+.biz-hour-text span{font-family:'Inter',sans-serif;font-size:12.5px;font-weight:800;white-space:nowrap;}
+.biz-hour-close{background:transparent;border:none;border-left:1px solid rgba(255,255,255,0.25);color:var(--bg);opacity:.7;font-size:15px;cursor:pointer;padding:6px 12px;align-self:stretch;}
+.biz-hour-close:hover{opacity:1;}
+@media(max-width:700px){.biz-hour-bubble{top:auto;bottom:16px;right:12px;left:12px;justify-content:center;}}
 </style>
 </head>
 <body>
@@ -577,12 +594,23 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     </div>
   </div>
 </nav>
+<div id="bizHourBubble" class="biz-hour-bubble">
+  <a id="bizHourLink" href="#" target="_blank" rel="noopener" class="biz-hour-inner">
+    <span class="biz-hour-dot"></span>
+    <span class="biz-hour-text"><b>BYINFORGH Business Hour</b><span id="bizHourCountdown">&hellip;</span></span>
+  </a>
+  <button class="biz-hour-close" id="bizHourClose" type="button" aria-label="Dismiss">&times;</button>
+</div>
 
 <header style="padding:56px 0 40px;">
   <div class="wrap">
     <span class="eyebrow">Welcome back</span>
     <h1 style="font-size:clamp(30px,5vw,48px);margin-top:10px;" id="welcomeName">Business Growth Series</h1>
     <p style="color:var(--ink-dim);font-size:15px;margin-top:12px;max-width:520px;">All 203 lessons, the community, and the AI assistant, all in one place.</p>
+    <div id="dashOnlineBadge" style="display:none;align-items:center;gap:8px;margin-top:16px;font-family:'Inter',sans-serif;font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--teal);">
+      <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;animation:bizHourPulse 1.6s infinite;"></span>
+      <span id="dashOnlineCount">0</span>&nbsp;business owners online right now
+    </div>
     <div class="start-here-banner" id="startHereBanner">
       <div class="start-here-kente"><span></span><span></span><span></span><span></span></div>
       <div class="start-here-body">
@@ -1148,6 +1176,7 @@ async function initApp(){
 
   renderYourPath();
   renderAccountability();
+  loadOnlineNow();
   loadResources();
   loadEvents();
   loadSpotlights();
@@ -1336,9 +1365,27 @@ document.getElementById('resModalClose').addEventListener('click', () => {
 document.getElementById('resourceModal').addEventListener('click', (e) => {
   if (e.target.id === 'resourceModal') document.getElementById('resourceModal').classList.remove('open');
 });
+// =====================================================================
+// ONLINE NOW — same online_member_count() RPC the public landing page
+// uses, so the number always matches. Refreshes every 45s while the
+// dashboard is open.
+// =====================================================================
+async function loadOnlineNow(){
+  const badge = document.getElementById('dashOnlineBadge');
+  const countEl = document.getElementById('dashOnlineCount');
+  if (!badge || !countEl) return;
+  const { data, error } = await sb.rpc('online_member_count');
+  if (error) { console.warn('online_member_count RPC missing or failed:', error.message); return; }
+  countEl.textContent = (data ?? 0).toLocaleString();
+  badge.style.display = 'flex';
+}
+setInterval(() => { if (currentUser) loadOnlineNow(); }, 45000);
+
 async function loadEvents(){
   const list = document.getElementById('eventsList');
-  const { data } = await sb.from('events').select('*').order('created_at', { ascending: true });
+  // Only ever list a session that actually has a join link — a
+  // "Business Hour" with nowhere to click is worse than not showing it.
+  const { data } = await sb.from('events').select('*').not('meet_url', 'is', null).order('created_at', { ascending: true });
   list.innerHTML = (data || []).map(ev => `
     <div class="event-row">
       <div class="event-day">${esc(ev.day_label)}<b>${esc(ev.title)}</b></div>
@@ -1521,6 +1568,78 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
   if (!error) input.value = '';
 });
 
+</script>
+
+<script>
+// =====================================================================
+// BYINFORGH BUSINESS HOUR — floating countdown bubble shown on every
+// signed-in page. Reads the `events` table (same source as the Live
+// Sessions list). Only ever shows a session that (a) has a meet_url,
+// since a session with no join link is useless to surface, and (b) has
+// an event_at timestamp, needed to actually count down. If your
+// `events` table doesn't have an event_at column yet, add it:
+//   alter table events add column if not exists event_at timestamptz;
+// then set it on each row from the admin console's Business Hour tab.
+// =====================================================================
+(function(){
+  async function initBizHourBubble(){
+    if (typeof sb === 'undefined' || !sb) return;
+    const bubble = document.getElementById('bizHourBubble');
+    if (!bubble) return;
+    const { data: { session } } = await sb.auth.getSession();
+    if (!session) return;
+    let dismissedId = null;
+    try { dismissedId = sessionStorage.getItem('byg_bizhour_dismissed'); } catch(e){}
+
+    const { data, error } = await sb.from('events').select('*')
+      .not('meet_url', 'is', null).not('event_at', 'is', null)
+      .order('event_at', { ascending: true });
+    if (error || !data || !data.length) return;
+
+    const now = new Date();
+    let isLive = false;
+    let target = data.find(ev => {
+      const start = new Date(ev.event_at);
+      const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+      return now >= start && now <= end;
+    });
+    if (target) isLive = true;
+    if (!target) target = data.find(ev => new Date(ev.event_at) > now);
+    if (!target || String(target.id) === dismissedId) return;
+
+    const link = document.getElementById('bizHourLink');
+    const label = document.getElementById('bizHourCountdown');
+    link.href = target.meet_url;
+
+    function render(){
+      const start = new Date(target.event_at);
+      const diff = start - new Date();
+      if (isLive || diff <= 0) {
+        bubble.classList.add('is-live');
+        label.textContent = 'Live now — join →';
+        return;
+      }
+      const mins = Math.floor(diff / 60000);
+      const days = Math.floor(mins / 1440);
+      const hrs = Math.floor((mins % 1440) / 60);
+      const min = mins % 60;
+      label.textContent = 'Starts in ' + (days > 0 ? days + 'd ' : '') + ((hrs > 0 || days > 0) ? hrs + 'h ' : '') + min + 'm';
+    }
+    render();
+    bubble.style.display = 'flex';
+    const timer = setInterval(() => {
+      if (new Date(target.event_at) <= new Date()) isLive = true;
+      render();
+    }, 30000);
+    document.getElementById('bizHourClose').addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      bubble.style.display = 'none';
+      clearInterval(timer);
+      try { sessionStorage.setItem('byg_bizhour_dismissed', String(target.id)); } catch(e){}
+    });
+  }
+  window.addEventListener('load', () => setTimeout(initBizHourBubble, 300));
+})();
 </script>
 
 </body>
