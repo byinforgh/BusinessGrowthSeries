@@ -101,9 +101,31 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .footer-bottom a:hover{color:var(--teal);}
 
 .brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+/* ===================================================================
+   BYINFORGH BUSINESS HOUR — floating countdown bubble (every page)
+   =================================================================== */
+.biz-hour-bubble{position:fixed;top:72px;right:16px;z-index:120;background:var(--teal-deep);color:var(--bg);border-radius:18px;box-shadow:0 8px 22px rgba(10,54,63,0.38);display:none;align-items:center;animation:bizHourIn .4s ease;max-width:calc(100vw - 24px);transition:top .15s ease;}
+.biz-hour-bubble.is-live{background:var(--m7);}
+@keyframes bizHourIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.biz-hour-inner{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--bg);padding:10px 16px;border-radius:18px;}
+.biz-hour-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:bizHourPulse 1.6s infinite;}
+.biz-hour-bubble.is-live .biz-hour-dot{background:#fff;}
+@keyframes bizHourPulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.biz-hour-text{display:flex;flex-direction:column;line-height:1.3;}
+.biz-hour-text b{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.85;}
+.biz-hour-text .biz-hour-when{font-family:'Inter',sans-serif;font-size:10.5px;opacity:.75;white-space:nowrap;}
+.biz-hour-text .biz-hour-count{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;}
+@media(max-width:700px){.biz-hour-inner{padding:8px 12px;}}
 </style>
 </head>
 <body>
+<div id="bizHourBubble" class="biz-hour-bubble">
+  <a id="bizHourLink" href="#" target="_blank" rel="noopener" class="biz-hour-inner">
+    <span class="biz-hour-dot"></span>
+    <span class="biz-hour-text"><b>BYINFORGH Business Hour</b><span class="biz-hour-when" id="bizHourWhen"></span><span class="biz-hour-count" id="bizHourCountdown">&hellip;</span></span>
+  </a>
+</div>
+
 
 <div class="auth-shell">
   <div class="auth-card" id="authCard">
@@ -508,5 +530,66 @@ setTimeout(() => {
     </div>
   </div>
 </footer>
+<script>
+// BYINFORGH BUSINESS HOUR — floating countdown bubble, on every page.
+// Reads the `events` table (only rows with a meet_url and an event_at).
+// Sessions repeat weekly: once a session's start (+90 min live window)
+// has passed, the bubble rolls forward to the same day/time next week,
+// so it is always visible with a live countdown and the Meet link.
+//
+// Position: this page has no top nav to anchor under, so the bubble
+// just sits near the top of the screen at a small fixed offset.
+// =====================================================================
+(function(){
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  const LIVE_MS = 90 * 60 * 1000;
+  function nextStart(ev, now){
+    const s = new Date(ev.event_at).getTime();
+    if (now <= s + LIVE_MS) return s;
+    return s + Math.ceil((now - s - LIVE_MS) / WEEK) * WEEK;
+  }
+  async function initBizHourBubble(){
+    if (typeof sb === 'undefined' || !sb) return;
+    const bubble = document.getElementById('bizHourBubble');
+    if (!bubble) return;
+    // Public page — shown to every visitor, signed in or not.
+
+    const { data, error } = await sb.from('events').select('*')
+      .not('meet_url', 'is', null).not('event_at', 'is', null);
+    if (error || !data || !data.length) return;
+
+    const link = document.getElementById('bizHourLink');
+    const when = document.getElementById('bizHourWhen');
+    const label = document.getElementById('bizHourCountdown');
+
+    function render(){
+      const now = Date.now();
+      let best = null;
+      data.forEach(ev => {
+        const start = nextStart(ev, now);
+        if (!best || start < best.start) best = { ev, start };
+      });
+      if (!best) return;
+      link.href = best.ev.meet_url;
+      when.textContent = new Date(best.start).toLocaleString('en-GB', { timeZone: 'Africa/Accra', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }) + ' \u00b7 Ghana time';
+      const diff = best.start - now;
+      if (diff <= 0) {
+        bubble.classList.add('is-live');
+        label.textContent = 'Live now \u2014 join \u2192';
+      } else {
+        bubble.classList.remove('is-live');
+        const s = Math.floor(diff / 1000);
+        const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+        label.textContent = 'Starts in ' + (d > 0 ? d + 'd ' + h + 'h ' + m + 'm' : h + 'h ' + m + 'm ' + String(sec).padStart(2, '0') + 's');
+      }
+      bubble.style.display = 'flex';
+    }
+    render();
+    setInterval(render, 1000);
+  }
+  window.addEventListener('load', () => setTimeout(initBizHourBubble, 300));
+})();
+</script>
+
 </body>
 </html>
