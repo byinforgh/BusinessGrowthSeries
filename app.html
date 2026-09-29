@@ -563,6 +563,24 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 .biz-hour-text .biz-hour-when{font-family:'Inter',sans-serif;font-size:10.5px;opacity:.75;white-space:nowrap;}
 .biz-hour-text .biz-hour-count{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;}
 @media(max-width:700px){.biz-hour-inner{padding:8px 12px;}}
+
+/* ===================================================================
+   WELCOME OVERLAY — shown once, first time a profile has no
+   welcomed_at set. Purely in-app, no email infrastructure needed.
+   =================================================================== */
+.welcome-overlay{position:fixed;inset:0;z-index:200;background:rgba(28,28,28,0.55);display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;}
+.welcome-card{width:100%;max-width:720px;background:var(--surface-2);border:1px solid var(--line);margin:auto;}
+.welcome-card-inner{padding:36px;}
+.welcome-lead{font-size:14.5px;color:var(--ink-dim);line-height:1.6;margin-bottom:24px;}
+.welcome-grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px;}
+@media(max-width:640px){.welcome-grid{grid-template-columns:1fr;}}
+.welcome-block h4,.welcome-do h4,.welcome-dont h4{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--teal);margin:0 0 10px;}
+.welcome-block ul,.welcome-do ul,.welcome-dont ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.6;color:var(--ink);}
+.welcome-block li,.welcome-do li,.welcome-dont li{margin-bottom:8px;}
+.welcome-dos-donts{display:grid;grid-template-columns:1fr 1fr;gap:24px;border-top:1px solid var(--line);padding-top:20px;}
+@media(max-width:640px){.welcome-dos-donts{grid-template-columns:1fr;}}
+.welcome-do h4{color:#2E7D32;}
+.welcome-dont h4{color:#B04A3F;}
 </style>
 </head>
 <body>
@@ -572,6 +590,60 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   <div class="banned-gate">
     <h2>Account suspended</h2>
     <p>Your account was suspended for a community guideline violation<span id="banReasonText"></span>. If you think this is a mistake, reply to BYINFORGH's contact email to appeal.</p>
+  </div>
+</div>
+
+<div id="welcomeOverlay" class="welcome-overlay" style="display:none;">
+  <div class="welcome-card">
+    <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+    <div class="welcome-card-inner">
+      <p class="eyebrow" style="margin-bottom:6px;">Akwaaba</p>
+      <h2 id="welcomeHeadline" style="font-size:26px;text-transform:none;letter-spacing:0;margin-bottom:14px;">Welcome to the family</h2>
+      <p class="welcome-lead">We're genuinely excited you're here. This is a community of Ghanaian business owners, and people just starting out, learning to price better, sell more, and grow with people who get it. Here's how to get the most out of it.</p>
+
+      <div class="welcome-grid">
+        <div class="welcome-block">
+          <h4>Start here</h4>
+          <ul>
+            <li>Open the <b>Curriculum</b> tab and go through Lesson 1, it sets up everything after it.</li>
+            <li>Say hello in the <b>Community</b> feed, one line is plenty.</li>
+            <li>Check the <b>Business Hour</b> bubble (top right) for the next live session, and join it.</li>
+            <li>Add yourself to the <b>Directory</b> properly, that's how other members and real customers find you.</li>
+          </ul>
+        </div>
+        <div class="welcome-block">
+          <h4>What you get here</h4>
+          <ul>
+            <li>Weekly live Business Hour sessions you can ask questions in.</li>
+            <li>A structured curriculum you can go at your own pace.</li>
+            <li>A Q&amp;A space where members answer members.</li>
+            <li>A directory and connections tab to find customers, suppliers, and collaborators.</li>
+            <li>A wins feed, post them, however small, people here will celebrate them with you.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="welcome-dos-donts">
+        <div class="welcome-do">
+          <h4>Do</h4>
+          <ul>
+            <li>Show up as yourself, real questions and real wins beat a polished front.</li>
+            <li>Give as much as you take, answer a question if you know the answer.</li>
+            <li>Keep your profile and directory listing up to date, it's how people reach you.</li>
+          </ul>
+        </div>
+        <div class="welcome-dont">
+          <h4>Don't</h4>
+          <ul>
+            <li>Don't post unrelated ads or spam in Community or Q&amp;A.</li>
+            <li>Don't share another member's contact info without asking them first.</li>
+            <li>Don't be discouraged if growth is slow, that's normal, keep showing up.</li>
+          </ul>
+        </div>
+      </div>
+
+      <button type="button" class="btn-primary" id="welcomeContinueBtn" style="margin-top:22px;">Let's go &rarr;</button>
+    </div>
   </div>
 </div>
 
@@ -1147,6 +1219,37 @@ document.getElementById('contributeForm').addEventListener('submit', async funct
 // groups, connections, and verification each boot themselves on their
 // own page now, this function no longer calls any of them.
 // =====================================================================
+// A profile counts as complete once it has the basics, plus either
+// what they sell (business path) or their idea + series goal (no
+// business yet). Existing members who filled "sells" before this
+// change was made are never sent back through the profile form again.
+function isProfileComplete(p){
+  if (!p || !p.name || !p.phone || !p.location) return false;
+  if (p.sells) return true;
+  return !!(p.business_idea && p.series_goal);
+}
+
+// One-time in-app welcome screen. Shows the first time a profile has
+// no welcomed_at set, then marks it so it never shows again for that
+// member. Covers brand-new signups and any already-active member who
+// joined before this existed.
+function showWelcomeScreen(){
+  const overlay = document.getElementById('welcomeOverlay');
+  if (!overlay) return;
+  const headline = document.getElementById('welcomeHeadline');
+  if (currentProfile && currentProfile.name) {
+    headline.textContent = `Welcome to the family, ${esc(currentProfile.name.split(' ')[0])}`;
+  }
+  overlay.style.display = 'flex';
+  const btn = document.getElementById('welcomeContinueBtn');
+  btn.onclick = async () => {
+    overlay.style.display = 'none';
+    const { error } = await sb.from('profiles').update({ welcomed_at: new Date().toISOString() }).eq('id', currentUser.id);
+    if (error) console.warn('Could not save welcomed_at, will show again next time:', error);
+    else if (currentProfile) currentProfile.welcomed_at = new Date().toISOString();
+  };
+}
+
 async function initApp(){
   if (typeof sb === 'undefined' || !sb) {
     document.getElementById('loadingGate').innerHTML = '<p class="eyebrow">Supabase is not connected yet, see config.js.</p>';
@@ -1158,12 +1261,16 @@ async function initApp(){
     return;
   }
   const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-  if (!profile || !profile.sells) {
+  if (!isProfileComplete(profile)) {
     location.href = 'auth.html';
     return;
   }
   currentUser = session.user;
   currentProfile = profile;
+
+  if (!profile.welcomed_at) {
+    showWelcomeScreen();
+  }
 
   if (profile.banned) {
     document.getElementById('loadingGate').style.display = 'none';
@@ -1507,7 +1614,7 @@ function renderWins(){
     }).join('');
     const commentsHtml = open ? `
       <div class="win-comments">
-        ${wComments.map(cm => `<div class="win-comment"><b>${esc(profMap[cm.user_id]?.name || 'A member')}</b> ${esc(cm.body)}</div>`).join('') || '<div class="win-comment">No comments yet.</div>'}
+        ${wComments.map(cm => `<div class="win-comment"><b>${esc(profMap[cm.user_id]?.name || 'A member')}</b> ${esc(cm.body)}${(cm.user_id === currentUser.id || currentProfile.is_admin) ? ` <button type="button" class="win-comment-delete" data-comment="${esc(cm.id)}" title="Delete comment">✕</button>` : ''}</div>`).join('') || '<div class="win-comment">No comments yet.</div>'}
         <form class="win-comment-form" data-win="${esc(wid)}">
           <input type="text" maxlength="600" placeholder="Write a comment..." value="${esc(winDrafts[wid] || '')}" required>
           <button type="submit">Send</button>
@@ -1550,6 +1657,14 @@ async function loadWins(){
 document.getElementById('winsFeed').addEventListener('click', async (e) => {
   const reactBtn = e.target.closest('.win-react');
   const toggleBtn = e.target.closest('.win-comment-toggle');
+  const deleteBtn = e.target.closest('.win-comment-delete');
+  if (deleteBtn) {
+    if (!confirm('Delete this comment?')) return;
+    const { error } = await sb.from('win_comments').delete().eq('id', deleteBtn.dataset.comment);
+    if (error) { alert('Could not delete that comment: ' + error.message); return; }
+    loadWins();
+    return;
+  }
   if (toggleBtn) {
     const wid = toggleBtn.dataset.win;
     if (winOpenComments.has(wid)) winOpenComments.delete(wid); else winOpenComments.add(wid);
