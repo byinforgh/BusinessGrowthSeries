@@ -105,6 +105,11 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-text .biz-hour-when{font-family:'Inter',sans-serif;font-size:10.5px;opacity:.75;white-space:nowrap;}
 .biz-hour-text .biz-hour-count{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;}
 @media(max-width:700px){.biz-hour-inner{padding:8px 12px;}}
+.biz-hour-bubble{position:fixed;}
+.biz-hour-close{position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:var(--surface,#fff);color:var(--ink-dim,#666);border:1px solid var(--line,rgba(0,0,0,.15));font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:"Inter",sans-serif;padding:0;z-index:2;}
+.biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
+.biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
+.biz-hour-mini-tab.show{display:flex;align-items:center;}
 </style>
 </head>
 <body>
@@ -140,11 +145,13 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   </div>
 </nav>
 <div id="bizHourBubble" class="biz-hour-bubble">
+  <button type="button" id="bizHourMinBtn" class="biz-hour-close" title="Minimize" aria-label="Minimize">&minus;</button>
   <a id="bizHourLink" href="#" target="_blank" rel="noopener" class="biz-hour-inner">
     <span class="biz-hour-dot"></span>
     <span class="biz-hour-text"><b>BYINFORGH Business Hour</b><span class="biz-hour-when" id="bizHourWhen"></span><span class="biz-hour-count" id="bizHourCountdown">&hellip;</span></span>
   </a>
 </div>
+<div id="bizHourMiniTab" class="biz-hour-mini-tab" title="Show Business Hour countdown">&#9200;</div>
 <script>
 (function(){
   var page = location.pathname.split('/').pop() || 'app.html';
@@ -370,7 +377,33 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
     const anchor = document.querySelector('.app-topbar') || document.querySelector('body > nav');
     const rect = anchor ? anchor.getBoundingClientRect() : null;
     const bottom = rect && rect.bottom > 0 ? rect.bottom : 12;
-    bubble.style.top = Math.round(bottom + 8) + 'px';
+    const top = Math.round(bottom + 8) + 'px';
+    bubble.style.top = top;
+    const miniTab = document.getElementById('bizHourMiniTab');
+    if (miniTab) miniTab.style.top = top;
+  }
+  // Minimize/expand: click the bubble's - to dock it as a small tab at
+  // the screen edge, click the tab to bring it back. Persisted across
+  // pages via localStorage, since each page is a separate load.
+  function initBizHourMinimize(bubble){
+    const minBtn = document.getElementById('bizHourMinBtn');
+    const miniTab = document.getElementById('bizHourMiniTab');
+    if (!minBtn || !miniTab) return;
+    function applyState(){
+      const minimized = localStorage.getItem('bizHourMinimized') === 'true';
+      bubble.classList.toggle('is-minimized', minimized);
+      miniTab.classList.toggle('show', minimized && bubble.style.display !== 'none');
+    }
+    minBtn.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      localStorage.setItem('bizHourMinimized', 'true');
+      applyState();
+    });
+    miniTab.addEventListener('click', () => {
+      localStorage.setItem('bizHourMinimized', 'false');
+      applyState();
+    });
+    applyState();
   }
   async function initBizHourBubble(){
     if (typeof sb === 'undefined' || !sb) return;
@@ -411,6 +444,7 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
     }
     render();
     positionBubble(bubble);
+    initBizHourMinimize(bubble);
     setInterval(render, 1000);
     window.addEventListener('resize', () => positionBubble(bubble));
     window.addEventListener('orientationchange', () => setTimeout(() => positionBubble(bubble), 150));
