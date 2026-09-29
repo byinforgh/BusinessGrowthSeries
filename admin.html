@@ -259,6 +259,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 // =====================================================================
 let activeAdminTab = 'members';
 let memberSearch = '';
+let showIncompleteOnly = false;
 let editingEventId = null;
 
 async function loadAdminConsole(){
@@ -408,8 +409,11 @@ function renderAdminPanel(){
   } else if (activeAdminTab === 'members') {
     const total = d.members.length;
     const online = d.members.filter(m => isOnline(m.last_seen)).length;
+    const isComplete = m => !!(m.name && m.phone && m.location && (m.sells || (m.business_idea && m.series_goal)));
+    const incompleteCount = d.members.filter(m => !isComplete(m)).length;
     const q = memberSearch.trim().toLowerCase();
-    const filtered = !q ? d.members : d.members.filter(m =>
+    let scoped = !showIncompleteOnly ? d.members : d.members.filter(m => !isComplete(m));
+    const filtered = !q ? scoped : scoped.filter(m =>
       [m.name, m.business_name, m.category, m.location, m.phone, m.email].filter(Boolean).join(' ').toLowerCase().includes(q));
     body.innerHTML = `
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
@@ -421,6 +425,10 @@ function renderAdminPanel(){
           <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:var(--teal);">${online.toLocaleString()}</div>
           <div style="font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);">Online right now</div>
         </div>
+        <div class="admin-stat-clickable" id="incompleteStatCard" style="flex:1;min-width:160px;border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;cursor:pointer;${showIncompleteOnly ? 'outline:2px solid var(--gold);' : ''}">
+          <div style="font-family:'Inter',sans-serif;font-size:28px;font-weight:800;color:var(--m7);">${incompleteCount.toLocaleString()}</div>
+          <div style="font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);">Incomplete signups — click to filter</div>
+        </div>
       </div>
       <input type="text" id="memberSearchInput" placeholder="Search by name, business, category, location, phone, email..." value="${esc(memberSearch)}" style="width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:11px 14px;font-family:'Poppins',sans-serif;font-size:13px;outline:none;margin-bottom:16px;">
       ${filtered.map(m => `
@@ -431,6 +439,7 @@ function renderAdminPanel(){
             ${esc(m.name || 'Unnamed')}${m.business_name ? ' · ' + esc(m.business_name) : ''}
             ${m.is_admin ? ' <span style="color:var(--gold);">(admin)</span>' : ''}
             ${m.banned ? ' <span style="color:var(--m7);">(suspended)</span>' : ''}
+            ${!isComplete(m) ? ' <span style="color:var(--m7);">(incomplete)</span>' : ''}
           </div>
           <div class="admin-queue-meta">${esc(m.category || 'No category')} · ${esc(m.location || 'No location')} · last seen ${m.last_seen ? new Date(m.last_seen).toLocaleString('en-GB') : 'never'}</div>
         </div>
@@ -438,6 +447,11 @@ function renderAdminPanel(){
           <button class="btn-ghost">View profile →</button>
         </div>
       </div>`).join('') || '<p class="empty-note">No members match that search.</p>'}`;
+    const incompleteStatCard = document.getElementById('incompleteStatCard');
+    if (incompleteStatCard) incompleteStatCard.addEventListener('click', () => {
+      showIncompleteOnly = !showIncompleteOnly;
+      renderAdminTab();
+    });
   } else if (activeAdminTab === 'events') {
     const editing = editingEventId ? d.events.find(ev => ev.id === editingEventId) : null;
     function toLocalInputValue(iso){
@@ -600,12 +614,22 @@ document.getElementById('adminPanelBody').addEventListener('submit', async (e) =
 function openMemberModal(userId){
   const m = (window._adminData.members || []).find(x => x.id === userId);
   if (!m) return;
+  // Same completeness rule used on the member-facing pages: complete
+  // once it has the basics plus either what they sell, or (for
+  // members who joined without a business yet) their idea + goal.
+  const complete = !!(m.name && m.phone && m.location && (m.sells || (m.business_idea && m.series_goal)));
   const rows = [
+    ['Profile status', complete ? 'Complete' : 'Incomplete — never finished signup'],
     ['Name', m.name], ['Business', m.business_name], ['Category', m.category],
     ['Phone / WhatsApp', m.phone], ['Email (private)', m.email],
     ['Location', m.location], ['Landmark', m.landmark],
-    ['Sells', m.sells], ['Looking for', m.looking_for],
+    ['Has a running business', m.has_business === false ? 'No — idea stage' : 'Yes'],
+    ['Sells', m.sells],
+    ['Business idea', m.business_idea],
+    ['Goal for the Series', m.series_goal],
+    ['Looking for', m.looking_for],
     ['Biggest struggle (private)', m.struggle],
+    ['Welcomed', m.welcomed_at ? new Date(m.welcomed_at).toLocaleString('en-GB') : 'Not shown yet'],
     ['Verified', m.verified ? 'Yes' : 'No'],
     ['Admin', m.is_admin ? 'Yes' : 'No'],
     ['Suspended', m.banned ? `Yes — ${m.ban_reason || 'no reason recorded'}` : 'No'],
