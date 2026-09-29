@@ -68,6 +68,11 @@ section{padding:56px 0;scroll-margin-top:96px;}
 .qa-card.open .qa-a{max-height:2000px;}
 .qa-a p{margin:14px 0 0;padding:14px 16px;background:var(--surface-2);border-left:2px solid var(--teal);font-size:13.5px;color:var(--ink-dim);line-height:1.6;}
 .qa-share{font-family:'Inter',sans-serif;font-size:10px;color:var(--ink-dim);cursor:pointer;text-decoration:underline;margin-left:10px;}
+.qa-edit-btn{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--gold);background:none;border:none;cursor:pointer;text-decoration:underline;margin-left:8px;font-weight:700;}
+.qa-edit-form{display:flex;gap:8px;align-items:center;margin-top:6px;}
+.qa-edit-form input{flex:1;background:var(--surface);border:1px solid var(--line);padding:9px 11px;font-family:'Poppins',sans-serif;font-size:13px;color:var(--ink);outline:none;}
+.qa-edit-form button{background:var(--teal);color:var(--bg);border:none;padding:0 14px;font-weight:800;text-transform:uppercase;font-size:10.5px;cursor:pointer;height:36px;}
+.qa-edit-form .qa-edit-cancel{background:var(--surface-2);color:var(--ink-dim);}
 
 
 .qa-a .qa-by{display:block;font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--teal);margin-bottom:6px;}
@@ -105,6 +110,15 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-text .biz-hour-when{font-family:'Inter',sans-serif;font-size:10.5px;opacity:.75;white-space:nowrap;}
 .biz-hour-text .biz-hour-count{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;}
 @media(max-width:700px){.biz-hour-inner{padding:8px 12px;}}
+/* Force 16px on every text input/textarea/select on mobile. Below 16px,
+   iOS Safari auto-zooms the page when the field is focused and often
+   fails to zoom back out cleanly, that's the "pinch to reset" bug. */
+@media(max-width:700px){
+  input[type="text"],input[type="email"],input[type="tel"],input[type="search"],
+  input[type="password"],input[type="number"],input[type="url"],textarea,select{
+    font-size:16px !important;
+  }
+}
 .biz-hour-bubble{position:fixed;}
 .biz-hour-close{position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:var(--surface,#fff);color:var(--ink-dim,#666);border:1px solid var(--line,rgba(0,0,0,.15));font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:"Inter",sans-serif;padding:0;z-index:2;}
 .biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
@@ -155,8 +169,15 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 <script>
 (function(){
   var page = location.pathname.split('/').pop() || 'app.html';
+  var jumpNav = document.getElementById('jumpNav');
   document.querySelectorAll('#jumpNav a[data-page]').forEach(function(a){
-    if (a.getAttribute('data-page') === page) a.classList.add('active');
+    if (a.getAttribute('data-page') === page) {
+      a.classList.add('active');
+      // The nav row scrolls horizontally and the active tab can land
+      // off-screen (e.g. Q&A, near the end), scroll it into view so
+      // it's obvious which page you're on without hunting for it.
+      setTimeout(function(){ a.scrollIntoView({ block: 'nearest', inline: 'center' }); }, 0);
+    }
   });
 })();
 </script>
@@ -293,7 +314,12 @@ async function loadQA(){
     const askerName = profMap[item.user_id]?.name || 'A member';
     el.innerHTML = `
       <div class="qa-q-row"><span class="qa-tag">${esc(askerName)}</span><span class="qa-replies">${answers.length} repl${answers.length===1?'y':'ies'}</span></div>
-      <div class="qa-q">${esc(item.question)}</div>
+      <div class="qa-q" data-view>${esc(item.question)}${(currentUser && item.user_id === currentUser.id) ? ` <button type="button" class="qa-edit-btn" data-id="${esc(item.id)}" title="Edit your question">Edit</button>` : ''}</div>
+      <form class="qa-edit-form" data-id="${esc(item.id)}" style="display:none;">
+        <input type="text" value="${esc(item.question)}" required maxlength="1000">
+        <button type="submit">Save</button>
+        <button type="button" class="qa-edit-cancel">Cancel</button>
+      </form>
       <div class="qa-a-toggle">Show answers &amp; reply → <span class="qa-share" data-id="${esc(item.id)}">Copy link</span></div>
       <div class="qa-a">
         ${answersHtml}
@@ -308,6 +334,33 @@ async function loadQA(){
       if (e.target.classList.contains('qa-share')) return;
       el.classList.toggle('open');
     });
+    const editBtn = el.querySelector('.qa-edit-btn');
+    const editForm = el.querySelector('.qa-edit-form');
+    const viewRow = el.querySelector('[data-view]');
+    if (editBtn) editBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      viewRow.style.display = 'none';
+      editForm.style.display = 'flex';
+      editForm.querySelector('input').focus();
+    });
+    if (editForm) {
+      editForm.querySelector('.qa-edit-cancel').addEventListener('click', (e) => {
+        e.stopPropagation();
+        editForm.style.display = 'none';
+        viewRow.style.display = '';
+      });
+      editForm.addEventListener('click', (e) => e.stopPropagation());
+      editForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const newQuestion = editForm.querySelector('input').value.trim();
+        if (!newQuestion) return;
+        const { error: editErr } = await sb.from('qa_questions').update({ question: newQuestion }).eq('id', editForm.dataset.id).eq('user_id', currentUser.id);
+        if (editErr) { alert('Could not save your edit: ' + editErr.message); return; }
+        openIds.add(el.id);
+        await loadQA();
+      });
+    }
     el.querySelector('.qa-answer-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const form = e.currentTarget;
