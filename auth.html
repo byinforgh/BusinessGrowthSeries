@@ -57,6 +57,9 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
 .field input::placeholder, .field textarea::placeholder{color:var(--ink-dim);}
 .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--teal);}
 .field-hint{font-size:11.5px;color:var(--ink-dim);}
+.biz-toggle{display:flex;gap:10px;flex-wrap:wrap;}
+.biz-toggle-opt{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:13.5px;border-radius:2px;cursor:pointer;text-align:left;transition:border-color .15s,color .15s;}
+.biz-toggle-opt.active{border-color:var(--teal);color:var(--ink);background:rgba(15,76,92,0.06);font-weight:600;}
 .form-status{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--teal);min-height:18px;margin-top:10px;}
 
 .btn-primary{
@@ -166,8 +169,10 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
             <div class="mail-icon">✉</div>
             <h2>Check your email</h2>
             <p class="sub">We sent a login link to <b id="emailDisplay" style="color:var(--ink);"></b>. Open it on this device to continue, this tab will pick it up automatically.</p>
+            <p class="sub" style="margin-top:-14px;">Don't see it after a minute or two? Check your <b style="color:var(--ink);">spam or junk folder</b>, it sometimes lands there the first time.</p>
           </div>
           <div class="form-status center" id="waitingStatus"></div>
+          <div class="form-status center" id="existingAccountNote"></div>
           <div class="auth-links">
             <button type="button" id="resendBtn">Resend link</button>
             &nbsp;&middot;&nbsp;
@@ -180,20 +185,27 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
           <h2>Set up your business profile</h2>
           <p class="sub">This is how other members and the AI assistant get to know your business. Takes two minutes.</p>
           <form id="profileForm">
+            <div class="field">
+              <label>Where are you right now</label>
+              <div class="biz-toggle" id="bizToggle" role="group">
+                <button type="button" class="biz-toggle-opt active" id="optHasBusiness" data-val="yes">I already have a running business</button>
+                <button type="button" class="biz-toggle-opt" id="optNoBusiness" data-val="no">I don't have one yet, just an idea</button>
+              </div>
+            </div>
             <div class="grid2">
               <div class="field">
                 <label>Your name</label>
                 <input type="text" id="pName" placeholder="Full name" required>
               </div>
-              <div class="field">
+              <div class="field" id="fieldBusinessName">
                 <label>Business name</label>
                 <input type="text" id="pBusinessName" placeholder="Business name">
               </div>
             </div>
             <div class="grid2">
-              <div class="field">
+              <div class="field" id="fieldCategory">
                 <label>Category</label>
-                <select id="pCategory" required>
+                <select id="pCategory">
                   <option value="">Select one</option>
                   <option>Fashion</option><option>Food</option><option>Retail</option>
                   <option>Services</option><option>Logistics</option><option>Other</option>
@@ -215,13 +227,22 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
                 <input type="text" id="pLandmark" placeholder="e.g. Near Adum Market">
               </div>
             </div>
-            <div class="field">
+            <div class="field" id="fieldSells">
               <label>What do you sell or offer</label>
-              <textarea id="pSells" rows="2" placeholder="e.g. Ready to wear dresses and custom tailoring" required></textarea>
+              <textarea id="pSells" rows="2" placeholder="e.g. Ready to wear dresses and custom tailoring"></textarea>
+            </div>
+            <div class="field" id="fieldIdea" style="display:none;">
+              <label>What's your business idea</label>
+              <textarea id="pBusinessIdea" rows="2" placeholder="e.g. I want to start selling handmade jewelry online"></textarea>
+              <span class="field-hint">No business yet is completely fine, this just helps us point you to the right lessons and people.</span>
             </div>
             <div class="field">
               <label>What are you looking for right now</label>
               <textarea id="pLookingFor" rows="2" placeholder="e.g. More customers, a supplier, a business partner to collaborate with"></textarea>
+            </div>
+            <div class="field" id="fieldSeriesGoal">
+              <label id="lblSeriesGoal">What do you want to get out of the Business Growth Series</label>
+              <textarea id="pSeriesGoal" rows="2" placeholder="e.g. Learn how to price my products and find my first 10 customers"></textarea>
             </div>
             <div class="field">
               <label>Business logo or photo (optional)</label>
@@ -334,6 +355,18 @@ emailForm.addEventListener('submit', async function(e){
   if (!sb) { emailStatus.textContent = 'Supabase is not connected yet.'; return; }
   document.getElementById('sendLinkBtn').disabled = true;
   emailStatus.textContent = 'Sending...';
+
+  // Same email, whatever the capitalization, is always the same
+  // member, this only checks (no data returned) so the messaging on
+  // the next screen is accurate: "welcome back" vs "you're in".
+  let alreadyMember = false;
+  try {
+    const { data: exists } = await sb.rpc('email_has_account', { check_email: email });
+    alreadyMember = !!exists;
+  } catch (rpcErr) {
+    console.warn('email_has_account check failed, continuing anyway:', rpcErr);
+  }
+
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: currentRedirectUrl() }
@@ -343,6 +376,9 @@ emailForm.addEventListener('submit', async function(e){
   pendingEmail = email;
   document.getElementById('emailDisplay').textContent = email;
   emailStatus.textContent = '';
+  document.getElementById('existingAccountNote').textContent = alreadyMember
+    ? "Looks like you already have an account with this email, no new one is being made, this link will just log you straight back in."
+    : '';
   showStep('stepWaiting');
   startResendCooldown();
 });
@@ -382,6 +418,34 @@ document.getElementById('changeEmailBtn').addEventListener('click', () => {
   emailStatus.textContent = '';
   clearInterval(resendCooldownTimer);
 });
+
+// ---- Has-business toggle: swaps which fields are required so a
+// member with no business yet isn't blocked by fields that assume
+// they already sell something ----
+let hasBusiness = true;
+const optHasBusiness = document.getElementById('optHasBusiness');
+const optNoBusiness = document.getElementById('optNoBusiness');
+const fieldSells = document.getElementById('fieldSells');
+const fieldIdea = document.getElementById('fieldIdea');
+const fieldCategory = document.getElementById('fieldCategory');
+const fieldBusinessName = document.getElementById('fieldBusinessName');
+const lblSeriesGoal = document.getElementById('lblSeriesGoal');
+function applyBizToggle(){
+  optHasBusiness.classList.toggle('active', hasBusiness);
+  optNoBusiness.classList.toggle('active', !hasBusiness);
+  fieldSells.style.display = hasBusiness ? '' : 'none';
+  fieldIdea.style.display = hasBusiness ? 'none' : '';
+  document.getElementById('pSells').required = hasBusiness;
+  document.getElementById('pBusinessIdea').required = !hasBusiness;
+  document.getElementById('pCategory').required = hasBusiness;
+  document.getElementById('pSeriesGoal').required = !hasBusiness;
+  lblSeriesGoal.textContent = hasBusiness
+    ? "What do you want to get out of the Business Growth Series (optional, but tell us if you can)"
+    : "What do you want to get out of the Business Growth Series";
+}
+optHasBusiness.addEventListener('click', () => { hasBusiness = true; applyBizToggle(); });
+optNoBusiness.addEventListener('click', () => { hasBusiness = false; applyBizToggle(); });
+applyBizToggle();
 
 // ---- Logo preview ----
 document.getElementById('pLogo').addEventListener('change', function(e){
@@ -424,11 +488,14 @@ profileForm.addEventListener('submit', async function(e){
   const { error } = await sb.from('profiles').update({
     name: document.getElementById('pName').value.trim(),
     business_name: document.getElementById('pBusinessName').value.trim() || null,
-    category: document.getElementById('pCategory').value,
+    category: hasBusiness ? document.getElementById('pCategory').value : (document.getElementById('pCategory').value || null),
     phone: document.getElementById('pPhone').value.trim(),
     location: document.getElementById('pLocation').value.trim(),
     landmark: document.getElementById('pLandmark').value.trim() || null,
-    sells: document.getElementById('pSells').value.trim(),
+    has_business: hasBusiness,
+    sells: hasBusiness ? document.getElementById('pSells').value.trim() : null,
+    business_idea: hasBusiness ? null : document.getElementById('pBusinessIdea').value.trim(),
+    series_goal: document.getElementById('pSeriesGoal').value.trim() || null,
     looking_for: document.getElementById('pLookingFor').value.trim() || null,
     struggle: document.getElementById('pStruggle').value.trim(),
     logo_url: logoUrl,
@@ -474,11 +541,24 @@ async function routeForSession(session){
   }
   const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
   sessionRouted = true;
-  if (profile && profile.sells) {
+  if (isProfileComplete(profile)) {
     goToApp();
   } else {
+    // Returning to finish an in-progress profile: restore whichever
+    // path they were on so the form doesn't silently reset to "yes".
+    if (profile && profile.has_business === false) { hasBusiness = false; applyBizToggle(); }
     showStep('stepProfile');
   }
+}
+
+// A profile counts as complete once it has the basics, plus either
+// what they sell (business path) or their idea + series goal (no
+// business yet). Existing members who filled "sells" before this
+// change was made are never sent back through the form again.
+function isProfileComplete(p){
+  if (!p || !p.name || !p.phone || !p.location) return false;
+  if (p.sells) return true;
+  return !!(p.business_idea && p.series_goal);
 }
 
 // A magic link lands back here with tokens in the URL (hash or PKCE
