@@ -338,7 +338,16 @@ async function initPage(){
   const { data: { session } } = await sb.auth.getSession();
   if (!session) { location.href = 'auth.html'; return; }
   const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
-  if (!profile || !profile.sells) { location.href = 'auth.html'; return; }
+  // A profile counts as complete once it has the basics, plus either
+// what they sell (business path) or their idea + series goal (no
+// business yet). Existing members who filled "sells" before this
+// change was made are never sent back through the profile form again.
+function isProfileComplete(p){
+  if (!p || !p.name || !p.phone || !p.location) return false;
+  if (p.sells) return true;
+  return !!(p.business_idea && p.series_goal);
+}
+  if (!isProfileComplete(profile)) { location.href = 'auth.html'; return; }
   currentUser = session.user;
   currentProfile = profile;
 
