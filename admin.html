@@ -93,6 +93,11 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-text .biz-hour-when{font-family:'Inter',sans-serif;font-size:10.5px;opacity:.75;white-space:nowrap;}
 .biz-hour-text .biz-hour-count{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;}
 @media(max-width:700px){.biz-hour-inner{padding:8px 12px;}}
+.biz-hour-bubble{position:fixed;}
+.biz-hour-close{position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:var(--surface,#fff);color:var(--ink-dim,#666);border:1px solid var(--line,rgba(0,0,0,.15));font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:"Inter",sans-serif;padding:0;z-index:2;}
+.biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
+.biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
+.biz-hour-mini-tab.show{display:flex;align-items:center;}
 </style>
 </head>
 <body>
@@ -120,11 +125,13 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   </div>
 </nav>
 <div id="bizHourBubble" class="biz-hour-bubble">
+  <button type="button" id="bizHourMinBtn" class="biz-hour-close" title="Minimize" aria-label="Minimize">&minus;</button>
   <a id="bizHourLink" href="#" target="_blank" rel="noopener" class="biz-hour-inner">
     <span class="biz-hour-dot"></span>
     <span class="biz-hour-text"><b>BYINFORGH Business Hour</b><span class="biz-hour-when" id="bizHourWhen"></span><span class="biz-hour-count" id="bizHourCountdown">&hellip;</span></span>
   </a>
 </div>
+<div id="bizHourMiniTab" class="biz-hour-mini-tab" title="Show Business Hour countdown">&#9200;</div>
 
 <section id="admin">
   <div class="wrap">
@@ -643,6 +650,12 @@ function openMemberModal(userId){
         <span style="color:var(--ink-dim);font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.03em;">${label}</span>
         <span style="text-align:right;">${esc(val || '—')}</span>
       </div>`).join('')}
+    ${!complete ? `
+    <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
+      ${m.email ? `<button class="btn-ghost" id="memberResendBtn">Resend login link</button>` : ''}
+      ${m.phone ? `<a class="btn-ghost" id="memberWhatsappNudge" href="https://wa.me/${esc((m.phone||'').replace(/[^0-9]/g,''))}?text=${encodeURIComponent(`Hi ${m.name || 'there'}, this is BYINFORGH. We noticed you started signing up for the Business Growth Series but haven't finished your profile yet, it only takes two minutes and unlocks everything. Here's the link: https://businessgrowthseries.byinforgh.com/auth.html`)}" target="_blank" rel="noopener">Nudge on WhatsApp</a>` : ''}
+    </div>
+    <div id="memberResendStatus" style="font-size:12px;color:var(--teal);margin-top:8px;"></div>` : ''}
     <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
       ${m.banned
         ? `<button class="btn-primary" id="memberUnbanBtn">Lift suspension</button>`
@@ -662,6 +675,15 @@ function openMemberModal(userId){
     await sb.from('profiles').update({ banned: false, ban_reason: null }).eq('id', m.id);
     document.getElementById('memberModal').style.display = 'none';
     loadAdminConsole();
+  });
+  const resendBtn = document.getElementById('memberResendBtn');
+  if (resendBtn) resendBtn.addEventListener('click', async () => {
+    resendBtn.disabled = true;
+    const status = document.getElementById('memberResendStatus');
+    status.textContent = 'Sending...';
+    const { error } = await sb.auth.signInWithOtp({ email: m.email, options: { emailRedirectTo: location.origin + '/auth.html' } });
+    resendBtn.disabled = false;
+    status.textContent = error ? ('Could not send: ' + error.message) : `Login link sent to ${m.email}.`;
   });
 }
 document.getElementById('memberModalClose').addEventListener('click', () => {
@@ -695,7 +717,33 @@ document.getElementById('memberModal').addEventListener('click', (e) => {
     const anchor = document.querySelector('.app-topbar') || document.querySelector('body > nav');
     const rect = anchor ? anchor.getBoundingClientRect() : null;
     const bottom = rect && rect.bottom > 0 ? rect.bottom : 12;
-    bubble.style.top = Math.round(bottom + 8) + 'px';
+    const top = Math.round(bottom + 8) + 'px';
+    bubble.style.top = top;
+    const miniTab = document.getElementById('bizHourMiniTab');
+    if (miniTab) miniTab.style.top = top;
+  }
+  // Minimize/expand: click the bubble's - to dock it as a small tab at
+  // the screen edge, click the tab to bring it back. Persisted across
+  // pages via localStorage, since each page is a separate load.
+  function initBizHourMinimize(bubble){
+    const minBtn = document.getElementById('bizHourMinBtn');
+    const miniTab = document.getElementById('bizHourMiniTab');
+    if (!minBtn || !miniTab) return;
+    function applyState(){
+      const minimized = localStorage.getItem('bizHourMinimized') === 'true';
+      bubble.classList.toggle('is-minimized', minimized);
+      miniTab.classList.toggle('show', minimized && bubble.style.display !== 'none');
+    }
+    minBtn.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      localStorage.setItem('bizHourMinimized', 'true');
+      applyState();
+    });
+    miniTab.addEventListener('click', () => {
+      localStorage.setItem('bizHourMinimized', 'false');
+      applyState();
+    });
+    applyState();
   }
   async function initBizHourBubble(){
     if (typeof sb === 'undefined' || !sb) return;
@@ -736,6 +784,7 @@ document.getElementById('memberModal').addEventListener('click', (e) => {
     }
     render();
     positionBubble(bubble);
+    initBizHourMinimize(bubble);
     setInterval(render, 1000);
     window.addEventListener('resize', () => positionBubble(bubble));
     window.addEventListener('orientationchange', () => setTimeout(() => positionBubble(bubble), 150));
