@@ -102,6 +102,8 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
 .biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
 .biz-hour-mini-tab.show{display:flex;align-items:center;}
+
+.comm-del{background:none;border:none;color:var(--m7,#A6453B);font-size:11px;text-decoration:underline;cursor:pointer;margin-top:8px;padding:0;font-family:'Inter',sans-serif;}
 </style>
 </head>
 <body>
@@ -278,9 +280,18 @@ async function loadCommunity(){
     <div class="comm-post">
       <div class="comm-post-user">${esc(prof?.name || 'A member')}${prof?.business_name ? ' · ' + esc(prof.business_name) : ''}</div>
       <p>${esc(p.content)}</p>
+      ${(p.user_id === currentUser?.id || currentProfile?.is_admin) ? `<button type="button" class="comm-del" data-id="${esc(p.id)}">Delete</button>` : ''}
     </div>`;
   }).join('');
 }
+document.getElementById('communityFeed').addEventListener('click', async (e) => {
+  const b = e.target.closest('.comm-del');
+  if (!b || !sb) return;
+  if (!confirm('Delete this post? This cannot be undone.')) return;
+  const { error } = await sb.from('community_posts').delete().eq('id', b.dataset.id);
+  if (error) { alert('Could not delete: ' + error.message); return; }
+  loadCommunity();
+});
 document.getElementById('postForm').addEventListener('submit', async function(e){
   e.preventDefault();
   const content = document.getElementById('postContent').value.trim();
