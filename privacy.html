@@ -54,7 +54,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
   <a href="index.html" class="back-link">&larr; Back to byinforgh.com</a>
   <a href="index.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">B</span></div>BYINFORGH</a>
   <h1 style="font-size:34px;">Privacy Policy &amp; Terms of Use</h1>
-  <div class="updated">Business Growth Series &middot; Last updated 29 September 2026</div>
+  <div class="updated">Business Growth Series &middot; Last updated 30 September 2026</div>
 
   <div class="notice">
     <p><b>Plain language, written for you:</b> this policy tells you exactly what BYINFORGH collects, why, who can see it, and how it's protected. It is written to be genuinely understandable, not filled with legal jargon, and it follows the principles of Ghana's Data Protection Act, 2012 (Act 843).</p>
@@ -77,6 +77,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 
   <h2>What we collect</h2>
   <p>When you join, we collect your name, WhatsApp or phone number, email address, and location and nearest landmark. If you already have a running business, we also collect your business name, category, and what you sell. If you're joining without a business yet, we instead ask what your business idea is. Either way, we ask what you're looking for right now, what you want to get out of the Business Growth Series, and your biggest current struggle. If you choose to add one, we also store a business logo or photo you upload. We automatically record when you were last active, so the community can show who's online, and when you first saw our in-app welcome message.</p>
+  <p>If you use the Business Hour features, we also collect the questions you send in for the Business Hour, the business ideas you write down if you don't have a business yet, and your choice about receiving reminder emails. Messages BYINFORGH sends you (your Business Hour link, reminders and next-step prompts) are stored in your account so they show in your Messages inbox.</p>
 
   <h2>Why we collect it</h2>
   <ul>
@@ -85,15 +86,17 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
     <li>To show you in the business directory so other members can find, trade, or partner with you</li>
     <li>To calculate your accountability streak and the community leaderboard</li>
     <li>To send you your login link by email</li>
+    <li>To send you the Business Hour link every Sunday, a reminder on Wednesday to send in your questions, and a few helpful prompts if you haven't yet connected with another member, added your business to the directory, or finished your profile, by email and in your Messages inbox</li>
+    <li>To read and answer the questions you send in for the Business Hour</li>
     <li>To improve the AI assistant, only using documents and questions you or other members explicitly submit and BYINFORGH reviews and approves, never your private profile fields</li>
   </ul>
 
   <h2>Who can see what</h2>
-  <p>Your name, business name, category, location, landmark, what you sell, what you're looking for, phone number, and logo are visible to other logged in members, since that visibility is the point of the directory and community. Your email address, your business idea (if you joined without a business yet), what you want to get out of the Series, and what you told us about your biggest struggle are private, visible only to you and to BYINFORGH for support purposes, never shown to other members. This is enforced by Supabase's row-level security at the database level, not just by what the interface happens to display, which is what lets us make that private/public split reliable: only you can see your own private account details, and other members only ever see the fields you're told are shared.</p>
-  <p>Content you post in the community feed, the Q&amp;A hub, or submit as a business spotlight is visible to other logged in members, since those are public spaces by design. Nothing you post there is private.</p>
+  <p>Your name, business name, category, location, landmark, what you sell, what you're looking for, phone number, and logo are visible to other logged in members, since that visibility is the point of the directory and community. Your email address, your business idea (if you joined without a business yet), what you want to get out of the Series, and what you told us about your biggest struggle are private, visible only to you and to BYINFORGH for support purposes, never shown to other members. The questions you send in for the Business Hour are also visible only to you and BYINFORGH; we may answer them live during the session. What you write as "what you're looking for" is visible to other members, so only write what you're happy to share. This is enforced by Supabase's row-level security at the database level, not just by what the interface happens to display, which is what lets us make that private/public split reliable: only you can see your own private account details, and other members only ever see the fields you're told are shared.</p>
+  <p>Content you post in the community feed, the Q&amp;A hub, the Live Lounge (including your replies and likes), or submit as a business spotlight is visible to other logged in members, since those are public spaces by design. Nothing you post there is private.</p>
 
   <h2>Where your data lives</h2>
-  <p>Your account and profile data is stored with Supabase, a database and authentication provider, inside a project controlled by BYINFORGH. Photos and logos are stored the same way, in a dedicated storage bucket. The website pages themselves (what you see when you visit businessgrowthseries.byinforgh.com) are hosted with Hostinger; like any web host, it may keep standard technical access logs (such as IP address and browser type) as part of running the site, separate from your BYINFORGH profile data. Your data may be processed on infrastructure located outside Ghana as part of using these providers; BYINFORGH only works with providers that maintain their own data security standards for this reason.</p>
+  <p>Your account and profile data is stored with Supabase, a database and authentication provider, inside a project controlled by BYINFORGH. Photos and logos are stored the same way, in a dedicated storage bucket. The website pages themselves (what you see when you visit businessgrowthseries.byinforgh.com) are served through GitHub Pages, and the byinforgh.com domain is managed with Hostinger; like any web host, they may keep standard technical access logs (such as IP address and browser type) as part of running the site, separate from your BYINFORGH profile data. Reminder and login emails are delivered through an email provider (Resend), which receives your email address and the message text only for the purpose of delivering it. Your data may be processed on infrastructure located outside Ghana as part of using these providers; BYINFORGH only works with providers that maintain their own data security standards for this reason.</p>
 
   <h2>Security measures</h2>
   <p>Your data is protected at the database level, not just hidden behind a login screen in the interface:</p>
@@ -111,6 +114,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
     <li>A reporting system lets any member flag a message, post, or profile that crosses a line, reviewed by BYINFORGH</li>
     <li>A three-strike system automatically suspends an account after repeated, reviewed violations</li>
     <li>Admin moderation tools allow BYINFORGH to remove any post, question, answer, or chat message that shouldn't be there</li>
+    <li>You can switch off reminder emails at any time from your dashboard. In-app reminders in your Messages inbox will continue, and login emails are unaffected</li>
     <li>We do not collect passwords, financial account numbers, or national ID numbers anywhere on this platform</li>
     <li>We do not sell your data to anyone, and we do not share it with advertisers, under any circumstance</li>
   </ul>
