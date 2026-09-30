@@ -604,6 +604,33 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
 @media(max-width:640px){.welcome-dos-donts{grid-template-columns:1fr;}}
 .welcome-do h4{color:#2E7D32;}
 .welcome-dont h4{color:#B04A3F;}
+
+/* ===== BUSINESS HOUR AUTOMATION: inbox strip, next-step cards, ask form ===== */
+.bh-inbox{display:none;align-items:center;gap:14px;margin-top:18px;padding:14px 16px;background:var(--surface);border:1px solid var(--teal);border-left:5px solid var(--gold);flex-wrap:wrap;}
+.bh-inbox-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:bizHourPulse 1.6s infinite;}
+.bh-inbox-main{flex:1;min-width:200px;}
+.bh-inbox-title{font-family:'Inter',sans-serif;font-weight:800;font-size:14px;color:var(--teal-deep);}
+.bh-inbox-sub{font-size:12px;color:var(--ink-dim);margin-top:2px;}
+.bh-inbox-btn{background:var(--teal);color:var(--bg);text-decoration:none;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;padding:11px 16px;border-radius:2px;white-space:nowrap;}
+.bh-inbox-link{font-family:'Inter',sans-serif;font-size:11px;font-weight:700;text-transform:uppercase;color:var(--teal);text-decoration:underline;white-space:nowrap;}
+.bh-inbox-x{background:none;border:none;font-size:20px;line-height:1;color:var(--ink-dim);cursor:pointer;padding:4px 8px;}
+#next-step{padding:36px 0 8px;}
+.bh-cards{display:grid;gap:16px;}
+.bh-card{border:1px solid var(--line);background:var(--surface);padding:26px 28px;position:relative;border-top:4px solid var(--gold);}
+.bh-card h3{font-size:20px;text-transform:none;letter-spacing:0;margin:8px 0;}
+.bh-card p{font-size:14px;color:var(--ink-dim);line-height:1.6;margin:0 0 16px;max-width:640px;}
+.bh-card-x{position:absolute;top:10px;right:12px;background:none;border:none;font-size:20px;line-height:1;color:var(--ink-dim);cursor:pointer;}
+.bh-link-btn{background:none;border:none;color:var(--teal);text-decoration:underline;font-size:12.5px;font-weight:700;cursor:pointer;padding:0;margin-top:14px;font-family:'Inter',sans-serif;text-align:left;}
+.bh-grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:640px){.bh-grid2{grid-template-columns:1fr;}.bh-card{padding:20px 18px;}}
+.bh-ask{margin-top:32px;border:1px solid var(--line);background:var(--surface);padding:26px 28px;scroll-margin-top:110px;}
+.bh-ask h3{font-size:20px;text-transform:none;letter-spacing:0;margin:8px 0;}
+.bh-ask p{font-size:14px;color:var(--ink-dim);line-height:1.6;margin:0 0 16px;max-width:640px;}
+.bh-q{border-top:1px solid var(--line);padding:10px 0;font-size:13px;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
+.bh-q small{display:block;color:var(--ink-dim);font-size:11px;margin-top:2px;}
+.bh-q button{background:none;border:none;color:var(--m7);font-size:11px;text-decoration:underline;cursor:pointer;white-space:nowrap;}
+.bh-email-pref{display:flex;align-items:center;gap:10px;margin-top:18px;font-size:13px;color:var(--ink-dim);cursor:pointer;flex-wrap:wrap;}
+.bh-email-pref input{width:18px;height:18px;accent-color:var(--teal);}
 </style>
 </head>
 <body>
@@ -718,6 +745,7 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
       <span style="width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;animation:bizHourPulse 1.6s infinite;"></span>
       <span id="dashOnlineCount">0</span>&nbsp;business owners online right now
     </div>
+    <div id="bhInbox" class="bh-inbox"></div>
     <div class="start-here-banner" id="startHereBanner">
       <div class="start-here-kente"><span></span><span></span><span></span><span></span></div>
       <div class="start-here-body">
@@ -755,6 +783,12 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
     </div>
   </div>
 </header>
+
+<section id="next-step" style="display:none;">
+  <div class="wrap">
+    <div class="bh-cards" id="nextStepCards"></div>
+  </div>
+</section>
 
 <section id="your-path">
   <div class="wrap">
@@ -1040,6 +1074,21 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
       <h2>Weekly live sessions.</h2>
     </div>
     <div class="events-list" id="eventsList"></div>
+    <div class="bh-ask" id="ask-hour">
+      <span class="eyebrow">Ask the Business Hour</span>
+      <h3 id="askHourTitle">What should we answer on Sunday?</h3>
+      <p>Send one question or several. They go straight to BYINFORGH and we answer as many as we can live. You do not have to be on the call for us to answer yours, and you can see everything you sent below.</p>
+      <form id="askHourForm">
+        <div class="field">
+          <label>Your question</label>
+          <textarea id="askHourInput" rows="3" maxlength="1000" placeholder="e.g. My supplier keeps raising prices. How do I protect my margin without losing customers?" required></textarea>
+        </div>
+        <button type="submit" class="btn-primary" id="askHourBtn">Send my question</button>
+      </form>
+      <div class="form-status" id="askHourStatus"></div>
+      <div id="askHourMine"></div>
+    </div>
+    <label class="bh-email-pref"><input type="checkbox" id="emailPrefToggle"> Email me the Business Hour link and reminders <span class="form-status" id="emailPrefStatus" style="margin:0;"></span></label>
   </div>
 </section>
 <div class="truth-strip inline"><div class="wrap"><div class="marquee">
@@ -1326,11 +1375,255 @@ async function initApp(){
   loadTestimonials();
   checkForNewBadges();
   initStartHereBanner();
+  loadInboxStrip();
+  initNextStep();
+  initAskHour();
+  initEmailPref();
+  bhHandleDeepLinks();
   if (currentProfile.is_admin) {
     document.getElementById('navAdminLink').style.display = 'inline-block';
   }
 }
 window.addEventListener('load', () => setTimeout(initApp, 50));
+
+// =====================================================================
+// BUSINESS HOUR AUTOMATION
+// 1) Inbox strip: newest unread message from BYINFORGH
+// 2) Ask the Business Hour: the Wednesday questions form
+// 3) Email reminders switch
+// 4) Your next step: connect prompt, and for members with no business
+//    yet, a place to write down ideas and what they are looking for,
+//    plus a way to add their business to the directory once it starts
+// =====================================================================
+function bhSafeUrl(u){
+  if (!u) return '';
+  return (/^https?:\/\//i.test(u) || /^[a-z0-9_\-]+\.html/i.test(u)) ? u : '';
+}
+function bhTodayUtc(){ return new Date().toISOString().slice(0,10); }
+function bhDismissed(id){
+  try {
+    const t = parseInt(localStorage.getItem('bgs_dismiss_' + id) || '0', 10);
+    return t && (Date.now() - t) < 3 * 86400000;
+  } catch(e){ return false; }
+}
+function bhDismiss(id){ try { localStorage.setItem('bgs_dismiss_' + id, String(Date.now())); } catch(e){} }
+
+async function loadInboxStrip(){
+  const box = document.getElementById('bhInbox');
+  if (!box || !sb || !currentUser) return;
+  const { data, error } = await sb.from('member_notifications')
+    .select('id,kind,title,action_label,action_url,created_at')
+    .eq('user_id', currentUser.id).is('read_at', null)
+    .order('created_at', { ascending: false }).limit(5);
+  if (error || !data || !data.length) { box.style.display = 'none'; return; }
+  const top = data[0];
+  const url = bhSafeUrl(top.action_url) || 'messages.html?with=byinforgh';
+  const external = /^https?:\/\//i.test(url) && url.indexOf(location.origin) !== 0;
+  box.innerHTML = `
+    <span class="bh-inbox-dot"></span>
+    <div class="bh-inbox-main">
+      <div class="bh-inbox-title">${esc(top.title)}</div>
+      <div class="bh-inbox-sub">${data.length > 1 ? esc(String(data.length - 1)) + ' more waiting in your Messages' : 'New message from BYINFORGH'}</div>
+    </div>
+    <a class="bh-inbox-btn" href="${esc(url)}"${external ? ' target="_blank" rel="noopener"' : ''}>${esc(top.action_label || 'Open')}</a>
+    <a class="bh-inbox-link" href="messages.html?with=byinforgh">Open Messages</a>
+    <button type="button" class="bh-inbox-x" id="bhInboxClose" aria-label="Dismiss">&times;</button>`;
+  box.style.display = 'flex';
+  document.getElementById('bhInboxClose').addEventListener('click', async () => {
+    box.style.display = 'none';
+    await sb.from('member_notifications').update({ read_at: new Date().toISOString() })
+      .eq('user_id', currentUser.id).is('read_at', null);
+  });
+}
+
+function bhNextSundayLabel(){
+  const d = new Date();
+  const dow = d.getUTCDay();
+  let add = dow === 0 ? (d.getUTCHours() < 21 ? 0 : 7) : 7 - dow;
+  const t = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate() + add));
+  return t.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+}
+
+async function loadMyHourQuestions(){
+  const mine = document.getElementById('askHourMine');
+  if (!mine || !sb || !currentUser) return [];
+  const { data } = await sb.from('hour_questions')
+    .select('id,question,status,session_date,created_at')
+    .eq('user_id', currentUser.id).gte('session_date', bhTodayUtc())
+    .order('created_at', { ascending: false }).limit(10);
+  const rows = data || [];
+  mine.innerHTML = rows.length
+    ? '<div style="margin-top:18px;font-family:Inter,sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);">Your questions for the next session</div>' +
+      rows.map(q => `<div class="bh-q"><div>${esc(q.question)}<small>${q.status === 'answered' ? 'Answered' : q.status === 'skipped' ? 'Not covered this time' : 'Received'}</small></div>${q.status === 'new' ? `<button type="button" data-qid="${esc(q.id)}">Remove</button>` : ''}</div>`).join('')
+    : '';
+  return rows;
+}
+
+function initAskHour(){
+  const form = document.getElementById('askHourForm');
+  if (!form || !sb || !currentUser) return;
+  document.getElementById('askHourTitle').textContent = `What should we answer on ${bhNextSundayLabel()}?`;
+  loadMyHourQuestions();
+  document.getElementById('askHourMine').addEventListener('click', async (e) => {
+    const b = e.target.closest('button[data-qid]');
+    if (!b) return;
+    await sb.from('hour_questions').delete().eq('id', b.dataset.qid).eq('user_id', currentUser.id);
+    loadMyHourQuestions();
+  });
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const input = document.getElementById('askHourInput');
+    const status = document.getElementById('askHourStatus');
+    const btn = document.getElementById('askHourBtn');
+    const question = input.value.trim();
+    if (question.length < 3) { status.textContent = 'Write a little more so we can answer properly.'; return; }
+    const existing = await loadMyHourQuestions();
+    if (existing.length >= 5) { status.textContent = 'You have sent 5 questions for this session. Remove one to send another, or send the rest next week.'; return; }
+    btn.disabled = true;
+    status.textContent = 'Sending...';
+    const { error } = await sb.from('hour_questions').insert({ user_id: currentUser.id, question });
+    btn.disabled = false;
+    if (error) { status.textContent = 'Could not send: ' + error.message; return; }
+    input.value = '';
+    status.textContent = 'Received. We will answer it at the Business Hour.';
+    loadMyHourQuestions();
+  });
+}
+
+function initEmailPref(){
+  const cb = document.getElementById('emailPrefToggle');
+  const status = document.getElementById('emailPrefStatus');
+  if (!cb || !sb || !currentUser) return;
+  cb.checked = currentProfile.email_reminders !== false;
+  cb.addEventListener('change', async () => {
+    status.textContent = 'Saving...';
+    const { error } = await sb.from('profiles').update({ email_reminders: cb.checked }).eq('id', currentUser.id);
+    if (error) { cb.checked = !cb.checked; status.textContent = 'Could not save, try again.'; return; }
+    currentProfile.email_reminders = cb.checked;
+    status.textContent = cb.checked ? 'On. Reminders will come to your email and Messages.' : 'Off. Reminders will only appear in Messages.';
+  });
+}
+
+async function initNextStep(){
+  const sec = document.getElementById('next-step');
+  const holder = document.getElementById('nextStepCards');
+  if (!sec || !holder || !sb || !currentUser) return;
+  const force = new URLSearchParams(location.search).get('idea') === '1';
+  const isIdea = currentProfile.has_business === false;
+  const { count } = await sb.from('connections').select('id', { count: 'exact', head: true })
+    .or(`requester_id.eq.${currentUser.id},addressee_id.eq.${currentUser.id}`)
+    .in('status', ['pending', 'accepted']);
+  const noConnections = (count || 0) === 0;
+
+  const cards = [];
+  if (isIdea && (force || !bhDismissed('idea'))) cards.push('idea');
+  if (noConnections && !bhDismissed('connect')) cards.push('connect');
+  if (!cards.length) { sec.style.display = 'none'; return; }
+
+  holder.innerHTML = cards.map(id => {
+    if (id === 'idea') return `
+      <div class="bh-card" id="bhIdeaCard">
+        <button type="button" class="bh-card-x" data-dismiss="idea" aria-label="Hide for now">&times;</button>
+        <span class="eyebrow">Your next step</span>
+        <h3>Write down your business ideas and what you are looking for</h3>
+        <p>You joined before starting a business, and that is a good place to be. Tell us the ideas you are thinking about and what you need right now. Your business ideas stay private, only you and BYINFORGH can read them. What you are looking for can be seen by other members, so keep that line to what you are happy to share. It helps us point you to the right lessons and the right people.</p>
+        <form id="bhIdeaForm">
+          <div class="field"><label>Business ideas you are thinking about</label>
+            <textarea id="bhIdeaText" rows="4" maxlength="1500" placeholder="e.g. 1) Frozen food delivery in Koforidua. 2) A phone repair and accessories shop. 3) Selling school uniforms."></textarea></div>
+          <div class="field"><label>What are you looking for right now</label>
+            <textarea id="bhLookingText" rows="2" maxlength="600" placeholder="e.g. Startup money, a business partner, a supplier, a mentor, or skills to learn"></textarea></div>
+          <button type="submit" class="btn-primary" id="bhIdeaBtn">Save my ideas</button>
+        </form>
+        <div class="form-status" id="bhIdeaStatus"></div>
+        <button type="button" class="bh-link-btn" id="bhStartedBtn">I have started selling. Add my business to the directory.</button>
+        <form id="bhBizForm" style="display:none;margin-top:18px;border-top:1px solid var(--line);padding-top:18px;">
+          <div class="bh-grid2">
+            <div class="field"><label>Business name</label><input type="text" id="bhBizName" maxlength="120" required></div>
+            <div class="field"><label>Category</label>
+              <select id="bhBizCat" required><option value="">Select one</option>${['Fashion','Food','Retail','Services','Logistics','Other'].map(c => `<option>${c}</option>`).join('')}</select></div>
+          </div>
+          <div class="field"><label>What do you sell or offer</label><textarea id="bhBizSells" rows="2" maxlength="600" required placeholder="e.g. Frozen chicken and fish, delivered same day in Koforidua"></textarea>
+            <span class="field-hint">Your business name, category, what you sell and what you are looking for show on your directory card so other members can find you.</span></div>
+          <button type="submit" class="btn-primary" id="bhBizBtn">Add my business to the directory</button>
+          <div class="form-status" id="bhBizStatus"></div>
+        </form>
+      </div>`;
+    return `
+      <div class="bh-card" id="bhConnectCard">
+        <button type="button" class="bh-card-x" data-dismiss="connect" aria-label="Hide for now">&times;</button>
+        <span class="eyebrow">Your next step</span>
+        <h3>Connect with another business owner</h3>
+        <p>You have not connected with anyone yet. A connection lets you message each other directly, trade, and send each other customers. We picked members who fit what you do, and it takes one tap to send a request.</p>
+        <a class="btn-primary" href="connections.html" style="text-decoration:none;">See suggested members</a>
+        <a class="bh-link-btn" href="directory.html" style="margin-left:16px;text-decoration:underline;">Browse the directory</a>
+      </div>`;
+  }).join('');
+  sec.style.display = 'block';
+
+  holder.addEventListener('click', (e) => {
+    const x = e.target.closest('[data-dismiss]');
+    if (!x) return;
+    bhDismiss(x.dataset.dismiss);
+    x.closest('.bh-card').remove();
+    if (!holder.children.length) sec.style.display = 'none';
+  });
+
+  const ideaForm = document.getElementById('bhIdeaForm');
+  if (ideaForm) {
+    document.getElementById('bhIdeaText').value = currentProfile.business_idea || '';
+    document.getElementById('bhLookingText').value = currentProfile.looking_for || '';
+    ideaForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('bhIdeaStatus');
+      const idea = document.getElementById('bhIdeaText').value.trim();
+      const looking = document.getElementById('bhLookingText').value.trim();
+      if (!idea && !looking) { status.textContent = 'Write at least one line first.'; return; }
+      status.textContent = 'Saving...';
+      const { error } = await sb.from('profiles').update({ business_idea: idea || currentProfile.business_idea || null, looking_for: looking || null }).eq('id', currentUser.id);
+      if (error) { status.textContent = 'Could not save, try again.'; return; }
+      if (idea) currentProfile.business_idea = idea;
+      currentProfile.looking_for = looking || null;
+      status.textContent = 'Saved. When you are ready to start, come back here and add your business to the directory.';
+    });
+    document.getElementById('bhStartedBtn').addEventListener('click', () => {
+      const f = document.getElementById('bhBizForm');
+      f.style.display = f.style.display === 'none' ? 'block' : 'none';
+    });
+    document.getElementById('bhBizForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('bhBizStatus');
+      const btn = document.getElementById('bhBizBtn');
+      const business_name = document.getElementById('bhBizName').value.trim();
+      const category = document.getElementById('bhBizCat').value;
+      const sells = document.getElementById('bhBizSells').value.trim();
+      if (!business_name || !category || !sells) { status.textContent = 'Fill in all three so people can find you.'; return; }
+      btn.disabled = true; status.textContent = 'Adding...';
+      const { error } = await sb.from('profiles').update({ has_business: true, business_name, category, sells }).eq('id', currentUser.id);
+      btn.disabled = false;
+      if (error) { status.textContent = 'Could not add your business, try again.'; return; }
+      Object.assign(currentProfile, { has_business: true, business_name, category, sells });
+      document.getElementById('topbarName').innerHTML = `${esc(currentProfile.name)}<small>${esc(business_name)}</small>`;
+      holder.querySelector('#bhIdeaCard').innerHTML = `<span class="eyebrow">Done</span><h3>${esc(business_name)} is now in the directory</h3><p>Other members can find you, connect and message you. Next, send a connection request to someone who fits what you do.</p><a class="btn-primary" href="directory.html" style="text-decoration:none;">See your directory card</a> <a class="bh-link-btn" href="connections.html" style="margin-left:16px;text-decoration:underline;">Find people to connect with</a>`;
+    });
+  }
+}
+
+function bhHandleDeepLinks(){
+  const q = new URLSearchParams(location.search);
+  if (q.get('ask') === '1') {
+    setTimeout(() => {
+      const el = document.getElementById('ask-hour');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const t = document.getElementById('askHourInput');
+      if (t) t.focus({ preventScroll: true });
+    }, 900);
+  } else if (q.get('idea') === '1') {
+    setTimeout(() => {
+      const el = document.getElementById('next-step');
+      if (el && el.style.display !== 'none') el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 900);
+  }
+}
 
 // pending question from the landing page teaser, if any
 window.addEventListener('load', () => {
