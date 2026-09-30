@@ -123,6 +123,32 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
 .biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
 .biz-hour-mini-tab.show{display:flex;align-items:center;}
+
+.lounge-actions{display:flex;gap:12px;align-items:center;margin-top:2px;font-family:'Inter',sans-serif;font-size:10.5px;}
+.lounge-msg.mine .lounge-actions{justify-content:flex-end;}
+.lounge-act{background:none;border:none;padding:2px 0;cursor:pointer;color:var(--ink-dim);font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;}
+.lounge-act:hover{color:var(--teal);}
+.lounge-act.liked{color:var(--teal);}
+.lounge-quote{border-left:3px solid var(--gold);background:rgba(176,141,63,0.10);padding:5px 9px;margin-bottom:6px;font-size:11.5px;color:var(--ink-dim);text-align:left;cursor:pointer;max-height:3.2em;overflow:hidden;}
+.lounge-quote b{color:var(--teal);font-family:'Inter',sans-serif;font-size:10px;display:block;}
+.lounge-name.clickable{cursor:pointer;text-decoration:underline;text-decoration-color:rgba(15,76,92,0.35);}
+.lounge-name.clickable:hover{color:var(--teal);}
+.lounge-msg.flash .lounge-bubble{animation:loungeFlash 1.4s ease;}
+@keyframes loungeFlash{0%,60%{background:rgba(176,141,63,0.35);}100%{}}
+.reply-bar{display:none;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-2);border:1px solid var(--line);border-left:3px solid var(--gold);padding:8px 12px;margin-bottom:10px;font-size:12px;color:var(--ink-dim);}
+.reply-bar.show{display:flex;}
+.reply-bar b{color:var(--teal);}
+.reply-bar button{background:none;border:none;font-size:18px;line-height:1;cursor:pointer;color:var(--ink-dim);}
+.pf-overlay{position:fixed;inset:0;background:rgba(28,28,28,0.55);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.pf-overlay.open{display:flex;}
+.pf-card{background:var(--surface);border:1px solid var(--line);max-width:400px;width:100%;padding:26px;position:relative;}
+.pf-card h4{font-family:'Inter',sans-serif;font-weight:800;font-size:18px;margin:0 0 4px;color:var(--teal-deep);}
+.pf-card .pf-meta{font-size:12px;color:var(--ink-dim);margin-bottom:12px;}
+.pf-card .pf-row{font-size:13px;line-height:1.55;margin-bottom:8px;}
+.pf-card .pf-row span{display:block;font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);}
+.pf-close{position:absolute;top:10px;right:14px;background:none;border:none;font-size:22px;cursor:pointer;color:var(--ink-dim);}
+.pf-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;}
+.pf-actions a,.pf-actions button{flex:1;text-align:center;text-decoration:none;}
 </style>
 </head>
 <body>
@@ -192,6 +218,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       <div class="lounge-feed" id="loungeFeed"></div>
       <div class="lounge-composer-wrap">
         <div class="mention-suggest" id="mentionSuggest"></div>
+        <div class="reply-bar" id="replyBar"><span>Replying to <b id="replyBarName"></b>: <span id="replyBarText"></span></span><button type="button" id="replyBarCancel" aria-label="Cancel reply">&times;</button></div>
         <form class="lounge-composer" id="loungeForm">
           <input type="text" id="loungeInput" placeholder="Say something to the room... type @ to mention someone, or @Akosua for help" maxlength="1000" autocomplete="off">
           <button type="submit">Send</button>
@@ -202,6 +229,8 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
     </div>
   </div>
 </section>
+
+<div class="pf-overlay" id="pfOverlay"><div class="pf-card"><button class="pf-close" id="pfClose" aria-label="Close">&times;</button><div id="pfBody"></div></div></div>
 
 <footer>
   <div class="wrap">
@@ -355,46 +384,160 @@ function renderMentions(text){
 // FEED
 // =====================================================================
 const loungeFeed = document.getElementById('loungeFeed');
+let loungeMessages = [];
+let loungeLikes = {};      // message_id -> [user_ids]
+let replyingTo = null;     // message being replied to
+let loungeFirstLoad = true;
+
+function loungeName(m){
+  if (m.is_akosua) return 'Akosua';
+  if (m.user_id === currentUser?.id) return 'You';
+  return nameForLounge(m.user_id);
+}
 function renderLoungeMessages(messages){
+  const wasNearBottom = (loungeFeed.scrollHeight - loungeFeed.scrollTop - loungeFeed.clientHeight) < 140;
+  const prevTop = loungeFeed.scrollTop;
+  const byId = {};
+  messages.forEach(m => { byId[m.id] = m; });
   loungeFeed.innerHTML = messages.map(m => {
     const mine = m.user_id === currentUser?.id;
     const isAkosua = !!m.is_akosua;
-    const name = isAkosua ? 'Akosua' : (mine ? 'You' : nameForLounge(m.user_id));
+    const name = loungeName(m);
     const initials = isAkosua ? 'AI' : (name || '?').slice(0,2).toUpperCase();
     const canDelete = mine || currentProfile?.is_admin;
+    const likes = loungeLikes[m.id] || [];
+    const liked = likes.includes(currentUser?.id);
+    const parent = m.reply_to_id ? byId[m.reply_to_id] : null;
+    const quote = m.reply_to_id
+      ? (parent
+          ? `<div class="lounge-quote" data-jump="${esc(parent.id)}"><b>${esc(loungeName(parent))}</b>${esc((parent.body || '').slice(0, 110))}${(parent.body || '').length > 110 ? '…' : ''}</div>`
+          : `<div class="lounge-quote"><b>Earlier message</b>This message is no longer in the room.</div>`)
+      : '';
+    const nameHtml = (!isAkosua && !mine && m.user_id)
+      ? `<div class="lounge-name clickable" data-profile="${esc(m.user_id)}" title="View profile">${esc(name)}</div>`
+      : `<div class="lounge-name${isAkosua ? ' akosua-name' : ''}">${esc(name)}</div>`;
     return `
-    <div class="lounge-msg${mine ? ' mine' : ''}${isAkosua ? ' akosua' : ''}">
-      <div class="lounge-avatar">${esc(initials)}</div>
+    <div class="lounge-msg${mine ? ' mine' : ''}${isAkosua ? ' akosua' : ''}" id="lm-${esc(m.id)}">
+      <div class="lounge-avatar"${(!isAkosua && !mine && m.user_id) ? ` data-profile="${esc(m.user_id)}" style="cursor:pointer;"` : ''}>${esc(initials)}</div>
       <div class="lounge-body">
-        <div class="lounge-name${isAkosua ? ' akosua-name' : ''}">${esc(name)}</div>
-        <div class="lounge-bubble">${renderMentions(m.body)}</div>
-        <div class="lounge-time">${new Date(m.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${canDelete ? `<span class="lounge-del" data-id="${esc(m.id)}">delete</span>` : ''}</div>
+        ${nameHtml}
+        <div class="lounge-bubble">${quote}${renderMentions(m.body)}</div>
+        <div class="lounge-actions">
+          <button type="button" class="lounge-act${liked ? ' liked' : ''}" data-like="${esc(m.id)}">${liked ? '♥' : '♡'} ${likes.length ? likes.length : 'Like'}</button>
+          <button type="button" class="lounge-act" data-reply="${esc(m.id)}">Reply</button>
+          <span class="lounge-time" style="margin:0;">${new Date(m.created_at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${canDelete ? `<span class="lounge-del" data-id="${esc(m.id)}">delete</span>` : ''}</span>
+        </div>
       </div>
     </div>`;
   }).join('') || '<p style="color:var(--ink-dim);text-align:center;padding:40px;">No one has said anything yet, be the first to say hello.</p>';
-  loungeFeed.scrollTop = loungeFeed.scrollHeight;
+  if (loungeFirstLoad || wasNearBottom) { loungeFeed.scrollTop = loungeFeed.scrollHeight; loungeFirstLoad = false; }
+  else loungeFeed.scrollTop = prevTop;
 }
 function nameForLounge(userId){
   const m = memberDirectory.find(x => x.id === userId);
   return m ? (m.business_name || m.name) : 'A member';
 }
+
+// ---- reply, like, jump, profile, delete: one delegated handler ----
 loungeFeed.addEventListener('click', async (e) => {
   const del = e.target.closest('.lounge-del');
-  if (!del || !sb) return;
-  if (!confirm('Delete this message?')) return;
-  await sb.from('live_chat_messages').delete().eq('id', del.dataset.id);
-  loadLounge();
+  if (del && sb) {
+    if (!confirm('Delete this message?')) return;
+    await sb.from('live_chat_messages').delete().eq('id', del.dataset.id);
+    loadLounge();
+    return;
+  }
+  const likeBtn = e.target.closest('[data-like]');
+  if (likeBtn && sb && currentUser) {
+    const id = likeBtn.dataset.like;
+    const list = loungeLikes[id] || (loungeLikes[id] = []);
+    const already = list.includes(currentUser.id);
+    // update the screen first, then the database
+    loungeLikes[id] = already ? list.filter(u => u !== currentUser.id) : [...list, currentUser.id];
+    renderLoungeMessages(loungeMessages);
+    const { error } = already
+      ? await sb.from('live_chat_likes').delete().eq('message_id', id).eq('user_id', currentUser.id)
+      : await sb.from('live_chat_likes').insert({ message_id: id, user_id: currentUser.id });
+    if (error) { console.error(error); loadLounge(); }
+    return;
+  }
+  const replyBtn = e.target.closest('[data-reply]');
+  if (replyBtn) {
+    const m = loungeMessages.find(x => x.id === replyBtn.dataset.reply);
+    if (!m) return;
+    replyingTo = m;
+    document.getElementById('replyBarName').textContent = loungeName(m);
+    document.getElementById('replyBarText').textContent = (m.body || '').slice(0, 70) + ((m.body || '').length > 70 ? '…' : '');
+    document.getElementById('replyBar').classList.add('show');
+    loungeInput.focus();
+    return;
+  }
+  const jump = e.target.closest('[data-jump]');
+  if (jump) {
+    const el = document.getElementById('lm-' + jump.dataset.jump);
+    if (el) { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); el.classList.add('flash'); setTimeout(() => el.classList.remove('flash'), 1500); }
+    return;
+  }
+  const prof = e.target.closest('[data-profile]');
+  if (prof) openProfileCard(prof.dataset.profile);
 });
+document.getElementById('replyBarCancel').addEventListener('click', clearReply);
+function clearReply(){ replyingTo = null; document.getElementById('replyBar').classList.remove('show'); }
+
+// ---- tap a name to see who they are, connect or message ----
+async function openProfileCard(userId){
+  const overlay = document.getElementById('pfOverlay');
+  const body = document.getElementById('pfBody');
+  body.innerHTML = '<p style="font-size:13px;color:var(--ink-dim);">Loading...</p>';
+  overlay.classList.add('open');
+  const [{ data: p }, { data: conns }] = await Promise.all([
+    sb.from('public_profiles').select('*').eq('id', userId).maybeSingle(),
+    sb.from('connections').select('*').or(`and(requester_id.eq.${currentUser.id},addressee_id.eq.${userId}),and(requester_id.eq.${userId},addressee_id.eq.${currentUser.id})`),
+  ]);
+  if (!p) { body.innerHTML = '<p style="font-size:13px;">This member could not be found.</p>'; return; }
+  const c = (conns || []).find(x => x.status === 'accepted' || x.status === 'pending');
+  const status = c ? c.status : 'none';
+  const row = (label, v) => v ? `<div class="pf-row"><span>${label}</span>${esc(v)}</div>` : '';
+  body.innerHTML = `
+    <h4>${esc(p.business_name || p.name)}</h4>
+    <div class="pf-meta">${esc(p.name || '')}${p.category ? ' · ' + esc(p.category) : ''}${p.location ? ' · ' + esc(p.location) : ''}${p.verified ? ' · Verified' : ''}</div>
+    ${row('What they do', p.sells)}
+    ${row('Looking for', p.looking_for)}
+    <div class="pf-actions">
+      ${userId === currentUser.id ? '' :
+        status === 'accepted' ? `<a class="btn-primary" href="messages.html?with=${encodeURIComponent(userId)}">Message</a>`
+        : status === 'pending' ? `<button class="btn-ghost" disabled>Request sent</button>`
+        : `<button class="btn-primary" id="pfConnectBtn">Connect</button>`}
+      <a class="btn-ghost" href="directory.html">Directory</a>
+    </div>
+    <div class="form-status" id="pfStatus" style="font-size:12px;color:var(--teal);margin-top:10px;"></div>`;
+  const cb = document.getElementById('pfConnectBtn');
+  if (cb) cb.addEventListener('click', async () => {
+    cb.disabled = true;
+    const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: userId, status: 'pending' });
+    document.getElementById('pfStatus').textContent = error ? 'Could not send the request.' : 'Request sent. You can message once they accept.';
+    if (error) cb.disabled = false; else cb.textContent = 'Request sent';
+  });
+}
+document.getElementById('pfClose').addEventListener('click', () => document.getElementById('pfOverlay').classList.remove('open'));
+document.getElementById('pfOverlay').addEventListener('click', (e) => { if (e.target.id === 'pfOverlay') e.currentTarget.classList.remove('open'); });
 
 async function loadLounge(){
   const { data, error } = await sb.from('live_chat_messages').select('*').order('created_at', { ascending: true }).limit(150);
   if (error) { console.error(error); return; }
-  renderLoungeMessages(data || []);
+  loungeMessages = data || [];
+  loungeLikes = {};
+  if (loungeMessages.length) {
+    const { data: likes } = await sb.from('live_chat_likes').select('message_id,user_id').in('message_id', loungeMessages.map(m => m.id));
+    (likes || []).forEach(l => { (loungeLikes[l.message_id] = loungeLikes[l.message_id] || []).push(l.user_id); });
+  }
+  renderLoungeMessages(loungeMessages);
 }
 
 function subscribeLounge(){
   sb.channel('live_lounge')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'live_chat_messages' }, () => loadLounge())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'live_chat_likes' }, () => loadLounge())
     .subscribe();
 }
 
@@ -439,14 +582,17 @@ document.getElementById('loungeForm').addEventListener('submit', async function(
   loungeInput.value = '';
   mentionSuggest.classList.remove('show');
 
-  const { error } = await sb.from('live_chat_messages').insert({ user_id: currentUser.id, body });
+  const row = { user_id: currentUser.id, body };
+  if (replyingTo) row.reply_to_id = replyingTo.id;
+  const { data: sent, error } = await sb.from('live_chat_messages').insert(row).select('id').single();
   if (error) { alert('Message could not be sent. ' + (error.message || '')); return; }
+  clearReply();
   loadLounge();
 
   if (/@akosua/i.test(body)) {
     const reply = akosuaRespond(body.replace(/@akosua/i, '').trim() || body);
     setTimeout(async () => {
-      await sb.from('live_chat_messages').insert({ user_id: null, is_akosua: true, body: reply });
+      await sb.from('live_chat_messages').insert({ user_id: null, is_akosua: true, body: reply, reply_to_id: sent ? sent.id : null });
       loadLounge();
     }, 700);
   }
