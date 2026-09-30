@@ -157,6 +157,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       <button data-tab="community">Community &amp; Q&amp;A <span class="count-badge" id="adminCommunityCount"></span></button>
       <button data-tab="lounge">Live Lounge <span class="count-badge" id="adminLoungeCount"></span></button>
       <button data-tab="events">Business Hour <span class="count-badge" id="adminEventsCount"></span></button>
+      <button data-tab="hourq">Hour questions <span class="count-badge" id="adminHourqCount"></span></button>
     </div>
     <div id="adminPanelBody"></div>
   </div>
@@ -259,6 +260,11 @@ async function initAdmin(){
 
   document.getElementById('loadingGate').style.display = 'none';
   document.getElementById('adminShell').style.display = 'block';
+  const wantedTab = new URLSearchParams(location.search).get('tab');
+  if (wantedTab && document.querySelector(`#adminTabs button[data-tab="${wantedTab.replace(/[^a-z]/g, '')}"]`)) {
+    activeAdminTab = wantedTab.replace(/[^a-z]/g, '');
+    document.querySelectorAll('#adminTabs button').forEach(b => b.classList.toggle('active', b.getAttribute('data-tab') === activeAdminTab));
+  }
   loadAdminConsole();
 }
 window.addEventListener('load', () => setTimeout(initAdmin, 50));
@@ -319,6 +325,22 @@ async function loadAdminConsole(){
   document.getElementById('adminCommunityCount').textContent = (window._adminData.posts.length + window._adminData.questions.length) || '';
   document.getElementById('adminLoungeCount').textContent = window._adminData.loungeMsgs.length || '';
   document.getElementById('adminEventsCount').textContent = window._adminData.events.length || '';
+  // Hour questions inbox + automation status. Loaded separately so a
+  // missing table (migration not run yet) can never break the console.
+  try {
+    const [{ data: hq, error: hqErr }, { data: notes }, { data: conns }] = await Promise.all([
+      sb.from('hour_questions').select('*').order('session_date', { ascending: false }).order('created_at', { ascending: true }).limit(200),
+      sb.from('member_notifications').select('kind, created_at, emailed_at').order('created_at', { ascending: false }).limit(400),
+      sb.from('connections').select('requester_id, addressee_id, status'),
+    ]);
+    window._adminData.hourQuestions = hqErr ? [] : (hq || []);
+    window._adminData.hourqMissing = !!hqErr;
+    window._adminData.notes = notes || [];
+    window._adminData.conns = conns || [];
+    await preloadNamesFor(window._adminData.hourQuestions.map(q => q.user_id));
+  } catch (e) { window._adminData.hourQuestions = []; window._adminData.notes = []; window._adminData.conns = []; }
+  const newQs = (window._adminData.hourQuestions || []).filter(q => q.status === 'new').length;
+  document.getElementById('adminHourqCount').textContent = newQs || '';
   renderAdminPanel();
 }
 
@@ -501,8 +523,96 @@ function renderAdminPanel(){
           <button class="btn-danger admin-event-delete" data-id="${esc(ev.id)}">Delete</button>
         </div>
       </div>`).join('') || '<p class="empty-note">No sessions yet.</p>'}`;
+  } else if (activeAdminTab === 'hourq') {
+    renderHourQuestionsTab(body, d);
   }
 }
+
+// ---------------------------------------------------------------------
+// HOUR QUESTIONS INBOX + AUTOMATION PANEL
+// The questions members send from the Wednesday form land here, grouped
+// by the Sunday session they are for. Also shows what the automation has
+// sent and lets you send yourself a test before trusting it.
+// ---------------------------------------------------------------------
+function renderHourQuestionsTab(body, d){
+  if (d.hourqMissing) {
+    body.innerHTML = '<p class="empty-note">The hour_questions table does not exist yet. Run 1-run-first-migration.sql in Supabase, then refresh this page.</p>';
+    return;
+  }
+  const qs = d.hourQuestions || [];
+  const bySession = {};
+  qs.forEach(q => { (bySession[q.session_date] = bySession[q.session_date] || []).push(q); });
+  const sessions = Object.keys(bySession).sort().reverse();
+  const nowIso = Date.now();
+  const weekAgo = nowIso - 7 * 86400000;
+  const sentThisWeek = kind => (d.notes || []).filter(n => n.kind === kind && new Date(n.created_at).getTime() > weekAgo).length;
+  const emailedThisWeek = (d.notes || []).filter(n => n.emailed_at && new Date(n.emailed_at).getTime() > weekAgo).length;
+  const connectedIds = new Set();
+  (d.conns || []).forEach(c => { if (c.status === 'accepted' || c.status === 'pending') { connectedIds.add(c.requester_id); connectedIds.add(c.addressee_id); } });
+  const noConn = (d.members || []).filter(m => !connectedIds.has(m.id)).length;
+  const ideaOnly = (d.members || []).filter(m => m.has_business === false).length;
+  const optedOut = (d.members || []).filter(m => m.email_reminders === false).length;
+
+  const stat = (n, label) => `<div style="flex:1;min-width:130px;border:1px solid var(--line);background:var(--surface-2);padding:14px 16px;"><div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;color:var(--teal);">${n}</div><div style="font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-top:4px;">${label}</div></div>`;
+
+  body.innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;">
+      ${stat(sentThisWeek('hour_sunday'), 'Sunday links sent (7d)')}
+      ${stat(sentThisWeek('hour_wednesday'), 'Wednesday reminders (7d)')}
+      ${stat(emailedThisWeek, 'Emails delivered (7d)')}
+      ${stat(noConn, 'Members with no connections')}
+      ${stat(ideaOnly, 'Idea-stage members')}
+      ${stat(optedOut, 'Emails switched off')}
+    </div>
+    <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:26px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">Test the automation on yourself</div>
+      <p style="font-size:12.5px;color:var(--ink-dim);margin:0 0 12px;line-height:1.5;">Sends you this week's copy in Messages and to your email, nobody else is touched. Use it to check what members will see.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-ghost" data-nudge-test="sunday">Test Sunday link</button>
+        <button class="btn-ghost" data-nudge-test="wednesday">Test Wednesday reminder</button>
+        <button class="btn-ghost" data-nudge-test="prompts">Test prompts</button>
+        <button class="btn-danger" data-nudge-all="wednesday">Send Wednesday reminder to everyone now</button>
+      </div>
+      <div id="nudgeTestStatus" style="font-size:12px;color:var(--teal);margin-top:10px;min-height:16px;"></div>
+    </div>
+    ${sessions.map(sd => {
+      const list = bySession[sd];
+      const label = new Date(sd + 'T00:00:00Z').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' });
+      const open = list.filter(q => q.status === 'new').length;
+      return `
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:26px 0 10px;">
+        <h3 style="font-family:'Inter',sans-serif;font-size:14px;text-transform:uppercase;letter-spacing:.04em;margin:0;">${esc(label)} <span style="color:var(--ink-dim);font-weight:500;">· ${list.length} question${list.length === 1 ? '' : 's'}, ${open} open</span></h3>
+        <button class="btn-ghost" data-copy-session="${esc(sd)}">Copy list for the session</button>
+      </div>
+      ${list.map(q => `
+      <div class="admin-queue-item" style="${q.status !== 'new' ? 'opacity:.6;' : ''}">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(nameFor(q.user_id))}</div>
+          <div class="admin-queue-meta">${new Date(q.created_at).toLocaleString('en-GB')} · ${esc(q.status)}</div>
+          <div class="admin-queue-body">${esc(q.question)}</div>
+        </div>
+        <div class="admin-queue-actions">
+          ${q.status !== 'answered' ? `<button class="btn-primary" data-hq-status="answered" data-id="${esc(q.id)}">Answered</button>` : ''}
+          ${q.status === 'new' ? `<button class="btn-ghost" data-hq-status="skipped" data-id="${esc(q.id)}">Skip</button>` : `<button class="btn-ghost" data-hq-status="new" data-id="${esc(q.id)}">Reopen</button>`}
+          <button class="btn-danger" data-hq-delete="${esc(q.id)}">Delete</button>
+        </div>
+      </div>`).join('')}`;
+    }).join('') || '<p class="empty-note">No questions yet. Members can send them from the dashboard, and the Wednesday reminder points them there.</p>'}`;
+}
+
+async function runNudge(kind, onlyMe){
+  const status = document.getElementById('nudgeTestStatus');
+  if (status) status.textContent = 'Working...';
+  try {
+    const { data, error } = await sb.functions.invoke('send-nudge-emails', { body: { kind, queue: true, only_me: !!onlyMe } });
+    if (error) throw error;
+    if (status) status.textContent = data && data.note ? data.note : `Done. ${data.queued || 0} in-app message(s) created, ${data.sent || 0} email(s) sent.` + (onlyMe ? ' Check your Messages page.' : '');
+    loadAdminConsole();
+  } catch (e) {
+    if (status) status.textContent = 'Could not run it: ' + (e.message || e) + '. Check that the send-nudge-emails function is deployed.';
+  }
+}
+
 document.getElementById('adminTabs').addEventListener('click', (e) => {
   const btn = e.target.closest('button');
   if (!btn) return;
@@ -522,6 +632,29 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
   }
   const btn = e.target.closest('button');
   if (!btn) return;
+
+  if (btn.dataset.nudgeTest) { runNudge(btn.dataset.nudgeTest, true); return; }
+  if (btn.dataset.nudgeAll) {
+    if (!confirm('Send this to EVERY member now (in Messages, and by email for those who have emails on)? Members who already got this week\'s copy are skipped.')) return;
+    runNudge(btn.dataset.nudgeAll, false); return;
+  }
+  if (btn.dataset.copySession) {
+    const list = (window._adminData.hourQuestions || []).filter(q => q.session_date === btn.dataset.copySession && q.status === 'new');
+    const text = list.map((q, i) => `${i + 1}. ${nameFor(q.user_id)}: ${q.question}`).join('\n') || 'No open questions.';
+    navigator.clipboard?.writeText(text).then(() => { btn.textContent = 'Copied'; setTimeout(() => btn.textContent = 'Copy list for the session', 1500); });
+    return;
+  }
+  if (btn.dataset.hqStatus) {
+    const { error } = await sb.from('hour_questions').update({ status: btn.dataset.hqStatus }).eq('id', btn.dataset.id);
+    if (error) alert('Could not update: ' + error.message); else loadAdminConsole();
+    return;
+  }
+  if (btn.dataset.hqDelete) {
+    if (!confirm('Delete this question?')) return;
+    const { error } = await sb.from('hour_questions').delete().eq('id', btn.dataset.hqDelete);
+    if (error) alert('Could not delete: ' + error.message); else loadAdminConsole();
+    return;
+  }
 
   if (btn.classList.contains('admin-verify-approve')) {
     await sb.from('verification_requests').update({ status: 'approved', reviewed_at: new Date().toISOString() }).eq('id', btn.dataset.id);
@@ -644,6 +777,8 @@ function openMemberModal(userId){
     ['Business idea', m.business_idea],
     ['Goal for the Series', m.series_goal],
     ['Looking for', m.looking_for],
+    ['Ideas last written', m.idea_updated_at ? new Date(m.idea_updated_at).toLocaleString('en-GB') : '—'],
+    ['Reminder emails', m.email_reminders === false ? 'Switched off by member' : 'On'],
     ['Biggest struggle (private)', m.struggle],
     ['Welcomed', m.welcomed_at ? new Date(m.welcomed_at).toLocaleString('en-GB') : 'Not shown yet'],
     ['Verified', m.verified ? 'Yes' : 'No'],
