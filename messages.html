@@ -145,6 +145,15 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
 .biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
 .biz-hour-mini-tab.show{display:flex;align-items:center;}
+
+.convo-row.system .conn-avatar{background:var(--teal);color:var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;font-size:13px;border-color:var(--teal);}
+.convo-unread{width:9px;height:9px;border-radius:50%;background:var(--gold);margin-left:auto;flex-shrink:0;}
+.sys-msg{background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--gold);padding:14px 16px;font-size:13px;line-height:1.6;max-width:88%;align-self:flex-start;}
+.sys-msg.unread{border-left-color:var(--teal);background:rgba(15,76,92,0.05);}
+.sys-msg h4{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;margin:0 0 6px;color:var(--teal-deep);}
+.sys-msg .sys-body{white-space:pre-line;word-break:break-word;}
+.sys-msg a.sys-btn{display:inline-block;margin-top:10px;background:var(--teal);color:var(--bg);text-decoration:none;font-weight:800;text-transform:uppercase;letter-spacing:.04em;font-size:11px;padding:10px 16px;border-radius:2px;}
+.sys-note{font-size:11.5px;color:var(--ink-dim);padding:12px 22px;border-top:1px solid var(--line);}
 </style>
 </head>
 <body>
@@ -214,7 +223,7 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
     <div class="messages-shell">
       <div class="convo-list" id="convoList"></div>
       <div class="thread-col" id="threadCol">
-        <div class="thread-empty">Pick a connection on the left to start messaging.</div>
+        <div class="thread-empty">Pick a conversation on the left. BYINFORGH messages, including your Business Hour link, are the first one.</div>
       </div>
     </div>
   </div>
@@ -403,14 +412,48 @@ async function loadConversations(){
   allConnections = conns || [];
   renderConversationList();
 
+  await loadSystemNotes();
+  subscribeToSystemNotes();
   const wanted = new URLSearchParams(location.search).get('with');
-  if (wanted && profileDirectory[wanted]) openConversation(wanted);
+  if (wanted === SYSTEM_ID) openSystemThread();
+  else if (wanted && profileDirectory[wanted]) openConversation(wanted);
+  else if (!wanted && sysNotes.some(n => !n.read_at)) openSystemThread();
+}
+
+let sysNotes = [];
+const SYSTEM_ID = 'byinforgh';
+
+async function loadSystemNotes(){
+  const { data } = await sb.from('member_notifications')
+    .select('*').eq('user_id', currentUser.id)
+    .order('created_at', { ascending: true }).limit(60);
+  sysNotes = data || [];
+  renderConversationList();
+  if (activeConvoUserId === SYSTEM_ID) renderSystemThread();
+}
+function safeActionUrl(u){
+  if (!u) return '';
+  return (/^https?:\/\//i.test(u) || /^[a-z0-9_\-]+\.html/i.test(u)) ? u : '';
 }
 
 function renderConversationList(){
   const list = document.getElementById('convoList');
-  if (!allConnections.length) { list.innerHTML = '<p class="empty-note" style="margin:16px;">Connect with someone first, then message them here.</p>'; return; }
-  list.innerHTML = allConnections.map(c => {
+  const unread = sysNotes.filter(n => !n.read_at).length;
+  const last = sysNotes[sysNotes.length - 1];
+  const sysRow = `
+    <div class="convo-row system${activeConvoUserId === SYSTEM_ID ? ' active' : ''}" data-id="${SYSTEM_ID}">
+      <div class="conn-avatar">B</div>
+      <div style="min-width:0;">
+        <div class="convo-name">BYINFORGH</div>
+        <div class="convo-preview">${last ? esc(last.title) : 'Business Hour links and reminders'}</div>
+      </div>
+      ${unread ? '<span class="convo-unread" title="' + unread + ' unread"></span>' : ''}
+    </div>`;
+  if (!allConnections.length) {
+    list.innerHTML = sysRow + '<p class="empty-note" style="margin:16px;">Connect with someone, then message them here. <a href="connections.html" style="color:var(--teal);font-weight:700;">Find people to connect with</a></p>';
+    return;
+  }
+  list.innerHTML = sysRow + allConnections.map(c => {
     const otherId = c.requester_id === currentUser.id ? c.addressee_id : c.requester_id;
     const p = profileDirectory[otherId];
     if (!p) return '';
@@ -424,9 +467,50 @@ function renderConversationList(){
     </div>`;
   }).join('');
 }
+
+function renderSystemThread(){
+  const col = document.getElementById('threadCol');
+  const unreadIds = sysNotes.filter(n => !n.read_at).map(n => n.id);
+  col.innerHTML = `
+    <div class="thread-head"><div><div class="thread-head-name">BYINFORGH <span style="font-family:Inter,sans-serif;font-size:9px;color:var(--teal);border:1px solid var(--teal);padding:2px 6px;margin-left:6px;">OFFICIAL</span></div></div></div>
+    <div class="thread-feed" id="threadFeed">${
+      sysNotes.length ? sysNotes.map(n => {
+        const url = safeActionUrl(n.action_url);
+        const ext = /^https?:\/\//i.test(url) && url.indexOf(location.origin) !== 0;
+        return `<div class="sys-msg${n.read_at ? '' : ' unread'}">
+          <h4>${esc(n.title)}</h4>
+          <div class="sys-body">${esc(n.body)}</div>
+          ${url && n.action_label ? `<a class="sys-btn" href="${esc(url)}"${ext ? ' target="_blank" rel="noopener"' : ''}>${esc(n.action_label)}</a>` : ''}
+          <div class="thread-msg-time">${new Date(n.created_at).toLocaleString('en-GB', { weekday:'short', day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}</div>
+        </div>`;
+      }).join('') : '<div class="thread-empty">Your Business Hour link every Sunday, question reminders on Wednesday and helpful next steps will show up here.</div>'
+    }</div>
+    <div class="sys-note">This is a one-way inbox from BYINFORGH. To ask a question for the Business Hour, use <a href="app.html?ask=1#ask-hour" style="color:var(--teal);font-weight:700;">Ask the Business Hour</a>.</div>`;
+  const feed = document.getElementById('threadFeed');
+  if (feed) feed.scrollTop = feed.scrollHeight;
+  if (unreadIds.length) {
+    sb.from('member_notifications').update({ read_at: new Date().toISOString() }).in('id', unreadIds).then(() => {
+      sysNotes.forEach(n => { if (!n.read_at) n.read_at = new Date().toISOString(); });
+      renderConversationList();
+    });
+  }
+}
+function openSystemThread(){
+  activeConvoUserId = SYSTEM_ID;
+  if (dmChannel) { sb.removeChannel(dmChannel); dmChannel = null; }
+  history.replaceState(null, '', '?with=' + SYSTEM_ID);
+  renderConversationList();
+  renderSystemThread();
+}
+function subscribeToSystemNotes(){
+  sb.channel('sys_' + currentUser.id)
+    .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'member_notifications', filter: `user_id=eq.${currentUser.id}` }, () => loadSystemNotes())
+    .subscribe();
+}
 document.getElementById('convoList').addEventListener('click', (e) => {
   const row = e.target.closest('.convo-row');
-  if (row) openConversation(row.dataset.id);
+  if (!row) return;
+  if (row.dataset.id === SYSTEM_ID) openSystemThread(); else openConversation(row.dataset.id);
 });
 
 async function openConversation(otherId){
