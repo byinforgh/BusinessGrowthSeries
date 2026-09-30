@@ -124,6 +124,9 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
 .biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
 .biz-hour-mini-tab.show{display:flex;align-items:center;}
+
+.qa-del{background:none;border:none;color:var(--m7,#A6453B);font-size:10px;text-decoration:underline;cursor:pointer;margin-left:10px;padding:0;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.04em;}
+.qa-ans-del{background:none;border:none;color:var(--m7,#A6453B);font-size:10px;text-decoration:underline;cursor:pointer;margin-left:10px;padding:0;font-family:'Inter',sans-serif;}
 </style>
 </head>
 <body>
@@ -308,13 +311,14 @@ async function loadQA(){
       ? answers.map(a => {
           const who = profMap[a.user_id];
           const by = who ? `${esc(who.name || 'A member')}${who.business_name ? ' · ' + esc(who.business_name) : ''}` : 'BYINFORGH';
-          return `<p><span class="qa-by">${by}</span>${esc(a.answer)}</p>`;
+          const canDelAns = currentUser && (a.user_id === currentUser.id || currentProfile?.is_admin);
+          return `<p><span class="qa-by">${by}</span>${esc(a.answer)}${canDelAns ? `<button type="button" class="qa-ans-del" data-id="${esc(a.id)}">Delete</button>` : ''}</p>`;
         }).join('')
       : '<p>No answer yet, be the first to help.</p>';
     const askerName = profMap[item.user_id]?.name || 'A member';
     el.innerHTML = `
       <div class="qa-q-row"><span class="qa-tag">${esc(askerName)}</span><span class="qa-replies">${answers.length} repl${answers.length===1?'y':'ies'}</span></div>
-      <div class="qa-q" data-view>${esc(item.question)}${(currentUser && item.user_id === currentUser.id) ? ` <button type="button" class="qa-edit-btn" data-id="${esc(item.id)}" title="Edit your question">Edit</button>` : ''}</div>
+      <div class="qa-q" data-view>${esc(item.question)}${(currentUser && item.user_id === currentUser.id) ? ` <button type="button" class="qa-edit-btn" data-id="${esc(item.id)}" title="Edit your question">Edit</button>` : ''}${(currentUser && (item.user_id === currentUser.id || currentProfile?.is_admin)) ? `<button type="button" class="qa-del" data-id="${esc(item.id)}" title="Delete this question">Delete</button>` : ''}</div>
       <form class="qa-edit-form" data-id="${esc(item.id)}" style="display:none;">
         <input type="text" value="${esc(item.question)}" required maxlength="1000">
         <button type="submit">Save</button>
@@ -334,6 +338,22 @@ async function loadQA(){
       if (e.target.classList.contains('qa-share')) return;
       el.classList.toggle('open');
     });
+    const delQ = el.querySelector('.qa-del');
+    if (delQ) delQ.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm('Delete this question and all its answers? This cannot be undone.')) return;
+      const { error: dErr } = await sb.from('qa_questions').delete().eq('id', delQ.dataset.id);
+      if (dErr) { alert('Could not delete: ' + dErr.message); return; }
+      await loadQA();
+    });
+    el.querySelectorAll('.qa-ans-del').forEach(b => b.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (!confirm('Delete this answer?')) return;
+      const { error: dErr } = await sb.from('qa_answers').delete().eq('id', b.dataset.id);
+      if (dErr) { alert('Could not delete: ' + dErr.message); return; }
+      openIds.add(el.id);
+      await loadQA();
+    }));
     const editBtn = el.querySelector('.qa-edit-btn');
     const editForm = el.querySelector('.qa-edit-form');
     const viewRow = el.querySelector('[data-view]');
