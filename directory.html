@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Directory: BYINFORGH Business Growth Series</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -151,6 +151,21 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
 .biz-hour-mini-tab.show{display:flex;align-items:center;}
 </style>
+<style id="mobile-fit-fix">
+/* Mobile fit fix: stops form rows and grids from pushing the page wider than the phone screen.
+   overflow-x:clip is used (not hidden) so the sticky top bar keeps working. */
+html,body{max-width:100%;overflow-x:clip;}
+input,textarea,select{max-width:100%;box-sizing:border-box;}
+form input,form textarea,form select,.ai-input input,.suggestion-strip input,.qa-shell input{min-width:0;}
+form button[type="submit"]{flex-shrink:0;}
+.suggestion-strip form{min-width:0 !important;width:100%;}
+.suggestion-strip{box-sizing:border-box;max-width:100%;}
+.ai-shell > *,[style*="display:grid"] > *,[style*="display: grid"] > *{min-width:0;}
+@media(max-width:700px){
+  input[type="text"],input[type="email"],input[type="tel"],input[type="search"],input[type="url"],input[type="number"],input[type="date"],input[type="datetime-local"],input[type="time"],textarea,select{font-size:16px !important;}
+  img,video,iframe,table{max-width:100%;}
+}
+</style>
 </head>
 <body>
 
@@ -202,7 +217,9 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       // The nav row scrolls horizontally and the active tab can land
       // off-screen (e.g. Q&A, near the end), scroll it into view so
       // it's obvious which page you're on without hunting for it.
-      setTimeout(function(){ a.scrollIntoView({ block: 'nearest', inline: 'center' }); }, 0);
+      var jn = document.getElementById('jumpNav'), dash = jn && jn.querySelector('a[data-page="app.html"]');
+      if (dash && a !== dash) { dash.insertAdjacentElement('afterend', a); }
+      if (jn) { jn.scrollLeft = 0; }
     }
   });
 })();
