@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Live Lounge: BYINFORGH Business Growth Series</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,15 +29,20 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
 .kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
 
 .app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
-.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.app-topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1180px;margin:0 auto;gap:12px;}
+.app-topbar-row2{position:relative;border-top:1px solid var(--line);}
+.app-topbar-row2::after{content:'';position:absolute;top:0;right:0;bottom:0;width:28px;pointer-events:none;background:linear-gradient(90deg, transparent, var(--bg));}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
 .brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);;overflow:hidden;background:var(--surface);}
 .btn-ghost{background:transparent;color:var(--ink-dim);border:1px solid var(--line);padding:10px 16px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;}
 .btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
-.jump-nav{display:flex;gap:6px;align-items:center;overflow-x:auto;max-width:72vw;scrollbar-width:thin;}
-.jump-nav::-webkit-scrollbar{height:4px;}
+.jump-nav{
+  display:flex;gap:10px;align-items:center;overflow-x:auto;white-space:nowrap;
+  max-width:1180px;margin:0 auto;padding:10px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+}
+.jump-nav::-webkit-scrollbar{display:none;}
+.jump-nav a{flex-shrink:0;}
 .jump-nav a.active{background:var(--teal);color:var(--bg);border-color:var(--teal);}
-@media(max-width:700px){.jump-nav{max-width:60vw;}}
 
 .locked-gate{min-height:70vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:40px;}
 .banned-gate{max-width:520px;margin:80px auto;text-align:center;border:1px solid var(--m7);background:rgba(166,69,59,0.06);padding:44px 36px;}
@@ -150,6 +155,21 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .pf-actions{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;}
 .pf-actions a,.pf-actions button{flex:1;text-align:center;text-decoration:none;}
 </style>
+<style id="mobile-fit-fix">
+/* Mobile fit fix: stops form rows and grids from pushing the page wider than the phone screen.
+   overflow-x:clip is used (not hidden) so the sticky top bar keeps working. */
+html,body{max-width:100%;overflow-x:clip;}
+input,textarea,select{max-width:100%;box-sizing:border-box;}
+form input,form textarea,form select,.ai-input input,.suggestion-strip input,.qa-shell input{min-width:0;}
+form button[type="submit"]{flex-shrink:0;}
+.suggestion-strip form{min-width:0 !important;width:100%;}
+.suggestion-strip{box-sizing:border-box;max-width:100%;}
+.ai-shell > *,[style*="display:grid"] > *,[style*="display: grid"] > *{min-width:0;}
+@media(max-width:700px){
+  input[type="text"],input[type="email"],input[type="tel"],input[type="search"],input[type="url"],input[type="number"],input[type="date"],input[type="datetime-local"],input[type="time"],textarea,select{font-size:16px !important;}
+  img,video,iframe,table{max-width:100%;}
+}
+</style>
 </head>
 <body>
 
@@ -165,8 +185,11 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 
 <nav class="app-topbar">
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-  <div class="app-topbar-inner">
-    <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">B</span></div>BYINFORGH</a>
+    <div class="app-topbar-row1">
+   <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">B</span></div>BYINFORGH</a>
+   <button class="btn-ghost" id="logoutBtn">Log out</button>
+  </div>
+  <div class="app-topbar-row2">
     <div class="jump-nav" id="jumpNav">
       <a href="app.html" class="btn-ghost" data-page="app.html">Dashboard</a>
       <a href="curriculum.html" class="btn-ghost" data-page="curriculum.html">Curriculum</a>
@@ -177,7 +200,6 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       <a href="groups.html" class="btn-ghost" data-page="groups.html">Groups</a>
       <a href="messages.html" class="btn-ghost" data-page="messages.html">Messages</a>
       <a href="qa.html" class="btn-ghost" data-page="qa.html">Q&amp;A</a>
-      <button class="btn-ghost" id="logoutBtn">Log out</button>
     </div>
   </div>
 </nav>
@@ -199,7 +221,9 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
       // The nav row scrolls horizontally and the active tab can land
       // off-screen (e.g. Q&A, near the end), scroll it into view so
       // it's obvious which page you're on without hunting for it.
-      setTimeout(function(){ a.scrollIntoView({ block: 'nearest', inline: 'center' }); }, 0);
+      var jn = document.getElementById('jumpNav'), dash = jn && jn.querySelector('a[data-page="app.html"]');
+      if (dash && a !== dash) { dash.insertAdjacentElement('afterend', a); }
+      if (jn) { jn.scrollLeft = 0; }
     }
   });
 })();
