@@ -472,6 +472,9 @@ function applyBizToggle(){
   document.getElementById('pSells').required = hasBusiness;
   document.getElementById('pBusinessIdea').required = !hasBusiness;
   document.getElementById('pCategory').required = hasBusiness;
+  document.getElementById('pBusinessName').required = hasBusiness;
+  fieldBusinessName.style.display = hasBusiness ? '' : 'none';
+  if (typeof updateProfileProgress === 'function') updateProfileProgress();
   document.getElementById('pSeriesGoal').required = !hasBusiness;
   lblSeriesGoal.textContent = hasBusiness
     ? "What do you want to get out of the Business Growth Series (optional, but tell us if you can)"
@@ -480,6 +483,55 @@ function applyBizToggle(){
 optHasBusiness.addEventListener('click', () => { hasBusiness = true; applyBizToggle(); });
 optNoBusiness.addEventListener('click', () => { hasBusiness = false; applyBizToggle(); });
 applyBizToggle();
+
+
+// ---- Required fields, live progress, and pre-fill for returning members ----
+const _junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test((v || '').trim());
+function profileRequiredList(){
+  const v = id => (document.getElementById(id).value || '').trim();
+  const list = [
+    ['Your name', v('pName').length >= 2 && !_junk(v('pName'))],
+    ['WhatsApp / phone number (at least 9 digits)', v('pPhone').replace(/\D/g, '').length >= 9],
+    ['Location', v('pLocation').length >= 2 && !_junk(v('pLocation'))],
+  ];
+  if (hasBusiness) {
+    list.push(['Business name', v('pBusinessName').length >= 2]);
+    list.push(['Category', v('pCategory') !== '']);
+    list.push(['What you sell or offer', v('pSells').length >= 3]);
+  } else {
+    list.push(['Your business idea', v('pBusinessIdea').length >= 5]);
+    list.push(['What you want from the Series', v('pSeriesGoal').length >= 5]);
+  }
+  list.push(['Your biggest struggle', v('pStruggle').length >= 3]);
+  return list;
+}
+function profileMissingFields(){ return profileRequiredList().filter(x => !x[1]).map(x => x[0]); }
+function updateProfileProgress(){
+  const box = document.getElementById('profileProgress'); if (!box) return;
+  const list = profileRequiredList(), done = list.filter(x => x[1]).length;
+  const left = list.filter(x => !x[1]).map(x => x[0]);
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px;"><span>${done} of ${list.length} required details done</span><span>${Math.round(done / list.length * 100)}%</span></div>` +
+    `<div style="height:6px;background:var(--line);"><div style="height:6px;width:${done / list.length * 100}%;background:var(--gold);transition:width .2s;"></div></div>` +
+    (left.length ? `<div style="font-size:12px;color:var(--ink-dim);margin-top:8px;">Still needed: ${left.map(x => x.replace(/ \(.*\)/, '')).join(', ')}</div>` : '<div style="font-size:12px;color:var(--teal);margin-top:8px;">All done. Tap the button below to enter.</div>');
+}
+(function(){
+  const btn = document.getElementById('saveProfileBtn');
+  const box = document.createElement('div'); box.id = 'profileProgress'; box.style.margin = '4px 0 16px';
+  btn.parentNode.insertBefore(box, btn);
+  document.getElementById('profileForm').addEventListener('input', updateProfileProgress);
+  document.getElementById('profileForm').addEventListener('change', updateProfileProgress);
+  updateProfileProgress();
+})();
+function prefillProfileForm(p){
+  if (!p) return;
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+  set('pName', p.name); set('pBusinessName', p.business_name); set('pCategory', p.category);
+  set('pPhone', p.phone); set('pLocation', p.location); set('pLandmark', p.landmark);
+  set('pSells', p.sells); set('pBusinessIdea', p.business_idea); set('pSeriesGoal', p.series_goal);
+  set('pLookingFor', p.looking_for); set('pStruggle', p.struggle);
+  if (p.logo_url) document.getElementById('logoPreview').innerHTML = `<img src="${p.logo_url.replace(/"/g, '')}" alt="Your logo">`;
+  updateProfileProgress();
+}
 
 // ---- Logo preview ----
 document.getElementById('pLogo').addEventListener('change', function(e){
@@ -497,6 +549,12 @@ const profileForm = document.getElementById('profileForm');
 const profileStatus = document.getElementById('profileStatus');
 profileForm.addEventListener('submit', async function(e){
   e.preventDefault();
+  const missingNow = profileMissingFields();
+  if (missingNow.length) {
+    profileStatus.textContent = 'Please complete: ' + missingNow.join(', ') + '.';
+    profileStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
   const { data: { user } } = await sb.auth.getUser();
   if (!user) { profileStatus.textContent = 'Session expired, please log in again.'; return; }
   document.getElementById('saveProfileBtn').disabled = true;
@@ -521,7 +579,7 @@ profileForm.addEventListener('submit', async function(e){
   profileStatus.textContent = 'Saving...';
   const { error } = await sb.from('profiles').update({
     name: document.getElementById('pName').value.trim(),
-    business_name: document.getElementById('pBusinessName').value.trim() || null,
+    business_name: hasBusiness ? (document.getElementById('pBusinessName').value.trim() || null) : (document.getElementById('pBusinessName').value.trim() || null),
     category: hasBusiness ? document.getElementById('pCategory').value : (document.getElementById('pCategory').value || null),
     phone: document.getElementById('pPhone').value.trim(),
     location: document.getElementById('pLocation').value.trim(),
@@ -532,7 +590,7 @@ profileForm.addEventListener('submit', async function(e){
     series_goal: document.getElementById('pSeriesGoal').value.trim() || null,
     looking_for: document.getElementById('pLookingFor').value.trim() || null,
     struggle: document.getElementById('pStruggle').value.trim(),
-    logo_url: logoUrl,
+    ...(logoUrl ? { logo_url: logoUrl } : {}),
     last_seen: new Date().toISOString(),
   }).eq('id', user.id);
   document.getElementById('saveProfileBtn').disabled = false;
@@ -581,8 +639,14 @@ async function routeForSession(session){
     // Returning to finish an in-progress profile: restore whichever
     // path they were on so the form doesn't silently reset to "yes".
     if (profile && profile.has_business === false) { hasBusiness = false; applyBizToggle(); }
+    prefillProfileForm(profile);
     const note = document.getElementById('profileReturningNote');
-    if (note) note.style.display = (profile && profile.name) ? 'block' : 'none';
+    const left = profileMissingFields();
+    if (note) {
+      note.style.display = 'block';
+      note.innerHTML = '<p style="margin:0;font-size:13.5px;color:var(--ink);"><b>Your profile is not finished yet.</b> The dashboard, community, directory, messages and the 203 lessons open as soon as it is complete.' +
+        (left.length ? ' Still needed: <b>' + left.map(x => x.replace(/ \(.*\)/, '')).join(', ') + '</b>.' : '') + '</p>';
+    }
     showStep('stepProfile');
   }
 }
@@ -592,9 +656,15 @@ async function routeForSession(session){
 // business yet). Existing members who filled "sells" before this
 // change was made are never sent back through the form again.
 function isProfileComplete(p){
-  if (!p || !p.name || !p.phone || !p.location) return false;
-  if (p.sells) return true;
-  return !!(p.business_idea && p.series_goal);
+  // Strict rule, same as the database lock: real values, not blanks or filler.
+  if (!p) return false;
+  const t = v => (v == null ? '' : String(v)).trim();
+  const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
+  if (t(p.name).length < 2 || junk(p.name)) return false;
+  if (t(p.phone).replace(/\D/g, '').length < 9) return false;
+  if (t(p.location).length < 2 || junk(p.location)) return false;
+  if (p.has_business === false) return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
+  return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
 }
 
 // A magic link lands back here with tokens in the URL (hash or PKCE
