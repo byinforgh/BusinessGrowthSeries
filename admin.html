@@ -361,6 +361,27 @@ async function loadAdminConsole(){
 
 // A member counts as "online" if they were active in the last 5 minutes —
 // keep this window in sync with whatever online_member_count() uses.
+function isComplete(m){
+  const t = v => (v == null ? '' : String(v)).trim();
+  if (!m || t(m.name).length < 2 || t(m.phone).replace(/\D/g, '').length < 9 || t(m.location).length < 2) return false;
+  if (m.has_business === false) return t(m.business_idea).length >= 5 && t(m.series_goal).length >= 5;
+  return t(m.business_name).length >= 2 && t(m.category) !== '' && t(m.sells).length >= 3;
+}
+function missingFor(m){
+  const t = v => (v == null ? '' : String(v)).trim(), out = [];
+  if (t(m.name).length < 2) out.push('name');
+  if (t(m.phone).replace(/\D/g, '').length < 9) out.push('phone');
+  if (t(m.location).length < 2) out.push('location');
+  if (m.has_business === false) { if (t(m.business_idea).length < 5) out.push('business idea'); if (t(m.series_goal).length < 5) out.push('series goal'); }
+  else { if (t(m.business_name).length < 2) out.push('business name'); if (!t(m.category)) out.push('category'); if (t(m.sells).length < 3) out.push('what they sell'); }
+  return out;
+}
+function fmtDur(sec){
+  sec = Math.max(0, Math.round(sec || 0));
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+  if (h >= 1) return h + 'h ' + String(m).padStart(2, '0') + 'm';
+  return m >= 1 ? m + ' min' : 'under 1 min';
+}
 function isOnline(lastSeen){
   if (!lastSeen) return false;
   return (Date.now() - new Date(lastSeen).getTime()) < 5 * 60 * 1000;
@@ -462,7 +483,6 @@ function renderAdminPanel(){
   } else if (activeAdminTab === 'members') {
     const total = d.members.length;
     const online = d.members.filter(m => isOnline(m.last_seen)).length;
-    const isComplete = m => !!(m.name && m.phone && m.location && (m.sells || (m.business_idea && m.series_goal)));
     const incompleteCount = d.members.filter(m => !isComplete(m)).length;
     const q = memberSearch.trim().toLowerCase();
     let scoped = !showIncompleteOnly ? d.members : d.members.filter(m => !isComplete(m));
@@ -492,7 +512,7 @@ function renderAdminPanel(){
             ${esc(m.name || 'Unnamed')}${m.business_name ? ' · ' + esc(m.business_name) : ''}
             ${m.is_admin ? ' <span style="color:var(--gold);">(admin)</span>' : ''}
             ${m.banned ? ' <span style="color:var(--m7);">(suspended)</span>' : ''}
-            ${!isComplete(m) ? ' <span style="color:var(--m7);">(incomplete)</span>' : ''}
+            ${!isComplete(m) ? ' <span style="color:var(--m7);">(incomplete: ' + esc(missingFor(m).join(', ')) + ')</span>' : ''}
           </div>
           <div class="admin-queue-meta">${esc(m.category || 'No category')} · ${esc(m.location || 'No location')} · last seen ${m.last_seen ? new Date(m.last_seen).toLocaleString('en-GB') : 'never'}</div>
         </div>
@@ -775,15 +795,37 @@ document.getElementById('adminPanelBody').addEventListener('submit', async (e) =
 // fields (email, biggest struggle) that admin alone can see, for
 // support and tracking purposes.
 // =====================================================================
+
+// Time online for one member. Needs database file 4 (admin_member_activity).
+async function loadMemberActivity(userId){
+  const el = document.getElementById('memberActivityBody'); if (!el) return;
+  const { data, error } = await sb.rpc('admin_member_activity', { p_user: userId });
+  if (error || !data) {
+    el.textContent = /find the function|PGRST202|42883/i.test((error && (error.code + ' ' + error.message)) || '') ? 'Tracking is not switched on yet. Run database file 4 in Supabase.' : 'Could not load activity.';
+    return;
+  }
+  const line = (k, v) => `<div style="display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-bottom:1px solid var(--line);"><span style="color:var(--ink-dim);">${k}</span><b>${v}</b></div>`;
+  const avg = data.sessions ? data.total_seconds / data.sessions : 0;
+  el.innerHTML =
+    line('Total time online', fmtDur(data.total_seconds)) +
+    line('Last 7 days', fmtDur(data.last7_seconds)) +
+    line('Visits', data.sessions) +
+    line('Average visit', fmtDur(avg)) +
+    line('Days active', data.days_active) +
+    (data.recent && data.recent.length ? `<div style="margin-top:10px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);">Recent visits</div>` +
+      data.recent.map(r => `<div style="display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:12.5px;"><span>${new Date(r.started_at).toLocaleString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}${r.page ? ' · ' + esc(String(r.page).replace('.html','')) : ''}</span><span>${fmtDur(r.seconds)}</span></div>`).join('') : '') +
+    `<div style="font-size:11px;color:var(--ink-dim);margin-top:10px;">Counts only time a page is open and visible. ${data.first_tracked ? 'Tracking since ' + new Date(data.first_tracked).toLocaleDateString('en-GB') + '.' : 'No tracked visits yet, tracking starts after the new pages are uploaded.'}</div>`;
+}
+
 function openMemberModal(userId){
   const m = (window._adminData.members || []).find(x => x.id === userId);
   if (!m) return;
   // Same completeness rule used on the member-facing pages: complete
   // once it has the basics plus either what they sell, or (for
   // members who joined without a business yet) their idea + goal.
-  const complete = !!(m.name && m.phone && m.location && (m.sells || (m.business_idea && m.series_goal)));
+  const complete = isComplete(m);
   const rows = [
-    ['Profile status', complete ? 'Complete' : 'Incomplete — never finished signup'],
+    ['Profile status', complete ? 'Complete' : 'Incomplete. Still missing: ' + (missingFor(m).join(', ') || 'details')],
     ['Name', m.name], ['Business', m.business_name], ['Category', m.category],
     ['Phone / WhatsApp', m.phone], ['Email (private)', m.email],
     ['Location', m.location], ['Landmark', m.landmark],
@@ -809,6 +851,10 @@ function openMemberModal(userId){
         <span style="color:var(--ink-dim);font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.03em;">${label}</span>
         <span style="text-align:right;">${esc(val || '—')}</span>
       </div>`).join('')}
+    <div id="memberActivity" style="margin-top:20px;border:1px solid var(--line);background:var(--surface-2);padding:14px 16px;font-size:13px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--teal);margin-bottom:8px;">Time online</div>
+      <div id="memberActivityBody" style="color:var(--ink-dim);">Loading...</div>
+    </div>
     ${!complete ? `
     <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
       ${m.email ? `<button class="btn-ghost" id="memberResendBtn">Resend login link</button>` : ''}
@@ -821,6 +867,7 @@ function openMemberModal(userId){
         : `<button class="btn-danger" id="memberBanBtn">Suspend member</button>`}
     </div>`;
   document.getElementById('memberModal').style.display = 'flex';
+  loadMemberActivity(m.id);
   const banBtn = document.getElementById('memberBanBtn');
   if (banBtn) banBtn.addEventListener('click', async () => {
     const reason = prompt('Reason for suspension (shown to the member):');
