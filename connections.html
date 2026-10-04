@@ -271,11 +271,17 @@ async function initPage(){
 // business yet). Existing members who filled "sells" before this
 // change was made are never sent back through the profile form again.
 function isProfileComplete(p){
-  if (!p || !p.name || !p.phone || !p.location) return false;
-  if (p.sells) return true;
-  return !!(p.business_idea && p.series_goal);
+  // Strict rule, same as the database lock: real values, not blanks or filler.
+  if (!p) return false;
+  const t = v => (v == null ? '' : String(v)).trim();
+  const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
+  if (t(p.name).length < 2 || junk(p.name)) return false;
+  if (t(p.phone).replace(/\D/g, '').length < 9) return false;
+  if (t(p.location).length < 2 || junk(p.location)) return false;
+  if (p.has_business === false) return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
+  return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
 }
-  if (!isProfileComplete(profile)) { location.href = 'auth.html'; return; }
+  if (!isProfileComplete(profile)) { try { sessionStorage.setItem('byg_redirect', location.pathname.split('/').pop() || 'app.html'); } catch(e){} location.href = 'auth.html'; return; }
   currentUser = session.user;
   currentProfile = profile;
 
@@ -365,7 +371,7 @@ function renderConnections(){
   if (activeConnTab === 'suggested') {
     items = computeSuggestedConnections().map(({ p, reason }) => `
       <div class="conn-card">
-        <div class="conn-card-top">
+        <div class="conn-card-top" data-profile-id="${esc(p.id || '')}">
           <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
           <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}${p.location ? ' · ' + esc(p.location) : ''}</div><div class="conn-meta">${esc(memberSinceLabel(p.created_at))}</div></div>
         </div>
@@ -375,10 +381,10 @@ function renderConnections(){
   } else if (activeConnTab === 'accepted') {
     items = allConnections.filter(c => c.status === 'accepted').map(c => {
       const otherId = c.requester_id === currentUser.id ? c.addressee_id : c.requester_id;
-      const p = profileDirectory[otherId] || { name: 'BYINFORGH member' };
+      const p = profileDirectory[otherId] || { id: otherId, name: 'BYINFORGH member' };
       return `
       <div class="conn-card">
-        <div class="conn-card-top">
+        <div class="conn-card-top" data-profile-id="${esc(p.id || '')}">
           <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
           <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}</div></div>
         </div>
@@ -390,10 +396,10 @@ function renderConnections(){
     }).join('') || '<p class="empty-note">No connections yet, try Suggested to find your first ones.</p>';
   } else if (activeConnTab === 'incoming') {
     items = allConnections.filter(c => c.status === 'pending' && c.addressee_id === currentUser.id).map(c => {
-      const p = profileDirectory[c.requester_id] || { name: 'BYINFORGH member' };
+      const p = profileDirectory[c.requester_id] || { id: c.requester_id, name: 'BYINFORGH member' };
       return `
       <div class="conn-card">
-        <div class="conn-card-top">
+        <div class="conn-card-top" data-profile-id="${esc(p.id || '')}">
           <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
           <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">wants to connect · ${esc(memberSinceLabel(p.created_at))}</div></div>
         </div>
@@ -405,10 +411,10 @@ function renderConnections(){
     }).join('') || '<p class="empty-note">No pending requests.</p>';
   } else if (activeConnTab === 'outgoing') {
     items = allConnections.filter(c => c.status === 'pending' && c.requester_id === currentUser.id).map(c => {
-      const p = profileDirectory[c.addressee_id] || { name: 'BYINFORGH member' };
+      const p = profileDirectory[c.addressee_id] || { id: c.addressee_id, name: 'BYINFORGH member' };
       return `
       <div class="conn-card">
-        <div class="conn-card-top">
+        <div class="conn-card-top" data-profile-id="${esc(p.id || '')}">
           <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
           <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">Request sent, awaiting reply</div></div>
         </div>
@@ -710,7 +716,7 @@ window.addEventListener('bgs:connections-changed', () => loadConnections());
     var html =
       '<div class="bgsx-card" role="dialog" aria-modal="true">' +
         '<div class="bgsx-eyebrow">' + (isReq ? 'New connection request' : 'Request accepted') + '</div>' +
-        '<div class="bgsx-who"><div class="bgsx-av">' + av + '</div><div><div class="bgsx-name">' + esc(name) + '</div>' + (meta ? '<div class="bgsx-meta">' + esc(meta) + '</div>' : '') + '</div></div>' +
+        '<div class="bgsx-who" data-profile-id="' + esc(item.other) + '"><div class="bgsx-av">' + av + '</div><div><div class="bgsx-name">' + esc(name) + '</div>' + (meta ? '<div class="bgsx-meta">' + esc(meta) + '</div>' : '') + '</div></div>' +
         '<p class="bgsx-text" id="bgsxText">' + (isReq ? esc(name) + ' wants to connect with you. Accept to start messaging each other.' : esc(name) + ' accepted your request. You can now message each other.') + '</p>' +
         (isReq && p && p.sells ? '<div class="bgsx-sells">' + esc(String(p.sells).slice(0, 140)) + '</div>' : '') +
         '<div class="bgsx-err" id="bgsxErr"></div>' +
@@ -772,6 +778,127 @@ window.addEventListener('bgs:connections-changed', () => loadConnections());
     document.addEventListener('visibilitychange', function(){ if (!document.hidden) refresh(); });
   }
   var tries = 0, boot = setInterval(function(){ tries++; if (ctx()) { clearInterval(boot); start(); } else if (tries > 170) clearInterval(boot); }, 700);
+})();
+</script>
+
+<script id="bgs-profile-view">
+/* BYINFORGH full profile view and activity heartbeat.
+   Any element with data-profile-id opens that member's full profile. */
+(function(){
+  'use strict';
+  if (window.__bgsProfileView) return; window.__bgsProfileView = true;
+  var PAGE = (location.pathname.split('/').pop() || 'app.html');
+  var sid = null, hbOff = false;
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function ctx(){ try { if (typeof sb !== 'undefined' && sb && typeof currentUser !== 'undefined' && currentUser) return { sb: sb, user: currentUser }; } catch(e){} return null; }
+
+  function css(){
+    if (document.getElementById('bgsp-css')) return;
+    var s = document.createElement('style'); s.id = 'bgsp-css';
+    s.textContent =
+      '[data-profile-id]{cursor:pointer;}[data-profile-id]:hover .conn-name,[data-profile-id]:hover h4,h4[data-profile-id]:hover,.conn-name[data-profile-id]:hover{text-decoration:underline;}' +
+      '.bgsp-ov{position:fixed;inset:0;z-index:320;background:rgba(10,40,48,.6);display:flex;align-items:flex-end;justify-content:center;padding:0;box-sizing:border-box;}' +
+      '@media(min-width:640px){.bgsp-ov{align-items:center;padding:18px;}}' +
+      '.bgsp-card{background:#FAF6EC;width:100%;max-width:460px;max-height:92vh;overflow-y:auto;box-sizing:border-box;border-top:4px solid #B08D3F;padding:24px 22px 22px;font-family:Poppins,Inter,sans-serif;color:#1d2a2e;position:relative;box-shadow:0 18px 50px rgba(0,0,0,.3);}' +
+      '.bgsp-x{position:absolute;top:10px;right:12px;border:0;background:transparent;font-size:26px;line-height:1;color:#5b676b;cursor:pointer;padding:6px 10px;}' +
+      '.bgsp-head{display:flex;gap:14px;align-items:center;margin-bottom:14px;padding-right:28px;}' +
+      '.bgsp-av{width:64px;height:64px;border-radius:50%;border:2px solid #B08D3F;background:#fff;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;font-weight:800;font-size:22px;color:#0F4C5C;}' +
+      '.bgsp-av img{width:100%;height:100%;object-fit:cover;}' +
+      '.bgsp-name{font-family:Inter,sans-serif;font-weight:800;font-size:19px;line-height:1.2;word-break:break-word;}' +
+      '.bgsp-sub{font-size:13px;color:#5b676b;margin-top:3px;}' +
+      '.bgsp-tag{display:inline-block;font-family:Inter,sans-serif;font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border:1px solid #0F4C5C;color:#0F4C5C;padding:2px 7px;border-radius:20px;margin-right:6px;margin-top:8px;}' +
+      '.bgsp-tag.on{background:#0F4C5C;color:#FAF6EC;}' +
+      '.bgsp-row{padding:10px 0;border-top:1px solid rgba(0,0,0,.09);font-size:13.5px;line-height:1.5;word-break:break-word;}' +
+      '.bgsp-row span{display:block;font-family:Inter,sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:#5b676b;margin-bottom:3px;}' +
+      '.bgsp-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;}' +
+      '.bgsp-btn{flex:1 1 auto;border:1px solid #0F4C5C;background:#0F4C5C;color:#FAF6EC;padding:12px 14px;font-family:Inter,sans-serif;font-weight:800;font-size:12px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;}' +
+      '.bgsp-btn.ghost{background:transparent;color:#3c4a4e;border-color:rgba(0,0,0,.2);}.bgsp-btn[disabled]{opacity:.6;cursor:default;}' +
+      '.bgsp-msg{font-size:12.5px;color:#0F4C5C;margin-top:10px;min-height:16px;}';
+    document.head.appendChild(s);
+  }
+  function closeP(){ var o = document.getElementById('bgsp-ov'); if (o) o.remove(); }
+
+  async function openProfile(id){
+    var c = ctx(); if (!c || !id) return;
+    css(); closeP();
+    var ov = document.createElement('div'); ov.className = 'bgsp-ov'; ov.id = 'bgsp-ov';
+    ov.innerHTML = '<div class="bgsp-card"><button class="bgsp-x" aria-label="Close">&times;</button><p style="font-size:13px;color:#5b676b;">Loading profile...</p></div>';
+    document.body.appendChild(ov);
+    ov.addEventListener('click', function(e){ if (e.target === ov || e.target.closest('.bgsp-x')) closeP(); });
+    var me = c.user.id;
+    var res = await Promise.all([
+      c.sb.from('public_profiles').select('*').eq('id', id).maybeSingle(),
+      id === me ? Promise.resolve({ data: [] }) :
+        c.sb.from('connections').select('*').or('and(requester_id.eq.' + me + ',addressee_id.eq.' + id + '),and(requester_id.eq.' + id + ',addressee_id.eq.' + me + ')')
+    ]);
+    var p = res[0].data, conns = res[1].data || [];
+    var card = ov.querySelector('.bgsp-card');
+    if (!p) { card.innerHTML = '<button class="bgsp-x" aria-label="Close">&times;</button><p style="font-size:14px;">This member could not be found.</p>'; return; }
+    var cn = conns.find(function(x){ return x.status === 'accepted' || x.status === 'pending'; });
+    var status = id === me ? 'self' : !cn ? 'none' : cn.status === 'accepted' ? 'accepted' : (cn.addressee_id === me ? 'incoming' : 'pending');
+    var name = p.business_name || p.name || 'Member';
+    var person = p.business_name && p.name ? p.name : '';
+    var online = p.last_seen && (Date.now() - new Date(p.last_seen).getTime()) < 5 * 60 * 1000;
+    var since = p.created_at ? new Date(p.created_at).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' }) : '';
+    var place = [p.location, p.landmark].filter(Boolean).join(', ');
+    var row = function(label, v){ return v ? '<div class="bgsp-row"><span>' + label + '</span>' + esc(v) + '</div>' : ''; };
+    var phoneRow = '';
+    if (p.phone && (status === 'accepted' || status === 'self')) {
+      var d = String(p.phone).replace(/\D/g, '');
+      phoneRow = '<div class="bgsp-row"><span>WhatsApp / phone</span><a href="https://wa.me/' + esc(d) + '" target="_blank" rel="noopener" style="color:#0F4C5C;font-weight:700;">' + esc(p.phone) + '</a></div>';
+    }
+    var buttons =
+      status === 'accepted' ? '<a class="bgsp-btn" href="messages.html?with=' + encodeURIComponent(id) + '">Message</a>' :
+      status === 'pending'  ? '<button class="bgsp-btn ghost" disabled>Request sent</button>' :
+      status === 'incoming' ? '<button class="bgsp-btn" data-a="accept">Accept request</button><button class="bgsp-btn ghost" data-a="decline">Decline</button>' :
+      status === 'none'     ? '<button class="bgsp-btn" data-a="connect">Connect</button>' : '';
+    var canReport = status !== 'self' && typeof openReportModal === 'function';
+    card.innerHTML =
+      '<button class="bgsp-x" aria-label="Close">&times;</button>' +
+      '<div class="bgsp-head"><div class="bgsp-av">' + (p.logo_url ? '<img src="' + esc(p.logo_url) + '" alt="">' : esc(name.trim().charAt(0).toUpperCase())) + '</div>' +
+        '<div><div class="bgsp-name">' + esc(name) + '</div>' + (person ? '<div class="bgsp-sub">' + esc(person) + '</div>' : '') +
+        '<div>' + (p.verified ? '<span class="bgsp-tag on">Verified</span>' : '') + (online ? '<span class="bgsp-tag on">Online now</span>' : '') + (p.category ? '<span class="bgsp-tag">' + esc(p.category) + '</span>' : '') + '</div></div></div>' +
+      row('Location', place) + row('What they sell or offer', p.sells) + row('Looking for', p.looking_for) +
+      (p.has_business === false ? row('Stage', 'Starting out, working on a business idea') : '') +
+      phoneRow + row('Member since', since) +
+      '<div class="bgsp-act" id="bgspAct">' + buttons + (canReport ? '<button class="bgsp-btn ghost" data-a="report" style="flex:0 0 auto;">Report</button>' : '') + '</div>' +
+      '<div class="bgsp-msg" id="bgspMsg"></div>';
+    document.getElementById('bgspAct').addEventListener('click', async function(e){
+      var b = e.target.closest('button[data-a]'); if (!b) return;
+      var a = b.getAttribute('data-a'), msg = document.getElementById('bgspMsg');
+      if (a === 'report') { closeP(); openReportModal(id, name, 'profile', null); return; }
+      b.disabled = true;
+      var r = a === 'connect' ? await window.bgsSendConnection(id) : await window.bgsRespondConnection(cn.id, a);
+      if (!r.ok) { b.disabled = false; msg.textContent = r.error || r.message || 'That did not work, please try again.'; return; }
+      openProfile(id);
+    });
+  }
+  window.bgsOpenProfile = openProfile;
+
+  document.addEventListener('click', function(e){
+    var t = e.target.closest('[data-profile-id]'); if (!t) return;
+    var inner = e.target.closest('button,a,input,textarea,select');
+    if (inner && inner !== t && t.contains(inner)) return;
+    e.preventDefault(); e.stopPropagation();
+    openProfile(t.getAttribute('data-profile-id'));
+  }, true);
+
+  /* ---------- activity heartbeat: counts only time a page is open and visible ---------- */
+  async function beat(){
+    if (hbOff || document.hidden) return;
+    var c = ctx(); if (!c) return;
+    try {
+      if (!sid) { try { sid = sessionStorage.getItem('bgs_sid'); } catch(e){} }
+      var r = await c.sb.rpc('bgs_heartbeat', { p_session: sid || null, p_page: PAGE });
+      if (r.error) { if (/PGRST202|42883|find the function|schema cache/i.test((r.error.code || '') + ' ' + (r.error.message || ''))) hbOff = true; return; }
+      if (r.data) { sid = r.data; try { sessionStorage.setItem('bgs_sid', sid); } catch(e){} }
+    } catch(e){}
+  }
+  var tries = 0, boot = setInterval(function(){
+    tries++;
+    if (ctx()) { clearInterval(boot); beat(); setInterval(beat, 60000); document.addEventListener('visibilitychange', function(){ if (!document.hidden) beat(); }); }
+    else if (tries > 170) clearInterval(boot);
+  }, 700);
 })();
 </script>
 
