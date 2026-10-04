@@ -520,7 +520,7 @@ async function openProfileCard(userId){
   ]);
   if (!p) { body.innerHTML = '<p style="font-size:13px;">This member could not be found.</p>'; return; }
   const c = (conns || []).find(x => x.status === 'accepted' || x.status === 'pending');
-  const status = c ? c.status : 'none';
+  const status = !c ? 'none' : (c.status === 'pending' && c.addressee_id === currentUser.id ? 'incoming' : c.status);
   const row = (label, v) => v ? `<div class="pf-row"><span>${label}</span>${esc(v)}</div>` : '';
   body.innerHTML = `
     <h4>${esc(p.business_name || p.name)}</h4>
@@ -531,6 +531,7 @@ async function openProfileCard(userId){
       ${userId === currentUser.id ? '' :
         status === 'accepted' ? `<a class="btn-primary" href="messages.html?with=${encodeURIComponent(userId)}">Message</a>`
         : status === 'pending' ? `<button class="btn-ghost" disabled>Request sent</button>`
+        : status === 'incoming' ? `<button class="btn-primary" id="pfAcceptBtn">Accept request</button>`
         : `<button class="btn-primary" id="pfConnectBtn">Connect</button>`}
       <a class="btn-ghost" href="directory.html">Directory</a>
     </div>
@@ -538,9 +539,16 @@ async function openProfileCard(userId){
   const cb = document.getElementById('pfConnectBtn');
   if (cb) cb.addEventListener('click', async () => {
     cb.disabled = true;
-    const { error } = await sb.from('connections').insert({ requester_id: currentUser.id, addressee_id: userId, status: 'pending' });
-    document.getElementById('pfStatus').textContent = error ? 'Could not send the request.' : 'Request sent. You can message once they accept.';
-    if (error) cb.disabled = false; else cb.textContent = 'Request sent';
+    const res = await window.bgsSendConnection(userId);
+    document.getElementById('pfStatus').textContent = !res.ok ? (res.error || res.message || 'Could not send the request.') : (res.message || 'Request sent. You can message once they accept.');
+    if (!res.ok) cb.disabled = false; else cb.textContent = res.status === 'accepted' ? 'Connected' : 'Request sent';
+  });
+  const ab = document.getElementById('pfAcceptBtn');
+  if (ab) ab.addEventListener('click', async () => {
+    ab.disabled = true;
+    const res = await window.bgsRespondConnection(c.id, 'accept');
+    document.getElementById('pfStatus').textContent = res.ok ? 'You are now connected. You can message each other.' : (res.error || 'Could not accept, please try again.');
+    if (!res.ok) ab.disabled = false; else ab.textContent = 'Connected';
   });
 }
 document.getElementById('pfClose').addEventListener('click', () => document.getElementById('pfOverlay').classList.remove('open'));
@@ -719,6 +727,222 @@ document.getElementById('loungeForm').addEventListener('submit', async function(
     window.addEventListener('orientationchange', () => setTimeout(() => positionBubble(bubble), 150));
   }
   window.addEventListener('load', () => setTimeout(initBizHourBubble, 300));
+})();
+</script>
+
+<script id="bgs-connect-sync">
+/* BYINFORGH connection sync: request popup, menu badges, safe send and respond helpers.
+   Works with realtime when it is enabled, and falls back to a 30 second check when it is not. */
+(function(){
+  'use strict';
+  if (window.__bgsConnSync) return; window.__bgsConnSync = true;
+  var uid = null, started = false, queue = [], showing = null, mem = {};
+  var PAGE = (location.pathname.split('/').pop() || 'app.html');
+
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function ctx(){ try { if (typeof sb !== 'undefined' && sb && typeof currentUser !== 'undefined' && currentUser) return { sb: sb, user: currentUser }; } catch(e){} return null; }
+  function skey(){ return 'bgs_conn_seen_' + uid; }
+  function load(){ try { return JSON.parse(localStorage.getItem(skey()) || '{}') || {}; } catch(e){ return mem; } }
+  function save(o){ mem = o; try { localStorage.setItem(skey(), JSON.stringify(o)); } catch(e){} }
+  function isSeen(k){ return !!load()[k]; }
+  function mark(k){ var o = load(); o[k] = 1; save(o); }
+  function unmark(k){ var o = load(); if (o[k]) { delete o[k]; save(o); } }
+  function fire(name, detail){ try { window.dispatchEvent(new CustomEvent(name, { detail: detail || {} })); } catch(e){} }
+  function missingFn(err){ return err && /PGRST202|42883|find the function|schema cache/i.test((err.code || '') + ' ' + (err.message || '')); }
+
+  /* ---------- public helpers used by the pages ---------- */
+  var MSG = {
+    accepted: 'They had already sent you a request, so you are now connected.',
+    already_connected: 'You are already connected with this member.',
+    already_sent: 'Your request is already waiting for a reply.',
+    cooldown: 'This member has not accepted your last request. You can try again in a few weeks.'
+  };
+  window.bgsSendConnection = async function(targetId){
+    var c = ctx(); if (!c) return { ok: false, error: 'Please log in again.' };
+    var r = await c.sb.rpc('send_connection_request', { target: targetId });
+    if (!r.error) {
+      var st = r.data;
+      refresh(); fire('bgs:connections-changed');
+      return { ok: st !== 'cooldown', status: st, message: MSG[st] || '' };
+    }
+    if (!missingFn(r.error)) return { ok: false, error: r.error.message || 'Could not send the request.' };
+    var ins = await c.sb.from('connections').insert({ requester_id: c.user.id, addressee_id: targetId, status: 'pending' });
+    if (ins.error) {
+      var dup = ins.error.code === '23505';
+      return { ok: false, error: dup ? 'A request with this member already exists. Check Requests and Sent on the Connections page.' : (ins.error.message || 'Could not send the request.') };
+    }
+    refresh(); fire('bgs:connections-changed');
+    return { ok: true, status: 'sent', message: '' };
+  };
+  window.bgsRespondConnection = async function(connId, action){
+    var c = ctx(); if (!c) return { ok: false, error: 'Please log in again.' };
+    var r = await c.sb.rpc('respond_connection', { conn_id: String(connId), action: action });
+    if (!r.error) { refresh(); fire('bgs:connections-changed'); return { ok: true }; }
+    if (!missingFn(r.error)) return { ok: false, error: r.error.message || 'That did not work, please try again.' };
+    var status = action === 'accept' ? 'accepted' : action === 'decline' ? 'declined' : 'removed';
+    var u = await c.sb.from('connections').update({ status: status, responded_at: new Date().toISOString() }).eq('id', connId).select('id');
+    if (u.error) return { ok: false, error: u.error.message || 'That did not work, please try again.' };
+    if (!u.data || !u.data.length) return { ok: false, error: 'The database did not allow that change. Run file 3-connections-sync.sql in Supabase.' };
+    refresh(); fire('bgs:connections-changed');
+    return { ok: true };
+  };
+
+  /* ---------- menu badges ---------- */
+  function setBadge(href, n){
+    document.querySelectorAll('#jumpNav a[href="' + href + '"], #appNavLinks a[href="' + href + '"]').forEach(function(a){
+      var b = a.querySelector('.bgsx-badge');
+      if (!n) { if (b) b.remove(); return; }
+      if (!b) { b = document.createElement('span'); b.className = 'bgsx-badge'; a.appendChild(b); }
+      b.textContent = n > 9 ? '9+' : String(n);
+    });
+  }
+  async function loadUnread(){
+    var c = ctx(); if (!c) return;
+    try {
+      var a = await c.sb.from('dm_messages').select('id', { count: 'exact', head: true }).eq('recipient_id', uid).is('read_at', null);
+      var b = await c.sb.from('member_notifications').select('id', { count: 'exact', head: true }).eq('user_id', uid).is('read_at', null);
+      setBadge('messages.html', (a.count || 0) + (b.count || 0));
+    } catch(e){}
+  }
+
+  /* ---------- check for new requests ---------- */
+  async function refresh(){
+    var c = ctx(); if (!c) return;
+    var r = await c.sb.from('connections').select('*').or('requester_id.eq.' + uid + ',addressee_id.eq.' + uid);
+    if (r.error || !r.data) return;
+    var incoming = [], fresh = [];
+    r.data.forEach(function(x){
+      if (x.status !== 'pending') unmark(x.id + ':pending');
+      if (x.status !== 'accepted') unmark(x.id + ':accepted');
+      if (x.status === 'pending' && x.addressee_id === uid) incoming.push(x);
+    });
+    setBadge('connections.html', incoming.length);
+    incoming.forEach(function(x){ if (!isSeen(x.id + ':pending')) fresh.push({ kind: 'request', conn: x, other: x.requester_id, key: x.id + ':pending' }); });
+    r.data.forEach(function(x){
+      if (x.status === 'accepted' && x.requester_id === uid && !isSeen(x.id + ':accepted')) {
+        var t = x.responded_at ? new Date(x.responded_at).getTime() : 0;
+        if (Date.now() - t < 3 * 86400000) fresh.push({ kind: 'accepted', conn: x, other: x.addressee_id, key: x.id + ':accepted' });
+        else mark(x.id + ':accepted');
+      }
+    });
+    fresh.forEach(function(it){
+      if ((showing && showing.key === it.key) || queue.some(function(q){ return q.key === it.key; })) return;
+      queue.push(it);
+    });
+    loadUnread();
+    next();
+  }
+
+  /* ---------- popup ---------- */
+  function css(){
+    if (document.getElementById('bgsx-css')) return;
+    var s = document.createElement('style'); s.id = 'bgsx-css';
+    s.textContent =
+      '.bgsx-badge{display:inline-block;min-width:16px;height:16px;line-height:16px;padding:0 4px;margin-left:6px;border-radius:9px;background:#B08D3F;color:#fff;font-size:10px;font-weight:800;text-align:center;letter-spacing:0;vertical-align:middle;}' +
+      '.bgsx-ov{position:fixed;inset:0;z-index:300;background:rgba(10,40,48,.55);display:flex;align-items:center;justify-content:center;padding:18px;box-sizing:border-box;}' +
+      '.bgsx-card{background:#FAF6EC;border:1px solid rgba(15,76,92,.25);border-top:4px solid #B08D3F;max-width:380px;width:100%;box-sizing:border-box;padding:24px 22px 20px;box-shadow:0 18px 50px rgba(0,0,0,.28);font-family:Poppins,Inter,sans-serif;color:#1d2a2e;}' +
+      '.bgsx-eyebrow{font-family:Inter,sans-serif;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#0F4C5C;margin-bottom:12px;}' +
+      '.bgsx-who{display:flex;gap:12px;align-items:center;margin-bottom:12px;}' +
+      '.bgsx-av{width:48px;height:48px;border-radius:50%;border:2px solid #B08D3F;background:#fff;overflow:hidden;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:Inter,sans-serif;font-weight:800;color:#0F4C5C;}' +
+      '.bgsx-av img{width:100%;height:100%;object-fit:cover;}' +
+      '.bgsx-name{font-family:Inter,sans-serif;font-weight:800;font-size:17px;line-height:1.25;word-break:break-word;}' +
+      '.bgsx-meta{font-size:12.5px;color:#5b676b;margin-top:2px;}' +
+      '.bgsx-text{font-size:13.5px;line-height:1.55;color:#3c4a4e;margin:0 0 6px;}' +
+      '.bgsx-sells{font-size:12.5px;color:#5b676b;border-left:3px solid #3F93A8;padding-left:10px;margin:10px 0 0;}' +
+      '.bgsx-act{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px;}' +
+      '.bgsx-btn{flex:1 1 auto;border:1px solid #0F4C5C;background:#0F4C5C;color:#FAF6EC;padding:12px 14px;font-family:Inter,sans-serif;font-weight:800;font-size:12px;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;text-align:center;text-decoration:none;box-sizing:border-box;}' +
+      '.bgsx-btn.ghost{background:transparent;color:#3c4a4e;border-color:rgba(0,0,0,.2);}' +
+      '.bgsx-btn[disabled]{opacity:.6;cursor:default;}' +
+      '.bgsx-more{font-size:11.5px;color:#5b676b;margin-top:12px;text-align:center;}' +
+      '.bgsx-err{font-size:12px;color:#A6453B;margin-top:10px;min-height:0;}' +
+      '.bgsx-toast{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;z-index:290;background:#0F4C5C;color:#FAF6EC;padding:12px 16px;max-width:calc(100vw - 32px);box-sizing:border-box;display:flex;gap:14px;align-items:center;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.25);}' +
+      '.bgsx-toast a{color:#E6C879;font-weight:800;text-decoration:none;font-family:Inter,sans-serif;font-size:12px;text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;}';
+    document.head.appendChild(s);
+  }
+  function close(){
+    var o = document.getElementById('bgsx-ov'); if (o) o.remove();
+    if (showing) mark(showing.key);
+    showing = null;
+    setTimeout(next, 250);
+  }
+  async function next(){
+    if (showing || !queue.length) return;
+    var c = ctx(); if (!c) return;
+    showing = queue.shift();
+    var item = showing, p = null;
+    try { var r = await c.sb.from('public_profiles').select('*').eq('id', item.other).maybeSingle(); p = r.data; } catch(e){}
+    var name = p ? (p.business_name || p.name || 'A member') : 'A member';
+    var person = p && p.business_name && p.name ? p.name : '';
+    var meta = [person, p && p.category, p && p.location].filter(Boolean).join(' · ');
+    var initial = name.trim().charAt(0).toUpperCase() || 'B';
+    var av = p && p.logo_url ? '<img src="' + esc(p.logo_url) + '" alt="">' : esc(initial);
+    var isReq = item.kind === 'request';
+    var more = queue.length ? '<div class="bgsx-more">' + queue.length + ' more waiting in Requests</div>' : '';
+    var html =
+      '<div class="bgsx-card" role="dialog" aria-modal="true">' +
+        '<div class="bgsx-eyebrow">' + (isReq ? 'New connection request' : 'Request accepted') + '</div>' +
+        '<div class="bgsx-who"><div class="bgsx-av">' + av + '</div><div><div class="bgsx-name">' + esc(name) + '</div>' + (meta ? '<div class="bgsx-meta">' + esc(meta) + '</div>' : '') + '</div></div>' +
+        '<p class="bgsx-text" id="bgsxText">' + (isReq ? esc(name) + ' wants to connect with you. Accept to start messaging each other.' : esc(name) + ' accepted your request. You can now message each other.') + '</p>' +
+        (isReq && p && p.sells ? '<div class="bgsx-sells">' + esc(String(p.sells).slice(0, 140)) + '</div>' : '') +
+        '<div class="bgsx-err" id="bgsxErr"></div>' +
+        '<div class="bgsx-act" id="bgsxAct">' +
+          (isReq ? '<button class="bgsx-btn" data-a="accept">Accept</button><button class="bgsx-btn ghost" data-a="decline">Decline</button><button class="bgsx-btn ghost" data-a="later">Later</button>'
+                 : '<a class="bgsx-btn" href="messages.html?with=' + encodeURIComponent(item.other) + '">Message</a><button class="bgsx-btn ghost" data-a="later">Close</button>') +
+        '</div>' + more +
+      '</div>';
+    var ov = document.createElement('div'); ov.className = 'bgsx-ov'; ov.id = 'bgsx-ov'; ov.innerHTML = html;
+    document.body.appendChild(ov);
+    ov.addEventListener('click', async function(e){
+      if (e.target === ov) { close(); return; }
+      var b = e.target.closest('button[data-a]'); if (!b) return;
+      var a = b.getAttribute('data-a');
+      if (a === 'later') { close(); return; }
+      b.disabled = true;
+      var res = await window.bgsRespondConnection(item.conn.id, a);
+      if (!res.ok) { b.disabled = false; document.getElementById('bgsxErr').textContent = res.error; return; }
+      if (a === 'decline') { close(); return; }
+      document.getElementById('bgsxText').textContent = 'You are now connected with ' + name + '.';
+      document.getElementById('bgsxErr').textContent = '';
+      document.getElementById('bgsxAct').innerHTML = '<a class="bgsx-btn" href="messages.html?with=' + encodeURIComponent(item.other) + '">Message ' + esc(name) + '</a><button class="bgsx-btn ghost" data-a="later">Close</button>';
+    });
+  }
+
+  /* ---------- new message toast ---------- */
+  async function onDM(payload){
+    var m = payload && payload.new; if (!m) return;
+    fire('bgs:dm', m);
+    loadUnread();
+    var active = null; try { active = (PAGE === 'messages.html') ? activeConvoUserId : null; } catch(e){}
+    if (active === m.sender_id && !document.hidden) return;
+    var c = ctx(); if (!c) return;
+    var name = 'A member';
+    try { var r = await c.sb.from('public_profiles').select('name,business_name').eq('id', m.sender_id).maybeSingle(); if (r.data) name = r.data.business_name || r.data.name || name; } catch(e){}
+    var old = document.getElementById('bgsx-toast'); if (old) old.remove();
+    var t = document.createElement('div'); t.className = 'bgsx-toast'; t.id = 'bgsx-toast';
+    t.innerHTML = '<span><b>' + esc(name) + '</b> sent you a message</span><a href="messages.html?with=' + encodeURIComponent(m.sender_id) + '">Open</a>';
+    document.body.appendChild(t);
+    setTimeout(function(){ if (t.parentNode) t.remove(); }, 8000);
+  }
+
+  function subscribe(){
+    var c = ctx(); if (!c) return;
+    try {
+      c.sb.channel('bgs_sync_' + uid)
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'connections', filter: 'addressee_id=eq.' + uid }, function(){ fire('bgs:connections-changed'); refresh(); })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'connections', filter: 'requester_id=eq.' + uid }, function(){ fire('bgs:connections-changed'); refresh(); })
+        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'dm_messages', filter: 'recipient_id=eq.' + uid }, onDM)
+        .subscribe();
+    } catch(e){}
+  }
+
+  function start(){
+    var c = ctx(); if (!c || started) return;
+    started = true; uid = c.user.id;
+    css(); refresh(); subscribe();
+    setInterval(refresh, 30000);
+    document.addEventListener('visibilitychange', function(){ if (!document.hidden) refresh(); });
+  }
+  var tries = 0, boot = setInterval(function(){ tries++; if (ctx()) { clearInterval(boot); start(); } else if (tries > 170) clearInterval(boot); }, 700);
 })();
 </script>
 
