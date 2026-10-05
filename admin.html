@@ -18,7 +18,7 @@
 html{scroll-behavior:smooth;}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
 a{color:inherit;}
-.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.wrap{max-width:1600px;margin:0 auto;padding:0 28px;}
 .eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
 h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
 .kente-stripe{height:6px;display:flex;}
@@ -29,7 +29,7 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
 .kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
 
 .app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
-.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1180px;margin:0 auto;gap:16px;flex-wrap:wrap;}
+.app-topbar-inner{display:flex;align-items:center;justify-content:space-between;padding:14px 28px;max-width:1600px;margin:0 auto;gap:16px;flex-wrap:wrap;}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
 .brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);;overflow:hidden;background:var(--surface);}
 
@@ -172,6 +172,7 @@ form button[type="submit"]{flex-shrink:0;}
       <button data-tab="community">Community &amp; Q&amp;A <span class="count-badge" id="adminCommunityCount"></span></button>
       <button data-tab="lounge">Live Lounge <span class="count-badge" id="adminLoungeCount"></span></button>
       <button data-tab="events">Business Hour <span class="count-badge" id="adminEventsCount"></span></button>
+      <button data-tab="attendance">Attendance <span class="count-badge" id="adminJoinsCount"></span></button>
       <button data-tab="hourq">Hour questions <span class="count-badge" id="adminHourqCount"></span></button>
     </div>
     <div id="adminPanelBody"></div>
@@ -354,6 +355,13 @@ async function loadAdminConsole(){
     window._adminData.conns = conns || [];
     await preloadNamesFor(window._adminData.hourQuestions.map(q => q.user_id));
   } catch (e) { window._adminData.hourQuestions = []; window._adminData.notes = []; window._adminData.conns = []; }
+  try {
+    const { data: sj, error: sjErr } = await sb.from('session_joins').select('*').order('session_start', { ascending: false }).order('joined_at', { ascending: true }).limit(3000);
+    window._adminData.joins = sjErr ? [] : (sj || []);
+    window._adminData.joinsMissing = !!sjErr;
+    await preloadNamesFor(window._adminData.joins.map(j => j.user_id));
+  } catch (e) { window._adminData.joins = []; window._adminData.joinsMissing = true; }
+  document.getElementById('adminJoinsCount').textContent = (window._adminData.joins || []).length || '';
   const newQs = (window._adminData.hourQuestions || []).filter(q => q.status === 'new').length;
   document.getElementById('adminHourqCount').textContent = newQs || '';
   renderAdminPanel();
@@ -364,15 +372,20 @@ async function loadAdminConsole(){
 function isComplete(m){
   const t = v => (v == null ? '' : String(v)).trim();
   if (!m || t(m.name).length < 2 || t(m.phone).replace(/\D/g, '').length < 9 || t(m.location).length < 2) return false;
-  if (m.has_business === false) return t(m.business_idea).length >= 5 && t(m.series_goal).length >= 5;
+  const stage = m.business_stage || (m.has_business === false ? 'starting' : 'running');
+  if (stage === 'education') return t(m.series_goal).length >= 5;
+  if (stage === 'starting') return t(m.business_idea).length >= 5 && t(m.series_goal).length >= 5;
   return t(m.business_name).length >= 2 && t(m.category) !== '' && t(m.sells).length >= 3;
 }
 function missingFor(m){
   const t = v => (v == null ? '' : String(v)).trim(), out = [];
-  if (t(m.name).length < 2) out.push('name');
+  if (t(m.name).length < 2 || t(m.name) === 'New member') out.push('name');
   if (t(m.phone).replace(/\D/g, '').length < 9) out.push('phone');
   if (t(m.location).length < 2) out.push('location');
-  if (m.has_business === false) { if (t(m.business_idea).length < 5) out.push('business idea'); if (t(m.series_goal).length < 5) out.push('series goal'); }
+  const stage = m.business_stage || (m.has_business === false ? 'starting' : 'running');
+  if (!m.business_stage && m.has_business !== false && t(m.sells).length < 3) out.push('has not chosen running / starting / just education');
+  if (stage === 'education') { if (t(m.series_goal).length < 5) out.push('what they want to learn'); }
+  else if (stage === 'starting') { if (t(m.business_idea).length < 5) out.push('business idea'); if (t(m.series_goal).length < 5) out.push('series goal'); }
   else { if (t(m.business_name).length < 2) out.push('business name'); if (!t(m.category)) out.push('category'); if (t(m.sells).length < 3) out.push('what they sell'); }
   return out;
 }
@@ -558,9 +571,68 @@ function renderAdminPanel(){
           <button class="btn-danger admin-event-delete" data-id="${esc(ev.id)}">Delete</button>
         </div>
       </div>`).join('') || '<p class="empty-note">No sessions yet.</p>'}`;
+  } else if (activeAdminTab === 'attendance') {
+    renderAttendanceTab(body, d);
   } else if (activeAdminTab === 'hourq') {
     renderHourQuestionsTab(body, d);
   }
+}
+
+
+// ---------------------------------------------------------------------
+// ATTENDANCE: who tapped the Business Hour join link, grouped by week.
+// A row is saved when a member taps the Meet link inside the platform
+// (or opens join.html) during the live window. It shows who clicked
+// in, not how long they stayed on the call.
+// ---------------------------------------------------------------------
+function renderAttendanceTab(body, d){
+  if (d.joinsMissing) {
+    body.innerHTML = '<p class="empty-note">The session_joins table does not exist yet. Run 5-profile-lock-and-attendance.sql in Supabase, then refresh this page.</p>';
+    return;
+  }
+  const joins = d.joins || [];
+  const memberById = {};
+  (d.members || []).forEach(m => { memberById[m.id] = m; });
+  const bySession = {};
+  joins.forEach(j => { (bySession[j.session_start] = bySession[j.session_start] || []).push(j); });
+  const sessions = Object.keys(bySession).sort((a, b) => new Date(b) - new Date(a));
+  const perMember = {};
+  joins.forEach(j => { perMember[j.user_id] = (perMember[j.user_id] || 0) + 1; });
+  const unique = Object.keys(perMember).length;
+  const avg = sessions.length ? Math.round(joins.length / sessions.length * 10) / 10 : 0;
+  const link = location.origin + location.pathname.replace(/[^/]*$/, '') + 'join.html';
+  const stat = (n, label) => `<div style="flex:1;min-width:130px;border:1px solid var(--line);background:var(--surface-2);padding:14px 16px;"><div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;color:var(--teal);">${n}</div><div style="font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-top:4px;">${label}</div></div>`;
+  body.innerHTML = `
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
+      ${stat(sessions.length, 'Sessions with joins')}
+      ${stat(unique, 'Different members joined')}
+      ${stat(avg, 'Average per session')}
+    </div>
+    <div style="border:1px solid var(--gold);background:rgba(176,141,63,0.08);padding:14px 16px;margin-bottom:22px;font-size:13px;line-height:1.6;">
+      <b>Use this tracked link in emails, WhatsApp and TikTok:</b><br>
+      <code id="trackedJoinLink" style="word-break:break-all;">${esc(link)}</code>
+      <button type="button" class="btn-ghost" id="copyTrackedLink" style="margin-left:10px;">Copy link</button><br>
+      <span style="color:var(--ink-dim);">Members who open it are logged in, counted for that week, then sent straight to the Google Meet room. A raw Meet link pasted anywhere cannot be counted. This shows who clicked in, not how long they stayed.</span>
+    </div>
+    ${sessions.map(sk => {
+      const rows = bySession[sk];
+      return `
+      <div style="border:1px solid var(--line);margin-bottom:16px;">
+        <div style="padding:12px 16px;background:var(--surface-2);font-weight:700;font-size:14px;">${esc(new Date(sk).toLocaleString('en-GB', { timeZone: 'Africa/Accra', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true }))} <span style="color:var(--teal);">· ${rows.length} joined</span></div>
+        ${rows.map(j => {
+          const m = memberById[j.user_id] || {};
+          const returning = perMember[j.user_id] > 1 ? ` <span style="color:var(--gold);font-size:11px;">(${perMember[j.user_id]} sessions in total)</span>` : '';
+          return `<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:10px 16px;border-top:1px solid var(--line);font-size:13px;">
+            <span><b>${esc(m.name || nameFor(j.user_id))}</b>${m.business_name ? ' · ' + esc(m.business_name) : ''}${returning}</span>
+            <span style="color:var(--ink-dim);">${esc(m.phone || '')} · joined at ${esc(new Date(j.joined_at).toLocaleTimeString('en-GB', { timeZone: 'Africa/Accra', hour: '2-digit', minute: '2-digit' }))}</span>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('') || '<p class="empty-note">No joins recorded yet. They appear here after members tap the join link during a live session.</p>'}`;
+  const copyBtn = document.getElementById('copyTrackedLink');
+  if (copyBtn) copyBtn.addEventListener('click', () => {
+    try { navigator.clipboard.writeText(link); copyBtn.textContent = 'Copied'; } catch (e) { copyBtn.textContent = 'Copy failed'; }
+  });
 }
 
 // ---------------------------------------------------------------------
@@ -829,7 +901,7 @@ function openMemberModal(userId){
     ['Name', m.name], ['Business', m.business_name], ['Category', m.category],
     ['Phone / WhatsApp', m.phone], ['Email (private)', m.email],
     ['Location', m.location], ['Landmark', m.landmark],
-    ['Has a running business', m.has_business === false ? 'No — idea stage' : 'Yes'],
+    ['Business stage', m.business_stage === 'education' ? 'No business, just the education' : (m.business_stage === 'starting' || m.has_business === false) ? 'Starting a business' : (m.business_stage === 'running' || (m.sells && String(m.sells).trim().length >= 3)) ? 'Has a running business' : 'Not chosen yet'],
     ['Sells', m.sells],
     ['Business idea', m.business_idea],
     ['Goal for the Series', m.series_goal],
