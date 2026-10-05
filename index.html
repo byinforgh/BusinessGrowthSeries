@@ -45,7 +45,7 @@ body{
 a{color:inherit;}
 img{max-width:100%;display:block;}
 
-.wrap{max-width:1320px;margin:0 auto;padding:0 28px;}
+.wrap{max-width:1600px;margin:0 auto;padding:0 28px;}
 .eyebrow{
   font-family:'Inter',sans-serif;
   letter-spacing:.14em;
@@ -63,7 +63,7 @@ nav{
   backdrop-filter:blur(10px);
   border-bottom:1px solid var(--line);
 }
-.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1320px;margin:0 auto;}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1600px;margin:0 auto;}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:17px;letter-spacing:.02em;text-decoration:none;}
 .brand-mark{
   width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);
@@ -882,6 +882,41 @@ window.addEventListener('load', () => setTimeout(reflectSessionState, 50));
     btn.style.alignItems = 'center'; btn.style.justifyContent = 'center';
   });
   btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+})();
+</script>
+
+<script id="bgs-hour-attendance">
+/* Business Hour attendance: when a member taps a Google Meet join link inside the platform
+   during the live window (60 min before start until 90 min after), one row is saved for that
+   week's session. One row per member per session, so repeat taps never double count. */
+(function(){
+  if (window.__bgsAttend) return; window.__bgsAttend = true;
+  var WEEK = 7*24*60*60*1000, LIVE = 90*60*1000, EARLY = 60*60*1000, events = null;
+  async function getEvents(){
+    if (events) return events;
+    try { var r = await sb.from('events').select('id,event_at,meet_url').not('meet_url','is',null).not('event_at','is',null); events = r.data || []; } catch(e){ events = []; }
+    return events;
+  }
+  function occurrence(ev, now){
+    var s = new Date(ev.event_at).getTime();
+    if (now <= s + LIVE) return s;
+    return s + Math.ceil((now - s - LIVE) / WEEK) * WEEK;
+  }
+  document.addEventListener('click', async function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href*="meet.google.com"]') : null;
+    if (!a || typeof sb === 'undefined' || !sb) return;
+    try {
+      var sess = await sb.auth.getSession(); var session = sess.data && sess.data.session; if (!session) return;
+      var evs = await getEvents(), now = Date.now(), hit = null;
+      evs.forEach(function(ev){
+        if (a.href.indexOf((ev.meet_url || '').replace(/^https?:\/\//,'')) === -1) return;
+        var start = occurrence(ev, now);
+        if (now >= start - EARLY && now <= start + LIVE) hit = { ev: ev, start: start };
+      });
+      if (!hit) return;
+      await sb.from('session_joins').insert({ user_id: session.user.id, event_id: hit.ev.id, session_start: new Date(hit.start).toISOString(), source: 'in-app link' });
+    } catch(err){ /* duplicate row or missing table: never block the member */ }
+  }, true);
 })();
 </script>
 </body>
