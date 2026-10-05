@@ -19,7 +19,7 @@
 html{scroll-behavior:smooth;}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
 a{color:inherit;}
-.wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+.wrap{max-width:1600px;margin:0 auto;padding:0 28px;}
 .eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
 h1,h2,h3{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
 .kente-stripe{height:6px;display:flex;}
@@ -30,7 +30,7 @@ h1,h2,h3{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:
 .kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
 
 .app-topbar{position:sticky;top:0;z-index:50;background:rgba(250,246,236,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
-.app-topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1180px;margin:0 auto;gap:12px;}
+.app-topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1600px;margin:0 auto;gap:12px;}
 .app-topbar-row2{position:relative;border-top:1px solid var(--line);}
 .app-topbar-row2::after{content:'';position:absolute;top:0;right:0;bottom:0;width:28px;pointer-events:none;background:linear-gradient(90deg, transparent, var(--bg));}
 .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;}
@@ -39,7 +39,7 @@ h1,h2,h3{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:
 .btn-ghost:hover{border-color:var(--ink-dim);color:var(--ink);}
 .jump-nav{
   display:flex;gap:10px;align-items:center;overflow-x:auto;white-space:nowrap;
-  max-width:1180px;margin:0 auto;padding:10px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  max-width:1600px;margin:0 auto;padding:10px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none;
 }
 .jump-nav::-webkit-scrollbar{display:none;}
 .jump-nav a{flex-shrink:0;}
@@ -286,15 +286,18 @@ async function initPage(){
 // business yet). Existing members who filled "sells" before this
 // change was made are never sent back through the profile form again.
 function isProfileComplete(p){
-  // Strict rule, same as the database lock: real values, not blanks or filler.
+  // Strict rule, same as the database lock (bgs_profile_complete): real values, not blanks or filler.
   if (!p) return false;
   const t = v => (v == null ? '' : String(v)).trim();
   const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
   if (t(p.name).length < 2 || junk(p.name)) return false;
   if (t(p.phone).replace(/\D/g, '').length < 9) return false;
   if (t(p.location).length < 2 || junk(p.location)) return false;
-  if (p.has_business === false) return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
-  return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
+  const stage = p.business_stage || (p.has_business === false ? 'starting' : 'running');
+  if (stage === 'education') return t(p.series_goal).length >= 5;
+  if (stage === 'starting') return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
+  if (stage === 'running') return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
+  return false;
 }
   if (!isProfileComplete(profile)) { try { sessionStorage.setItem('byg_redirect', location.pathname.split('/').pop() || 'app.html'); } catch(e){} location.href = 'auth.html'; return; }
   currentUser = session.user;
@@ -933,5 +936,40 @@ function applyDeepLink(){
 })();
 </script>
 
+
+<script id="bgs-hour-attendance">
+/* Business Hour attendance: when a member taps a Google Meet join link inside the platform
+   during the live window (60 min before start until 90 min after), one row is saved for that
+   week's session. One row per member per session, so repeat taps never double count. */
+(function(){
+  if (window.__bgsAttend) return; window.__bgsAttend = true;
+  var WEEK = 7*24*60*60*1000, LIVE = 90*60*1000, EARLY = 60*60*1000, events = null;
+  async function getEvents(){
+    if (events) return events;
+    try { var r = await sb.from('events').select('id,event_at,meet_url').not('meet_url','is',null).not('event_at','is',null); events = r.data || []; } catch(e){ events = []; }
+    return events;
+  }
+  function occurrence(ev, now){
+    var s = new Date(ev.event_at).getTime();
+    if (now <= s + LIVE) return s;
+    return s + Math.ceil((now - s - LIVE) / WEEK) * WEEK;
+  }
+  document.addEventListener('click', async function(e){
+    var a = e.target && e.target.closest ? e.target.closest('a[href*="meet.google.com"]') : null;
+    if (!a || typeof sb === 'undefined' || !sb) return;
+    try {
+      var sess = await sb.auth.getSession(); var session = sess.data && sess.data.session; if (!session) return;
+      var evs = await getEvents(), now = Date.now(), hit = null;
+      evs.forEach(function(ev){
+        if (a.href.indexOf((ev.meet_url || '').replace(/^https?:\/\//,'')) === -1) return;
+        var start = occurrence(ev, now);
+        if (now >= start - EARLY && now <= start + LIVE) hit = { ev: ev, start: start };
+      });
+      if (!hit) return;
+      await sb.from('session_joins').insert({ user_id: session.user.id, event_id: hit.ev.id, session_start: new Date(hit.start).toISOString(), source: 'in-app link' });
+    } catch(err){ /* duplicate row or missing table: never block the member */ }
+  }, true);
+})();
+</script>
 </body>
 </html>
