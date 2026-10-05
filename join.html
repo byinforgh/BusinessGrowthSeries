@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join the BYINFORGH Business Hour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#FAF6EC;--ink:#1c1c1c;--ink-dim:#5d5a52;--teal:#0F4C5C;--gold:#B08D3F;--line:rgba(0,0,0,0.12);}
+*{box-sizing:border-box;}
+body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;padding:24px;}
+.card{max-width:460px;width:100%;border:1px solid var(--line);background:#fff;padding:36px 30px;text-align:center;}
+.spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;margin:0 auto 18px;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+h1{font-size:20px;margin:0 0 10px;}
+p{font-size:14px;line-height:1.6;color:var(--ink-dim);margin:0 0 16px;}
+a.btn{display:inline-block;background:var(--teal);color:#fff;padding:13px 24px;font-weight:600;font-size:13px;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;}
+</style>
+</head>
+<body>
+<div class="card" id="card">
+  <div class="spinner"></div>
+  <h1>Taking you to the Business Hour</h1>
+  <p>One moment, we are logging your place for this week.</p>
+</div>
+<script>
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+const WEEK = 7*24*60*60*1000, LIVE = 90*60*1000, EARLY = 60*60*1000;
+function occurrence(ev, now){
+  const s = new Date(ev.event_at).getTime();
+  if (now <= s + LIVE) return s;
+  return s + Math.ceil((now - s - LIVE) / WEEK) * WEEK;
+}
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function show(html){ document.getElementById('card').innerHTML = html; }
+
+async function run(){
+  if (!sb) { show('<h1>Something is not connected</h1><p>Please open the Business Hour link from the platform instead.</p>'); return; }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) {
+    try { sessionStorage.setItem('byg_redirect', 'join.html'); } catch(e){}
+    location.replace('auth.html?mode=login');
+    return;
+  }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  const t = v => (v == null ? '' : String(v)).trim();
+  const stage = profile && (profile.business_stage || (profile.has_business === false ? 'starting' : 'running'));
+  const complete = profile && t(profile.name).length >= 2 && t(profile.phone).replace(/\D/g,'').length >= 9 && t(profile.location).length >= 2 &&
+    ((stage === 'education' && t(profile.series_goal).length >= 5) ||
+     (stage === 'starting' && t(profile.business_idea).length >= 5 && t(profile.series_goal).length >= 5) ||
+     (stage === 'running' && t(profile.business_name).length >= 2 && t(profile.category) !== '' && t(profile.sells).length >= 3));
+  if (!complete) {
+    try { sessionStorage.setItem('byg_redirect', 'join.html'); } catch(e){}
+    location.replace('auth.html');
+    return;
+  }
+  const { data: events } = await sb.from('events').select('id,title,event_at,meet_url').not('meet_url','is',null).not('event_at','is',null);
+  if (!events || !events.length) { show('<h1>No session scheduled</h1><p>The next Business Hour has not been published yet.</p><a class="btn" href="app.html">Back to the dashboard</a>'); return; }
+  const now = Date.now();
+  let best = null;
+  events.forEach(ev => { const start = occurrence(ev, now); if (!best || start < best.start) best = { ev, start }; });
+  const inWindow = now >= best.start - EARLY && now <= best.start + LIVE;
+  if (inWindow) {
+    try {
+      await sb.from('session_joins').insert({ user_id: session.user.id, event_id: best.ev.id, session_start: new Date(best.start).toISOString(), source: 'tracked link' });
+    } catch(e){}
+    location.replace(best.ev.meet_url);
+    setTimeout(() => show('<h1>Opening the Business Hour</h1><p>If nothing opened, tap the button.</p><a class="btn" href="' + esc(best.ev.meet_url) + '">Open Google Meet</a>'), 1500);
+  } else {
+    const when = new Date(best.start).toLocaleString('en-GB', { timeZone: 'Africa/Accra', weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', hour12: true });
+    show('<h1>The Business Hour is not live yet</h1><p>The next session starts <b>' + esc(when) + '</b> Ghana time. This link opens up an hour before the start, so come back then.</p><a class="btn" href="app.html">Back to the dashboard</a>');
+  }
+}
+run();
+</script>
+</body>
+</html>
