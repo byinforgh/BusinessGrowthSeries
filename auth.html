@@ -58,7 +58,7 @@ h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;t
 .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--teal);}
 .field-hint{font-size:11.5px;color:var(--ink-dim);}
 .biz-toggle{display:flex;gap:10px;flex-wrap:wrap;}
-.biz-toggle-opt{flex:1;min-width:200px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:13.5px;border-radius:2px;cursor:pointer;text-align:left;transition:border-color .15s,color .15s;}
+.biz-toggle-opt{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:13.5px;border-radius:2px;cursor:pointer;text-align:left;transition:border-color .15s,color .15s;}
 .biz-toggle-opt.active{border-color:var(--teal);color:var(--ink);background:rgba(15,76,92,0.06);font-weight:600;}
 .form-status{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--teal);min-height:18px;margin-top:10px;}
 
@@ -216,84 +216,87 @@ form button[type="submit"]{flex-shrink:0;}
           <div id="profileReturningNote" style="display:none;border:1px solid var(--gold);background:rgba(176,141,63,0.1);padding:14px 16px;margin-bottom:20px;border-radius:2px;">
             <p style="margin:0;font-size:13.5px;color:var(--ink);"><b>Welcome back!</b> You're just a couple of details away from your dashboard, community, and the 203 lessons. Won't take long.</p>
           </div>
-          <h2>Set up your business profile</h2>
-          <p class="sub">This is how other members and the AI assistant get to know your business. Takes two minutes.</p>
-          <form id="profileForm">
+          <h2>Complete your profile to enter</h2>
+          <p class="sub">Every question below is required before you can enter the platform. Pick the option that fits you, then answer everything. Takes two minutes.</p>
+          <form id="profileForm" novalidate>
             <div class="field">
-              <label>Where are you right now</label>
+              <label>Where are you right now (pick one to continue)</label>
               <div class="biz-toggle" id="bizToggle" role="group">
-                <button type="button" class="biz-toggle-opt active" id="optHasBusiness" data-val="yes">I already have a running business</button>
-                <button type="button" class="biz-toggle-opt" id="optNoBusiness" data-val="no">I don't have one yet, just an idea</button>
+                <button type="button" class="biz-toggle-opt" data-stage="running">I have a running business</button>
+                <button type="button" class="biz-toggle-opt" data-stage="starting">I'm starting a business</button>
+                <button type="button" class="biz-toggle-opt" data-stage="education">I don't have a business, I just want the education</button>
               </div>
             </div>
-            <div class="grid2">
-              <div class="field">
-                <label>Your name</label>
-                <input type="text" id="pName" placeholder="Full name" required>
-              </div>
-              <div class="field" id="fieldBusinessName">
-                <label>Business name</label>
-                <input type="text" id="pBusinessName" placeholder="Business name">
-              </div>
-            </div>
-            <div class="grid2">
-              <div class="field" id="fieldCategory">
-                <label>Category</label>
-                <select id="pCategory">
-                  <option value="">Select one</option>
-                  <option>Fashion</option><option>Food</option><option>Retail</option>
-                  <option>Services</option><option>Logistics</option><option>Other</option>
-                </select>
-              </div>
-              <div class="field">
-                <label>WhatsApp / phone number</label>
-                <input type="tel" id="pPhone" placeholder="+233 XX XXX XXXX" required>
-                <span class="field-hint">Other members will be able to see this in the directory, so real customers and contacts can reach you.</span>
-              </div>
-            </div>
-            <div class="grid2">
-              <div class="field">
-                <label>Location</label>
-                <input type="text" id="pLocation" placeholder="e.g. Kumasi" required>
-              </div>
-              <div class="field">
-                <label>Nearest landmark</label>
-                <input type="text" id="pLandmark" placeholder="e.g. Near Adum Market">
-              </div>
-            </div>
-            <div class="field" id="fieldSells">
-              <label>What do you sell or offer</label>
-              <textarea id="pSells" rows="2" placeholder="e.g. Ready to wear dresses and custom tailoring"></textarea>
-            </div>
-            <div class="field" id="fieldIdea" style="display:none;">
-              <label>What's your business idea</label>
-              <textarea id="pBusinessIdea" rows="2" placeholder="e.g. I want to start selling handmade jewelry online"></textarea>
-              <span class="field-hint">No business yet is completely fine, this just helps us point you to the right lessons and people.</span>
-            </div>
-            <div class="field">
-              <label>What are you looking for right now</label>
-              <textarea id="pLookingFor" rows="2" placeholder="e.g. More customers, a supplier, a business partner to collaborate with"></textarea>
-            </div>
-            <div class="field" id="fieldSeriesGoal">
-              <label id="lblSeriesGoal">What do you want to get out of the Business Growth Series</label>
-              <textarea id="pSeriesGoal" rows="2" placeholder="e.g. Learn how to price my products and find my first 10 customers"></textarea>
-            </div>
-            <div class="field">
-              <label>Business logo or photo (optional)</label>
-              <div class="logo-upload-row">
-                <div class="logo-preview" id="logoPreview">B</div>
-                <div style="flex:1;">
-                  <input type="file" id="pLogo" accept="image/*" style="font-size:12.5px;color:var(--ink-dim);">
-                  <span class="field-hint" style="display:block;margin-top:6px;">Shows on your directory card and any spotlight feature. Skip for now and add it later if you like.</span>
+            <div id="profileFields" style="display:none;">
+              <div class="grid2">
+                <div class="field">
+                  <label>Your name</label>
+                  <input type="text" id="pName" placeholder="Full name">
+                </div>
+                <div class="field" id="fieldBusinessName">
+                  <label>Business name</label>
+                  <input type="text" id="pBusinessName" placeholder="Business name">
                 </div>
               </div>
+              <div class="grid2">
+                <div class="field" id="fieldCategory">
+                  <label>Category</label>
+                  <select id="pCategory">
+                    <option value="">Select one</option>
+                    <option>Fashion</option><option>Food</option><option>Retail</option>
+                    <option>Services</option><option>Logistics</option><option>Other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>WhatsApp / phone number</label>
+                  <input type="tel" id="pPhone" placeholder="+233 XX XXX XXXX">
+                  <span class="field-hint">Other members will be able to see this in the directory, so real customers and contacts can reach you.</span>
+                </div>
+              </div>
+              <div class="grid2">
+                <div class="field">
+                  <label>Location</label>
+                  <input type="text" id="pLocation" placeholder="e.g. Kumasi">
+                </div>
+                <div class="field">
+                  <label>Nearest landmark</label>
+                  <input type="text" id="pLandmark" placeholder="e.g. Near Adum Market">
+                </div>
+              </div>
+              <div class="field" id="fieldSells">
+                <label>What do you sell or offer</label>
+                <textarea id="pSells" rows="2" placeholder="e.g. Ready to wear dresses and custom tailoring"></textarea>
+              </div>
+              <div class="field" id="fieldIdea" style="display:none;">
+                <label>What's your business idea</label>
+                <textarea id="pBusinessIdea" rows="2" placeholder="e.g. I want to start selling handmade jewelry online"></textarea>
+                <span class="field-hint">Starting out is completely fine, this just helps us point you to the right lessons and people.</span>
+              </div>
+              <div class="field">
+                <label>What are you looking for right now</label>
+                <textarea id="pLookingFor" rows="2" placeholder="e.g. More customers, a supplier, a business partner, or skills to learn"></textarea>
+              </div>
+              <div class="field" id="fieldSeriesGoal">
+                <label id="lblSeriesGoal">What do you want to get out of the Business Growth Series</label>
+                <textarea id="pSeriesGoal" rows="2" placeholder="e.g. Learn how to price my products and find my first 10 customers"></textarea>
+              </div>
+              <div class="field">
+                <label>Business logo or photo (optional)</label>
+                <div class="logo-upload-row">
+                  <div class="logo-preview" id="logoPreview">B</div>
+                  <div style="flex:1;">
+                    <input type="file" id="pLogo" accept="image/*" style="font-size:12.5px;color:var(--ink-dim);">
+                    <span class="field-hint" style="display:block;margin-top:6px;">The only optional item. Shows on your directory card. You can add it later.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label>What's your biggest struggle right now</label>
+                <textarea id="pStruggle" rows="2" placeholder="e.g. Customers don't reply after I quote a price"></textarea>
+                <span class="field-hint">This helps the AI assistant and the community actually help you, be specific.</span>
+              </div>
+              <button type="submit" class="btn-primary" id="saveProfileBtn">Enter Business Growth Series &rarr;</button>
             </div>
-            <div class="field">
-              <label>What's your biggest struggle right now</label>
-              <textarea id="pStruggle" rows="2" placeholder="e.g. Customers don't reply after I quote a price" required></textarea>
-              <span class="field-hint">This helps the AI assistant and the community actually help you, be specific.</span>
-            </div>
-            <button type="submit" class="btn-primary" id="saveProfileBtn">Enter Business Growth Series &rarr;</button>
           </form>
           <div class="form-status" id="profileStatus"></div>
           <p style="font-size:11.5px;color:var(--ink-dim);margin-top:16px;text-align:center;">By joining you agree to our <a href="privacy.html" style="color:var(--teal);">Privacy Policy &amp; Terms</a>. Your struggle and email stay private, only visible to you and BYINFORGH.</p>
@@ -453,56 +456,48 @@ document.getElementById('changeEmailBtn').addEventListener('click', () => {
   clearInterval(resendCooldownTimer);
 });
 
-// ---- Has-business toggle: swaps which fields are required so a
-// member with no business yet isn't blocked by fields that assume
-// they already sell something ----
-let hasBusiness = true;
-const optHasBusiness = document.getElementById('optHasBusiness');
-const optNoBusiness = document.getElementById('optNoBusiness');
-const fieldSells = document.getElementById('fieldSells');
-const fieldIdea = document.getElementById('fieldIdea');
-const fieldCategory = document.getElementById('fieldCategory');
-const fieldBusinessName = document.getElementById('fieldBusinessName');
-const lblSeriesGoal = document.getElementById('lblSeriesGoal');
-function applyBizToggle(){
-  optHasBusiness.classList.toggle('active', hasBusiness);
-  optNoBusiness.classList.toggle('active', !hasBusiness);
-  fieldSells.style.display = hasBusiness ? '' : 'none';
-  fieldIdea.style.display = hasBusiness ? 'none' : '';
-  document.getElementById('pSells').required = hasBusiness;
-  document.getElementById('pBusinessIdea').required = !hasBusiness;
-  document.getElementById('pCategory').required = hasBusiness;
-  document.getElementById('pBusinessName').required = hasBusiness;
-  fieldBusinessName.style.display = hasBusiness ? '' : 'none';
-  if (typeof updateProfileProgress === 'function') updateProfileProgress();
-  document.getElementById('pSeriesGoal').required = !hasBusiness;
-  lblSeriesGoal.textContent = hasBusiness
-    ? "What do you want to get out of the Business Growth Series (optional, but tell us if you can)"
-    : "What do you want to get out of the Business Growth Series";
+// ---- Business stage: nothing is pre-selected. The member must pick one of
+// three paths (running business, starting a business, just the education)
+// before any other question appears, and every question is then required. ----
+let stage = null;
+const stageBtns = document.querySelectorAll('#bizToggle .biz-toggle-opt');
+function applyStage(){
+  const g = id => document.getElementById(id);
+  stageBtns.forEach(b => b.classList.toggle('active', b.dataset.stage === stage));
+  g('profileFields').style.display = stage ? '' : 'none';
+  if (stage) {
+    g('fieldBusinessName').style.display = stage === 'running' ? '' : 'none';
+    g('fieldCategory').style.display = stage === 'running' ? '' : 'none';
+    g('fieldSells').style.display = stage === 'running' ? '' : 'none';
+    g('fieldIdea').style.display = stage === 'starting' ? '' : 'none';
+    g('lblSeriesGoal').textContent = stage === 'education'
+      ? 'What do you want to learn from the Business Growth Series'
+      : 'What do you want to get out of the Business Growth Series';
+  }
+  updateProfileProgress();
 }
-optHasBusiness.addEventListener('click', () => { hasBusiness = true; applyBizToggle(); });
-optNoBusiness.addEventListener('click', () => { hasBusiness = false; applyBizToggle(); });
-applyBizToggle();
-
+stageBtns.forEach(b => b.addEventListener('click', () => { stage = b.dataset.stage; applyStage(); }));
 
 // ---- Required fields, live progress, and pre-fill for returning members ----
 const _junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test((v || '').trim());
 function profileRequiredList(){
   const v = id => (document.getElementById(id).value || '').trim();
-  const list = [
-    ['Your name', v('pName').length >= 2 && !_junk(v('pName'))],
-    ['WhatsApp / phone number (at least 9 digits)', v('pPhone').replace(/\D/g, '').length >= 9],
-    ['Location', v('pLocation').length >= 2 && !_junk(v('pLocation'))],
-  ];
-  if (hasBusiness) {
-    list.push(['Business name', v('pBusinessName').length >= 2]);
+  const list = [['Where you are right now', !!stage]];
+  if (!stage) return list;
+  list.push(['Your name', v('pName').length >= 2 && !_junk(v('pName'))]);
+  list.push(['WhatsApp / phone number (at least 9 digits)', v('pPhone').replace(/\D/g, '').length >= 9]);
+  list.push(['Location', v('pLocation').length >= 2 && !_junk(v('pLocation'))]);
+  list.push(['Nearest landmark', v('pLandmark').length >= 3 && !_junk(v('pLandmark'))]);
+  if (stage === 'running') {
+    list.push(['Business name', v('pBusinessName').length >= 2 && !_junk(v('pBusinessName'))]);
     list.push(['Category', v('pCategory') !== '']);
-    list.push(['What you sell or offer', v('pSells').length >= 3]);
-  } else {
-    list.push(['Your business idea', v('pBusinessIdea').length >= 5]);
-    list.push(['What you want from the Series', v('pSeriesGoal').length >= 5]);
+    list.push(['What you sell or offer', v('pSells').length >= 3 && !_junk(v('pSells'))]);
+  } else if (stage === 'starting') {
+    list.push(['Your business idea', v('pBusinessIdea').length >= 5 && !_junk(v('pBusinessIdea'))]);
   }
-  list.push(['Your biggest struggle', v('pStruggle').length >= 3]);
+  list.push([stage === 'education' ? 'What you want to learn' : 'What you want from the Series', v('pSeriesGoal').length >= 5 && !_junk(v('pSeriesGoal'))]);
+  list.push(['What you are looking for', v('pLookingFor').length >= 3 && !_junk(v('pLookingFor'))]);
+  list.push(['Your biggest struggle', v('pStruggle').length >= 3 && !_junk(v('pStruggle'))]);
   return list;
 }
 function profileMissingFields(){ return profileRequiredList().filter(x => !x[1]).map(x => x[0]); }
@@ -524,13 +519,14 @@ function updateProfileProgress(){
 })();
 function prefillProfileForm(p){
   if (!p) return;
+  if (!stage) stage = p.business_stage || (p.has_business === false ? 'starting' : (p.sells ? 'running' : null));
   const set = (id, val) => { const el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
-  set('pName', p.name); set('pBusinessName', p.business_name); set('pCategory', p.category);
+  set('pName', p.name === 'New member' ? '' : p.name); set('pBusinessName', p.business_name); set('pCategory', p.category);
   set('pPhone', p.phone); set('pLocation', p.location); set('pLandmark', p.landmark);
   set('pSells', p.sells); set('pBusinessIdea', p.business_idea); set('pSeriesGoal', p.series_goal);
   set('pLookingFor', p.looking_for); set('pStruggle', p.struggle);
   if (p.logo_url) document.getElementById('logoPreview').innerHTML = `<img src="${p.logo_url.replace(/"/g, '')}" alt="Your logo">`;
-  updateProfileProgress();
+  applyStage();
 }
 
 // ---- Logo preview ----
@@ -579,15 +575,16 @@ profileForm.addEventListener('submit', async function(e){
   profileStatus.textContent = 'Saving...';
   const { error } = await sb.from('profiles').update({
     name: document.getElementById('pName').value.trim(),
-    business_name: hasBusiness ? (document.getElementById('pBusinessName').value.trim() || null) : (document.getElementById('pBusinessName').value.trim() || null),
-    category: hasBusiness ? document.getElementById('pCategory').value : (document.getElementById('pCategory').value || null),
+    business_name: stage === 'running' ? document.getElementById('pBusinessName').value.trim() : null,
+    category: stage === 'running' ? document.getElementById('pCategory').value : null,
     phone: document.getElementById('pPhone').value.trim(),
     location: document.getElementById('pLocation').value.trim(),
-    landmark: document.getElementById('pLandmark').value.trim() || null,
-    has_business: hasBusiness,
-    sells: hasBusiness ? document.getElementById('pSells').value.trim() : null,
-    business_idea: hasBusiness ? null : document.getElementById('pBusinessIdea').value.trim(),
-    series_goal: document.getElementById('pSeriesGoal').value.trim() || null,
+    landmark: document.getElementById('pLandmark').value.trim(),
+    has_business: stage === 'running',
+    business_stage: stage,
+    sells: stage === 'running' ? document.getElementById('pSells').value.trim() : null,
+    business_idea: stage === 'starting' ? document.getElementById('pBusinessIdea').value.trim() : null,
+    series_goal: document.getElementById('pSeriesGoal').value.trim(),
     looking_for: document.getElementById('pLookingFor').value.trim() || null,
     struggle: document.getElementById('pStruggle').value.trim(),
     ...(logoUrl ? { logo_url: logoUrl } : {}),
@@ -638,7 +635,6 @@ async function routeForSession(session){
   } else {
     // Returning to finish an in-progress profile: restore whichever
     // path they were on so the form doesn't silently reset to "yes".
-    if (profile && profile.has_business === false) { hasBusiness = false; applyBizToggle(); }
     prefillProfileForm(profile);
     const note = document.getElementById('profileReturningNote');
     const left = profileMissingFields();
@@ -656,15 +652,18 @@ async function routeForSession(session){
 // business yet). Existing members who filled "sells" before this
 // change was made are never sent back through the form again.
 function isProfileComplete(p){
-  // Strict rule, same as the database lock: real values, not blanks or filler.
+  // Strict rule, same as the database lock (bgs_profile_complete): real values, not blanks or filler.
   if (!p) return false;
   const t = v => (v == null ? '' : String(v)).trim();
   const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
   if (t(p.name).length < 2 || junk(p.name)) return false;
   if (t(p.phone).replace(/\D/g, '').length < 9) return false;
   if (t(p.location).length < 2 || junk(p.location)) return false;
-  if (p.has_business === false) return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
-  return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
+  const stage = p.business_stage || (p.has_business === false ? 'starting' : 'running');
+  if (stage === 'education') return t(p.series_goal).length >= 5;
+  if (stage === 'starting') return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
+  if (stage === 'running') return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
+  return false;
 }
 
 // A magic link lands back here with tokens in the URL (hash or PKCE
