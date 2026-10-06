@@ -31,6 +31,7 @@ const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
 const sb = (window.supabase) ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
+const MEET_FALLBACK = 'https://meet.google.com/hwm-tsmh-vyk';
 const WEEK = 7*24*60*60*1000, LIVE = 90*60*1000, EARLY = 60*60*1000;
 function occurrence(ev, now){
   const s = new Date(ev.event_at).getTime();
@@ -61,7 +62,7 @@ async function run(){
     return;
   }
   const { data: events } = await sb.from('events').select('id,title,event_at,meet_url').not('meet_url','is',null).not('event_at','is',null);
-  if (!events || !events.length) { show('<h1>No session scheduled</h1><p>The next Business Hour has not been published yet.</p><a class="btn" href="app.html">Back to the dashboard</a>'); return; }
+  if (!events || !events.length) { location.replace(MEET_FALLBACK); setTimeout(() => show('<h1>Opening the Business Hour</h1><p>If nothing opened, tap the button.</p><a class="btn" href="' + MEET_FALLBACK + '">Open Google Meet</a>'), 1500); return; }
   const now = Date.now();
   let best = null;
   events.forEach(ev => { const start = occurrence(ev, now); if (!best || start < best.start) best = { ev, start }; });
@@ -70,7 +71,7 @@ async function run(){
     try {
       await sb.from('session_joins').insert({ user_id: session.user.id, event_id: best.ev.id, session_start: new Date(best.start).toISOString(), source: 'tracked link' });
     } catch(e){}
-    location.replace(best.ev.meet_url);
+    location.replace(best.ev.meet_url || MEET_FALLBACK);
     setTimeout(() => show('<h1>Opening the Business Hour</h1><p>If nothing opened, tap the button.</p><a class="btn" href="' + esc(best.ev.meet_url) + '">Open Google Meet</a>'), 1500);
   } else {
     const when = new Date(best.start).toLocaleString('en-GB', { timeZone: 'Africa/Accra', weekday: 'long', day: 'numeric', month: 'long', hour: 'numeric', minute: '2-digit', hour12: true });
