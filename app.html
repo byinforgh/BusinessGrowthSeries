@@ -761,6 +761,42 @@ form button[type="submit"]{flex-shrink:0;}
       <span id="dashOnlineCount">0</span>&nbsp;business owners online right now
     </div>
     <div id="bhInbox" class="bh-inbox"></div>
+<div id="connPrompt" style="display:none;border:1px solid var(--line);border-left:3px solid var(--gold);background:var(--surface-2);padding:14px 18px;margin:18px 0 0;max-width:720px;font-size:13.5px;line-height:1.6;"></div>
+<script id="bgs-conn-prompt">
+/* Nudges members to check their connections: requests waiting for them, requests they sent, and members online now. */
+(function(){
+  var tries = 0, t = setInterval(async function(){
+    tries++;
+    if (typeof sb === 'undefined' || !sb || typeof currentUser === 'undefined' || !currentUser) { if (tries > 80) clearInterval(t); return; }
+    clearInterval(t);
+    try {
+      var key = 'bgs_conn_prompt_' + new Date().toISOString().slice(0,10);
+      var el = document.getElementById('connPrompt'); if (!el) return;
+      var r = await sb.from('connections').select('requester_id,addressee_id,status').or('requester_id.eq.' + currentUser.id + ',addressee_id.eq.' + currentUser.id);
+      var rows = r.data || [];
+      var inc = rows.filter(function(x){ return x.status === 'pending' && x.addressee_id === currentUser.id; }).length;
+      var out = rows.filter(function(x){ return x.status === 'pending' && x.requester_id === currentUser.id; }).length;
+      var acc = rows.filter(function(x){ return x.status === 'accepted'; });
+      var onlineN = 0;
+      if (acc.length) {
+        var ids = acc.map(function(x){ return x.requester_id === currentUser.id ? x.addressee_id : x.requester_id; });
+        var p = await sb.from('public_profiles').select('id,last_seen').in('id', ids);
+        onlineN = (p.data || []).filter(function(q){ return q.last_seen && Date.now() - new Date(q.last_seen).getTime() < 300000; }).length;
+      }
+      var parts = [];
+      if (inc) parts.push('<a href="connections.html?tab=incoming" style="color:var(--teal);font-weight:700;">' + inc + ' request' + (inc === 1 ? '' : 's') + ' waiting for your reply</a>');
+      if (out) parts.push('<a href="connections.html?tab=outgoing" style="color:var(--teal);font-weight:700;">' + out + ' request' + (out === 1 ? '' : 's') + ' you sent still pending</a>');
+      if (onlineN) parts.push('<a href="connections.html?tab=accepted" style="color:var(--teal);font-weight:700;">' + onlineN + ' of your connections online now</a>');
+      if (!parts.length && !acc.length) parts.push('<a href="connections.html" style="color:var(--teal);font-weight:700;">You have no connections yet. Find your first one</a>');
+      if (!parts.length) return;
+      el.innerHTML = '<b>Check your connections:</b> ' + parts.join(' · ') + '. <span id="connPromptX" style="float:right;cursor:pointer;color:var(--ink-dim);">Dismiss</span>';
+      el.style.display = 'block';
+      var x = document.getElementById('connPromptX'); if (x) x.onclick = function(){ el.style.display = 'none'; };
+    } catch(e){}
+  }, 700);
+})();
+</script>
+
     <div class="start-here-banner" id="startHereBanner">
       <div class="start-here-kente"><span></span><span></span><span></span><span></span></div>
       <div class="start-here-body">
