@@ -68,6 +68,18 @@ section{padding:56px 0;scroll-margin-top:96px;}
 .conn-avatar img{width:100%;height:100%;object-fit:cover;}
 .conn-name{font-size:13.5px;font-weight:700;}
 .conn-meta{font-size:11px;color:var(--ink-dim);}
+.conn-online{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--teal);font-weight:600;}
+.conn-online::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--teal);display:inline-block;}
+.conn-offline{font-size:11px;color:var(--ink-dim);}
+.ref-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;}
+.ref-box{background:var(--bg);max-width:440px;width:100%;padding:26px;border:1px solid var(--line);max-height:85vh;overflow:auto;}
+.ref-box h3{margin:0 0 6px;font-size:17px;}
+.ref-box p{font-size:13px;color:var(--ink-dim);line-height:1.5;margin:0 0 14px;}
+.ref-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line);margin-bottom:8px;cursor:pointer;font-size:13px;}
+.ref-row.sel{border-color:var(--teal);background:var(--surface-2);}
+.ref-row input{margin:0;}
+.ref-note{width:100%;border:1px solid var(--line);background:var(--surface);padding:10px;font-family:'Poppins',sans-serif;font-size:13px;margin:6px 0 14px;min-height:60px;}
+
 .conn-why{font-size:11.5px;color:var(--teal-deep);line-height:1.5;}
 .conn-actions{display:flex;gap:8px;margin-top:auto;}
 .conn-actions button{flex:1;}
@@ -296,6 +308,7 @@ function isProfileComplete(p){
   }
 
   sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+  if (!window.__bgsLsPing) { window.__bgsLsPing = setInterval(() => { if (!document.hidden && currentUser) sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{}); }, 60000); } /* bgs-ls-ping */
 
   document.getElementById('loadingGate').style.display = 'none';
   document.getElementById('pageShell').style.display = 'block';
@@ -315,6 +328,57 @@ let allConnections = [];
 let profileDirectory = {};
 let activeConnTab = 'suggested';
 let connTabTouched = false;
+
+
+// ---------- online status ----------
+function presenceHtml(p){
+  if (!p || !p.last_seen) return '<span class="conn-offline">Offline</span>';
+  const ms = Date.now() - new Date(p.last_seen).getTime();
+  if (ms < 5*60*1000) return '<span class="conn-online">Online now</span>';
+  const m = Math.floor(ms/60000), h = Math.floor(m/60), d = Math.floor(h/24);
+  const ago = m < 60 ? m + ' min ago' : h < 24 ? h + 'h ago' : d + (d === 1 ? ' day ago' : ' days ago');
+  return '<span class="conn-offline">Last seen ' + ago + '</span>';
+}
+// ---------- refer a business to another business ----------
+function openReferModal(referredId){
+  const referred = profileDirectory[referredId];
+  if (!referred) return;
+  const myAccepted = allConnections.filter(c => c.status === 'accepted')
+    .map(c => c.requester_id === currentUser.id ? c.addressee_id : c.requester_id)
+    .filter(id => id !== referredId && profileDirectory[id]);
+  const refName = referred.business_name || referred.name;
+  const ov = document.createElement('div'); ov.className = 'ref-overlay';
+  ov.innerHTML = `<div class="ref-box">
+    <h3>Refer ${esc(refName)}</h3>
+    <p>Pick one of your connections who could use ${esc(refName)}. We send them a message introducing it, and let ${esc(refName)} know too.</p>
+    ${myAccepted.length ? myAccepted.map(id => { const q = profileDirectory[id]; return `<label class="ref-row"><input type="radio" name="refTo" value="${esc(id)}"> <span>${esc(q.business_name || q.name)}${q.category ? ' · ' + esc(q.category) : ''}</span></label>`; }).join('')
+      : '<p>You need at least one other connection to refer to. Connect with more businesses first.</p>'}
+    <textarea class="ref-note" id="refNote" maxlength="400" placeholder="Add a line on why (optional), e.g. They did great work for me."></textarea>
+    <div style="display:flex;gap:8px;"><button class="btn-primary" id="refSend" ${myAccepted.length ? '' : 'disabled'}>Send referral</button><button class="btn-ghost" id="refCancel">Cancel</button></div>
+    <div id="refStatus" style="font-size:12px;color:var(--teal);margin-top:10px;min-height:14px;"></div>
+  </div>`;
+  document.body.appendChild(ov);
+  ov.addEventListener('click', e => { if (e.target === ov || e.target.id === 'refCancel') ov.remove(); });
+  ov.querySelectorAll('.ref-row').forEach(r => r.addEventListener('click', () => { ov.querySelectorAll('.ref-row').forEach(x => x.classList.remove('sel')); r.classList.add('sel'); }));
+  ov.querySelector('#refSend').addEventListener('click', async () => {
+    const pick = ov.querySelector('input[name=refTo]:checked');
+    const st = ov.querySelector('#refStatus');
+    if (!pick) { st.textContent = 'Choose who to refer them to.'; return; }
+    const toId = pick.value, to = profileDirectory[toId];
+    const toName = to.business_name || to.name, note = ov.querySelector('#refNote').value.trim();
+    const meName = (typeof currentProfile !== 'undefined' && currentProfile && (currentProfile.business_name || currentProfile.name)) || 'A connection';
+    const link = location.origin + location.pathname.replace(/[^/]*$/, '') + 'messages.html?with=';
+    const toBody = `🤝 Referral: ${meName} thinks you should meet ${refName}${referred.category ? ' (' + referred.category + ')' : ''}${referred.location ? ', ' + referred.location : ''}.${referred.sells ? ' They offer: ' + referred.sells + '.' : ''}${note ? ' "' + note + '"' : ''} Connect with them in the Directory or message them here: ${link}${referredId}`;
+    const refBody = `🤝 Referral: ${meName} just referred you to ${toName}${to.category ? ' (' + to.category + ')' : ''}. Expect a message from them, or reach out first: ${link}${toId}`;
+    st.textContent = 'Sending...';
+    const r1 = await sb.from('dm_messages').insert({ sender_id: currentUser.id, recipient_id: toId, body: toBody });
+    if (r1.error) { st.textContent = 'Could not send: ' + r1.error.message; return; }
+    await sb.from('dm_messages').insert({ sender_id: currentUser.id, recipient_id: referredId, body: refBody });
+    st.textContent = 'Referral sent.';
+    setTimeout(() => ov.remove(), 1200);
+  });
+}
+document.addEventListener('click', e => { const b = e.target.closest('.conn-refer-btn'); if (b) openReferModal(b.dataset.id); });
 
 async function loadConnections(){
   if (!sb || !currentUser) return;
@@ -389,10 +453,11 @@ function renderConnections(){
       <div class="conn-card">
         <div class="conn-card-top" data-profile-id="${esc(p.id || '')}">
           <div class="conn-avatar">${p.logo_url ? `<img src="${esc(p.logo_url)}">` : ''}</div>
-          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}</div></div>
+          <div><div class="conn-name">${esc(p.business_name || p.name)}</div><div class="conn-meta">${esc(p.category || '')}</div><div>${presenceHtml(p)}</div></div>
         </div>
         <div class="conn-actions">
           <a class="btn-primary" style="text-decoration:none;text-align:center;" href="messages.html?with=${esc(otherId)}">Message</a>
+          <button class="btn-ghost conn-refer-btn" data-id="${esc(otherId)}">Refer</button>
           <button class="btn-ghost conn-remove-btn" data-id="${esc(c.id)}">Remove</button>
         </div>
       </div>`;
