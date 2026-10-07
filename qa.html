@@ -300,6 +300,7 @@ function isProfileComplete(p){
   }
 
   sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+  if (!window.__bgsLsPing) { window.__bgsLsPing = setInterval(() => { if (!document.hidden && currentUser) sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{}); }, 60000); } /* bgs-ls-ping */
 
   document.getElementById('loadingGate').style.display = 'none';
   document.getElementById('pageShell').style.display = 'block';
@@ -315,6 +316,7 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 // =====================================================================
 // Q&A
 // =====================================================================
+const qaOpen = new Set(); // question cards the member has opened; survives every re-render
 async function loadQA(){
   const feed = document.getElementById('qaFeed');
   const { data, error } = await sb.from('qa_questions').select('*, qa_answers(*)').order('created_at', { ascending: false }).limit(20);
@@ -325,7 +327,8 @@ async function loadQA(){
   const profMap = {};
   (profs || []).forEach(p => profMap[p.id] = p);
   // remember which cards were open so posting an answer doesn't collapse them
-  const openIds = new Set([...feed.querySelectorAll('.qa-card.open')].map(el => el.id));
+  [...feed.querySelectorAll('.qa-card.open')].forEach(el => qaOpen.add(el.id));
+  const openIds = qaOpen;
   feed.innerHTML = '';
   const wanted = new URLSearchParams(location.search).get('question');
   data.forEach(item => {
@@ -363,6 +366,7 @@ async function loadQA(){
     el.querySelector('.qa-a-toggle').addEventListener('click', (e) => {
       if (e.target.classList.contains('qa-share')) return;
       el.classList.toggle('open');
+      if (el.classList.contains('open')) qaOpen.add(el.id); else qaOpen.delete(el.id);
     });
     const delQ = el.querySelector('.qa-del');
     if (delQ) delQ.addEventListener('click', async (e) => {
@@ -415,15 +419,26 @@ async function loadQA(){
       const status = el.querySelector('.qa-answer-status');
       if (!answer || !currentUser) return;
       status.textContent = 'Posting...';
-      const { error: insErr } = await sb.from('qa_answers').insert({ question_id: form.dataset.q, user_id: currentUser.id, answer });
+      const { data: saved, error: insErr } = await sb.from('qa_answers').insert({ question_id: form.dataset.q, user_id: currentUser.id, answer }).select().single();
       if (insErr) {
         console.error(insErr);
         status.textContent = 'Could not post your answer: ' + insErr.message;
         return;
       }
       input.value = '';
-      openIds.add(el.id);
+      status.textContent = 'Posted.';
+      qaOpen.add(el.id);
+      // show it straight away so it never "disappears", then sync with the server
+      const mine = profMap[currentUser.id] || { name: currentProfile?.name, business_name: currentProfile?.business_name };
+      const p = document.createElement('p');
+      p.innerHTML = `<span class="qa-by">${esc(mine.name || 'You')}${mine.business_name ? ' · ' + esc(mine.business_name) : ''}</span>${esc(answer)}`;
+      form.parentNode.insertBefore(p, form);
       await loadQA();
+      // if the server did not hand the answer back on reload, say so instead of silently losing it
+      const reloaded = document.getElementById(el.id);
+      if (saved && reloaded && !reloaded.innerHTML.includes(esc(answer).slice(0, 40))) {
+        console.warn('Answer saved but not returned by qa_answers select: check the SELECT policy on qa_answers.');
+      }
     });
     feed.appendChild(el);
     if (openIds.has(el.id)) el.classList.add('open');
