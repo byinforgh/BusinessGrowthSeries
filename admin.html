@@ -670,6 +670,15 @@ function renderHourQuestionsTab(body, d){
       ${stat(noConn, 'Members with no connections')}
       ${stat(ideaOnly, 'Idea-stage members')}
       ${stat(optedOut, 'Emails switched off')}
+      ${stat((d.members || []).filter(m => !isComplete(m)).length, 'Incomplete profiles')}
+    </div>
+    <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:18px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">Incomplete profiles: reminder every 3 days</div>
+      <p style="font-size:12.5px;color:var(--ink-dim);margin:0 0 12px;line-height:1.5;">${(d.members || []).filter(m => !isComplete(m)).length} member(s) have not finished their profile. A scheduled job emails each of them (and posts in their Messages) every 3 days, listing exactly what is missing, until they complete it. Members with reminders switched off get the in-app message only.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn-ghost" data-profile-nudge="test">Send me a test</button>
+        <button class="btn-danger" data-profile-nudge="all">Send to all incomplete profiles now</button>
+      </div>
     </div>
     <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:26px;">
       <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">Test the automation on yourself</div>
@@ -740,6 +749,15 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
   const btn = e.target.closest('button');
   if (!btn) return;
 
+  if (btn.dataset.profileNudge) {
+    if (btn.dataset.profileNudge === 'all' && !confirm('Email every member with an incomplete profile now? Anyone reminded in the last 3 days is skipped.')) return;
+    const status = document.getElementById('nudgeTestStatus');
+    if (status) status.textContent = 'Working...';
+    sb.functions.invoke('send-profile-reminders', { body: { only_me: btn.dataset.profileNudge === 'test', force: btn.dataset.profileNudge === 'test' } })
+      .then(({ data, error }) => { if (error) throw error; if (status) status.textContent = 'Done. ' + (data.queued || 0) + ' in-app message(s), ' + (data.sent || 0) + ' email(s) sent, ' + (data.skipped || 0) + ' skipped (reminded in last 3 days).'; loadAdminConsole(); })
+      .catch(e => { if (status) status.textContent = 'Could not run it: ' + (e.message || e) + '. Check that the send-profile-reminders function is deployed.'; });
+    return;
+  }
   if (btn.dataset.nudgeTest) { runNudge(btn.dataset.nudgeTest, true); return; }
   if (btn.dataset.nudgeAll) {
     if (!confirm('Send this to EVERY member now (in Messages, and by email for those who have emails on)? Members who already got this week\'s copy are skipped.')) return;
