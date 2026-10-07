@@ -337,12 +337,22 @@ function isProfileComplete(p){
   }
 
   sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+  if (!window.__bgsLsPing) { window.__bgsLsPing = setInterval(() => { if (!document.hidden && currentUser) sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{}); }, 60000); } /* bgs-ls-ping */
 
   document.getElementById('loadingGate').style.display = 'none';
   document.getElementById('pageShell').style.display = 'block';
 
   const { data: dir } = await sb.from('public_profiles').select('id, name, business_name');
-  memberDirectory = dir || [];
+  // Only real members (a proper name or business name, never the 'New member' placeholder) can be tagged
+  const isRealMember = m => {
+    const n = (m.name || '').trim(), b = (m.business_name || '').trim();
+    const placeholder = v => !v || v.toLowerCase() === 'new member' || v.length < 2;
+    return !placeholder(b) || !placeholder(n);
+  };
+  memberDirectory = (dir || []).filter(isRealMember).map(m => {
+    const b = (m.business_name || '').trim();
+    return (!b || b.toLowerCase() === 'new member') ? { ...m, business_name: null } : m;
+  });
 
   await loadLounge();
   subscribeLounge();
@@ -595,7 +605,7 @@ loungeInput.addEventListener('input', () => {
   const query = val.slice(at + 1).toLowerCase();
   const options = [{ id: 'akosua', label: 'Akosua (ask the AI assistant)' }]
     .concat(memberDirectory
-      .filter(m => (m.business_name || m.name || '').toLowerCase().includes(query))
+      .filter(m => { const l = (m.business_name || m.name || ''); return l.toLowerCase() !== 'new member' && l.toLowerCase().includes(query); })
       .slice(0, 6)
       .map(m => ({ id: m.id, label: m.business_name || m.name })));
   if (!options.length) { mentionSuggest.classList.remove('show'); return; }
