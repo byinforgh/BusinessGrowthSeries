@@ -361,6 +361,11 @@ async function loadAdminConsole(){
     window._adminData.joinsMissing = !!sjErr;
     await preloadNamesFor(window._adminData.joins.map(j => j.user_id));
   } catch (e) { window._adminData.joins = []; window._adminData.joinsMissing = true; }
+  try {
+    const { data: txe, error: txErr } = await sb.from('tecxfra_events').select('*').order('created_at', { ascending: false }).limit(2000);
+    window._adminData.tx = txErr ? [] : (txe || []); window._adminData.txMissing = !!txErr;
+    await preloadNamesFor(window._adminData.tx.map(x => x.user_id));
+  } catch (e) { window._adminData.tx = []; window._adminData.txMissing = true; }
   document.getElementById('adminJoinsCount').textContent = (window._adminData.joins || []).length || '';
   const newQs = (window._adminData.hourQuestions || []).filter(q => q.status === 'new').length;
   document.getElementById('adminHourqCount').textContent = newQs || '';
@@ -652,6 +657,10 @@ function renderHourQuestionsTab(body, d){
   const sessions = Object.keys(bySession).sort().reverse();
   const nowIso = Date.now();
   const weekAgo = nowIso - 7 * 86400000;
+  const txRows = d.tx || [];
+  const txCount = k => txRows.filter(r => r.kind === k).length;
+  const txPeople = k => new Set(txRows.filter(r => r.kind === k).map(r => r.user_id)).size;
+  const txRecent = txRows.filter(r => r.kind === 'trial_click').slice(0, 12).map(r => `<div style="font-size:12.5px;padding:6px 0;border-bottom:1px solid var(--line);"><b>${esc(nameFor(r.user_id))}</b> <span style="color:var(--ink-dim);">clicked the trial from ${esc(r.page || 'a page')} on ${new Date(r.created_at).toLocaleString('en-GB')}</span></div>`).join('') || '<p style="margin:0;font-size:12.5px;color:var(--ink-dim);">No trial clicks yet.</p>';
   const sentThisWeek = kind => (d.notes || []).filter(n => n.kind === kind && new Date(n.created_at).getTime() > weekAgo).length;
   const emailedThisWeek = (d.notes || []).filter(n => n.emailed_at && new Date(n.emailed_at).getTime() > weekAgo).length;
   const connectedIds = new Set();
@@ -671,6 +680,9 @@ function renderHourQuestionsTab(body, d){
       ${stat(ideaOnly, 'Idea-stage members')}
       ${stat(optedOut, 'Emails switched off')}
       ${stat((d.members || []).filter(m => !isComplete(m)).length, 'Incomplete profiles')}
+      ${stat(txCount('trial_click'), 'TecXFRA trial clicks')}
+      ${stat(txPeople('trial_click'), 'Members who clicked trial')}
+      ${stat(txCount('page_view'), 'TecXFRA page visits')}
     </div>
     <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:18px;">
       <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">Incomplete profiles: reminder every 3 days</div>
@@ -679,6 +691,10 @@ function renderHourQuestionsTab(body, d){
         <button class="btn-ghost" data-profile-nudge="test">Send me a test</button>
         <button class="btn-danger" data-profile-nudge="all">Send to all incomplete profiles now</button>
       </div>
+    </div>
+    <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:18px;">
+      <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">TecXFRA interest: latest trial clicks</div>
+      ${d.txMissing ? '<p style="margin:0;font-size:12.5px;color:var(--ink-dim);">Tracking table not created yet. Run tecxfra-track.sql in Supabase.</p>' : txRecent}
     </div>
     <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:26px;">
       <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">Test the automation on yourself</div>
