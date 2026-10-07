@@ -408,6 +408,7 @@ function isProfileComplete(p){
   }
 
   sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{});
+  if (!window.__bgsLsPing) { window.__bgsLsPing = setInterval(() => { if (!document.hidden && currentUser) sb.from('profiles').update({ last_seen: new Date().toISOString() }).eq('id', currentUser.id).then(()=>{}); }, 60000); } /* bgs-ls-ping */
 
   document.getElementById('loadingGate').style.display = 'none';
   document.getElementById('pageShell').style.display = 'block';
