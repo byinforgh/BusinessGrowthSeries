@@ -23,14 +23,14 @@
 
   var css = document.createElement('style');
   css.textContent = [
-  '.txw-btn{position:fixed;left:16px;bottom:18px;z-index:9990;display:flex;align-items:center;gap:10px;border:0;cursor:pointer;background:#12343f;color:#fff;padding:7px 16px 7px 7px;border-radius:40px;box-shadow:0 8px 24px rgba(18,52,63,.35);font:600 12.5px/1.2 Poppins,sans-serif;}',
+  '.txw-btn{position:fixed;left:0;bottom:calc(88px + env(safe-area-inset-bottom,0px));z-index:9990;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer;background:#12343f;color:#fff;width:34px;height:42px;padding:0;border-radius:0 21px 21px 0;box-shadow:0 4px 14px rgba(18,52,63,.3);opacity:.92;}',
   '.txw-btn:focus-visible{outline:3px solid #B08D3F;outline-offset:3px;}',
-  '.txw-mark{width:40px;height:40px;border-radius:50%;background:#FAF6EC;display:grid;place-items:center;flex:none;}',
-  '.txw-mark svg{width:26px;height:26px;}',
-  '.txw-btn small{display:block;font-weight:500;font-size:10.5px;color:#9fd3dc;letter-spacing:.01em;}',
-  '.txw-btn.pulse .txw-mark{animation:txwPulse 2.2s ease-out 3;}',
-  '@keyframes txwPulse{0%{box-shadow:0 0 0 0 rgba(74,168,184,.7);}100%{box-shadow:0 0 0 16px rgba(74,168,184,0);}}',
-  '.txw-panel{position:fixed;left:16px;bottom:78px;z-index:9991;width:min(380px,calc(100vw - 32px));max-height:min(78vh,640px);overflow:auto;background:#FAF6EC;color:#1c1c1c;border:1px solid rgba(0,0,0,.12);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.28);display:none;font-family:Poppins,sans-serif;}',
+  '.txw-mark{width:24px;height:24px;border-radius:50%;background:#FAF6EC;display:grid;place-items:center;flex:none;}',
+  '.txw-mark svg{width:17px;height:17px;}',
+  '.txw-btn .txw-lbl{display:none;}',
+  '.txw-btn.pulse{animation:txwPulse 2.2s ease-out 3;}',
+  '@keyframes txwPulse{0%{box-shadow:0 0 0 0 rgba(74,168,184,.7);}100%{box-shadow:0 0 0 12px rgba(74,168,184,0);}}',
+  '.txw-panel{position:fixed;left:10px;bottom:calc(140px + env(safe-area-inset-bottom,0px));z-index:9991;width:min(380px,calc(100vw - 32px));max-height:min(70vh,560px);overflow:auto;background:#FAF6EC;color:#1c1c1c;border:1px solid rgba(0,0,0,.12);border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.28);display:none;font-family:Poppins,sans-serif;}',
   '.txw-panel.open{display:block;animation:txwIn .22s ease-out;}',
   '@keyframes txwIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}',
   '.txw-head{background:#12343f;color:#fff;padding:18px 20px 16px;border-radius:14px 14px 0 0;position:relative;}',
@@ -51,20 +51,20 @@
   '.txw-cta:hover{background:#0b3a47;}',
   '.txw-cta.ghost{background:transparent;color:#0F4C5C;border:1px solid #0F4C5C;}',
   '.txw-fine{font-size:11px;color:#5d5a52;line-height:1.5;margin:6px 0 0;}',
-  '@media (max-width:640px){.txw-btn small{display:none;}.txw-btn{padding:6px;}.txw-panel{left:8px;right:8px;width:auto;bottom:74px;}}',
-  '@media (prefers-reduced-motion:reduce){.txw-btn.pulse .txw-mark,.txw-panel.open{animation:none;}}'
+  '@media (max-width:640px){.txw-panel{left:8px;right:8px;width:auto;}.txw-body{padding:14px 16px 16px;}.txw-head{padding:14px 16px 12px;}.txw-body h3{font-size:16px;}.txw-letters{display:none;}}',
+  '@media (prefers-reduced-motion:reduce){.txw-btn.pulse,.txw-panel.open{animation:none;}}'
   ].join('\n');
   document.head.appendChild(css);
 
   var MARK = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="46" r="9" fill="#4aa8b8"/><path d="M50 55 C42 68 44 84 50 96 C56 84 58 68 50 55 Z" fill="#4aa8b8"/><circle cx="47" cy="42" r="6.5" fill="#0c262f" opacity=".35"/></svg>';
-  var raise = (PAGE === 'messages' || PAGE === 'lounge') ? 'bottom:86px;' : '';
+  var raise = '';
 
   var btn = document.createElement('button');
   btn.className = 'txw-btn pulse'; btn.type = 'button'; btn.id = 'txwBtn';
   btn.setAttribute('aria-haspopup','dialog'); btn.setAttribute('aria-expanded','false');
   btn.setAttribute('aria-label','TecXFRA: run your business, 14 days free');
   if (raise) btn.style.cssText = raise;
-  btn.innerHTML = '<span class="txw-mark">' + MARK + '</span><span>TecXFRA<small>14 days free for members</small></span>';
+  btn.innerHTML = '<span class="txw-mark">' + MARK + '</span><span class="txw-lbl">TecXFRA</span>';
 
   var panel = document.createElement('div');
   panel.className = 'txw-panel'; panel.id = 'txwPanel'; panel.setAttribute('role','dialog'); panel.setAttribute('aria-label','TecXFRA free trial');
