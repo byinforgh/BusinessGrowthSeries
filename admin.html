@@ -346,7 +346,7 @@ async function loadAdminConsole(){
   try {
     const [{ data: hq, error: hqErr }, { data: notes }, { data: conns }] = await Promise.all([
       sb.from('hour_questions').select('*').order('session_date', { ascending: false }).order('created_at', { ascending: true }).limit(200),
-      sb.from('member_notifications').select('kind, created_at, emailed_at').order('created_at', { ascending: false }).limit(400),
+      sb.from('member_notifications').select('kind, user_id, created_at, emailed_at').order('created_at', { ascending: false }).limit(400),
       sb.from('connections').select('requester_id, addressee_id, status'),
     ]);
     window._adminData.hourQuestions = hqErr ? [] : (hq || []);
@@ -606,7 +606,7 @@ function renderAttendanceTab(body, d){
   const unique = Object.keys(perMember).length;
   const avg = sessions.length ? Math.round(joins.length / sessions.length * 10) / 10 : 0;
   const link = location.origin + location.pathname.replace(/[^/]*$/, '') + 'join.html';
-  const stat = (n, label) => `<div style="flex:1;min-width:130px;border:1px solid var(--line);background:var(--surface-2);padding:14px 16px;"><div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;color:var(--teal);">${n}</div><div style="font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-top:4px;">${label}</div></div>`;
+  const stat = (n, label, key) => `<div role="button" tabindex="0" data-stat="${key || ''}" style="flex:1;min-width:130px;border:1px solid var(--line);background:var(--surface-2);padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s;" onmouseover="this.style.borderColor='var(--teal)'" onmouseout="this.style.borderColor=''"><div style="font-family:'Inter',sans-serif;font-weight:800;font-size:22px;color:var(--teal);">${n}</div><div style="font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-dim);margin-top:2px;">${label}</div><div style="font-size:10.5px;color:var(--teal);margin-top:6px;font-weight:600;">View list &rarr;</div></div>`;
   body.innerHTML = `
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
       ${stat(sessions.length, 'Sessions with joins')}
@@ -673,16 +673,16 @@ function renderHourQuestionsTab(body, d){
 
   body.innerHTML = `
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:22px;">
-      ${stat(sentThisWeek('hour_sunday'), 'Sunday links sent (7d)')}
-      ${stat(sentThisWeek('hour_wednesday'), 'Wednesday reminders (7d)')}
-      ${stat(emailedThisWeek, 'Emails delivered (7d)')}
-      ${stat(noConn, 'Members with no connections')}
-      ${stat(ideaOnly, 'Idea-stage members')}
-      ${stat(optedOut, 'Emails switched off')}
-      ${stat((d.members || []).filter(m => !isComplete(m)).length, 'Incomplete profiles')}
-      ${stat(txCount('trial_click'), 'TecXFRA trial clicks')}
-      ${stat(txPeople('trial_click'), 'Members who clicked trial')}
-      ${stat(txCount('page_view'), 'TecXFRA page visits')}
+      ${stat(sentThisWeek('hour_sunday'), 'Sunday links sent (7d)', 'sunday')}
+      ${stat(sentThisWeek('hour_wednesday'), 'Wednesday reminders (7d)', 'wednesday')}
+      ${stat(emailedThisWeek, 'Emails delivered (7d)', 'emails')}
+      ${stat(noConn, 'Members with no connections', 'noconn')}
+      ${stat(ideaOnly, 'Idea-stage members', 'idea')}
+      ${stat(optedOut, 'Emails switched off', 'optout')}
+      ${stat((d.members || []).filter(m => !isComplete(m)).length, 'Incomplete profiles', 'incomplete')}
+      ${stat(txCount('trial_click'), 'TecXFRA trial clicks', 'trial')}
+      ${stat(txPeople('trial_click'), 'Members who clicked trial', 'trialpeople')}
+      ${stat(txCount('page_view'), 'TecXFRA page visits', 'visits')}
     </div>
     <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:18px;">
       <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">Incomplete profiles: reminder every 3 days</div>
@@ -922,6 +922,45 @@ async function loadMemberActivity(userId){
       data.recent.map(r => `<div style="display:flex;justify-content:space-between;gap:12px;padding:4px 0;font-size:12.5px;"><span>${new Date(r.started_at).toLocaleString('en-GB', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })}${r.page ? ' · ' + esc(String(r.page).replace('.html','')) : ''}</span><span>${fmtDur(r.seconds)}</span></div>`).join('') : '') +
     `<div style="font-size:11px;color:var(--ink-dim);margin-top:10px;">Counts only time a page is open and visible. ${data.first_tracked ? 'Tracking since ' + new Date(data.first_tracked).toLocaleDateString('en-GB') + '.' : 'No tracked visits yet, tracking starts after the new pages are uploaded.'}</div>`;
 }
+
+
+// ---------- stat cards: click to see who/what is behind the number ----------
+function openStatModal(key){
+  const d = window._adminData || {}, members = d.members || [], notes = d.notes || [], tx = d.tx || [];
+  const weekAgo = Date.now() - 7 * 86400000;
+  const when = iso => iso ? new Date(iso).toLocaleString('en-GB', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' }) : '';
+  const byId = id => members.find(m => m.id === id);
+  const row = (uid, sub) => ({ uid, name: nameFor(uid), sub });
+  let title = '', intro = '', rows = [];
+  const fromNotes = (list) => list.map(n => row(n.user_id, when(n.created_at) + (n.emailed_at ? ' · emailed' : ' · in-app only')));
+  if (key === 'sunday') { title = 'Sunday links sent (7 days)'; intro = 'Members who were sent this week\'s Business Hour link.'; rows = fromNotes(notes.filter(n => n.kind === 'hour_sunday' && new Date(n.created_at).getTime() > weekAgo)); }
+  else if (key === 'wednesday') { title = 'Wednesday reminders (7 days)'; intro = 'Members who were sent the Wednesday reminder.'; rows = fromNotes(notes.filter(n => n.kind === 'hour_wednesday' && new Date(n.created_at).getTime() > weekAgo)); }
+  else if (key === 'emails') { title = 'Emails delivered (7 days)'; intro = 'Every message in the last 7 days that also went out by email.'; rows = notes.filter(n => n.emailed_at && new Date(n.emailed_at).getTime() > weekAgo).map(n => row(n.user_id, (n.kind || 'message').replace(/_/g, ' ') + ' · ' + when(n.emailed_at))); }
+  else if (key === 'noconn') {
+    const ids = new Set(); (d.conns || []).forEach(c => { if (c.status === 'accepted' || c.status === 'pending') { ids.add(c.requester_id); ids.add(c.addressee_id); } });
+    title = 'Members with no connections'; intro = 'Nobody here has sent, received or accepted a connection yet. Good people to nudge.';
+    rows = members.filter(m => !ids.has(m.id)).map(m => row(m.id, (m.category || 'No category') + ' · ' + (m.location || 'No location')));
+  }
+  else if (key === 'idea') { title = 'Idea-stage members'; intro = 'Members who do not have a running business yet.'; rows = members.filter(m => m.has_business === false).map(m => row(m.id, m.business_idea ? 'Idea: ' + m.business_idea : 'No idea written yet')); }
+  else if (key === 'optout') { title = 'Emails switched off'; intro = 'These members only get in-app messages.'; rows = members.filter(m => m.email_reminders === false).map(m => row(m.id, m.location || 'No location')); }
+  else if (key === 'incomplete') { title = 'Incomplete profiles'; intro = 'Each row shows exactly what is still missing. Tap a row for the full profile.'; rows = members.filter(m => !isComplete(m)).map(m => row(m.id, 'Missing: ' + missingFor(m).join(', '))); }
+  else if (key === 'trial') { title = 'TecXFRA trial clicks'; intro = 'Every time a member pressed "Start my 14-day free trial".'; rows = tx.filter(r => r.kind === 'trial_click').map(r => row(r.user_id, 'from ' + (r.page || 'a page') + ' · ' + when(r.created_at))); }
+  else if (key === 'trialpeople') {
+    title = 'Members who clicked the trial'; intro = 'One row per member. These are your warmest TecXFRA leads: follow up with them.';
+    const seen = {}; tx.filter(r => r.kind === 'trial_click').forEach(r => { (seen[r.user_id] = seen[r.user_id] || []).push(r); });
+    rows = Object.keys(seen).map(uid => row(uid, seen[uid].length + ' click' + (seen[uid].length === 1 ? '' : 's') + ' · last ' + when(seen[uid][0].created_at)));
+  }
+  else if (key === 'visits') { title = 'TecXFRA page visits'; intro = 'Members who opened the full TecXFRA page.'; rows = tx.filter(r => r.kind === 'page_view').map(r => row(r.user_id, when(r.created_at))); }
+  else return;
+
+  let ov = document.getElementById('statModal');
+  if (!ov) { ov = document.createElement('div'); ov.id = 'statModal'; ov.style.cssText = 'position:fixed;inset:0;background:rgba(28,28,28,.55);z-index:350;display:flex;align-items:center;justify-content:center;padding:20px;'; document.body.appendChild(ov); ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('[data-stat-close]')) ov.style.display = 'none'; }); }
+  const list = rows.length ? rows.map(r => `<div class="admin-member-row" data-user="${esc(r.uid)}" style="padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer;"><div style="font-weight:700;font-size:14px;">${esc(r.name)}</div><div style="font-size:12px;color:var(--ink-dim);margin-top:2px;">${esc(r.sub)}</div></div>`).join('') : '<p style="padding:24px 0;text-align:center;color:var(--ink-dim);font-size:13.5px;margin:0;">Nothing here yet.</p>';
+  ov.innerHTML = `<div style="background:var(--bg);max-width:560px;width:100%;max-height:82vh;overflow:auto;border:1px solid var(--line);padding:24px 26px;"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;"><div><div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);">${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}</div><h3 style="margin:4px 0 6px;font-size:20px;">${esc(title)}</h3></div><button type="button" class="btn-ghost" data-stat-close style="padding:6px 12px;">Close</button></div><p style="font-size:13px;color:var(--ink-dim);line-height:1.55;margin:0 0 10px;">${esc(intro)}</p>${list}</div>`;
+  ov.style.display = 'flex';
+}
+document.addEventListener('click', e => { const c = e.target.closest('[data-stat]'); if (c && c.dataset.stat) openStatModal(c.dataset.stat); });
+document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset && e.target.dataset.stat) { e.preventDefault(); openStatModal(e.target.dataset.stat); } if (e.key === 'Escape') { const o = document.getElementById('statModal'); if (o) o.style.display = 'none'; } });
 
 function openMemberModal(userId){
   const m = (window._adminData.members || []).find(x => x.id === userId);
