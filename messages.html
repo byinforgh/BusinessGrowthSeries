@@ -70,7 +70,9 @@ section{padding:56px 0;scroll-margin-top:96px;}
 .filter-warning.show{display:block;}
 
 .messages-shell{display:grid;grid-template-columns:280px 1fr;border:1px solid var(--line);background:var(--bg);min-height:480px;}
-@media(max-width:860px){.messages-shell{grid-template-columns:1fr;}}
+@media(max-width:860px){.messages-shell{grid-template-columns:minmax(0,1fr);}.messages-shell>*{min-width:0;}.messages-shell{min-height:0;}.thread-composer input{min-width:0;width:100%;}.thread-composer .btn-primary{flex:none;}.messages-shell.thread-open .convo-list{display:none;}.thread-feed{min-height:260px;max-height:55vh;}.thread-msg{max-width:85%;}.convo-preview{max-width:60vw;}}
+.thread-back{display:none;background:none;border:0;color:var(--teal);font:700 12px Poppins,sans-serif;padding:0 10px 0 0;cursor:pointer;letter-spacing:.03em;}
+@media(max-width:860px){.messages-shell.thread-open .thread-back{display:inline-block;}}
 .convo-list{border-right:1px solid var(--line);}
 @media(max-width:860px){.convo-list{border-right:none;border-bottom:1px solid var(--line);}}
 .convo-row{display:flex;gap:10px;align-items:center;padding:14px 18px;border-bottom:1px solid var(--line);cursor:pointer;}
@@ -170,6 +172,27 @@ form button[type="submit"]{flex-shrink:0;}
   img,video,iframe,table{max-width:100%;}
 }
 </style>
+<style id="bgs-mobile-polish">
+@media (max-width:700px){
+  .wrap{padding-left:16px !important;padding-right:16px !important;}
+  section{padding:22px 0 !important;}
+  h1{font-size:26px !important;line-height:1.15 !important;}
+  h2{font-size:20px !important;line-height:1.2 !important;}
+  header{padding-top:18px !important;padding-bottom:12px !important;}
+  .verify-panel,.safety-notice,.bh-card,.bh-ask,.suggestion-strip,.wins-shell,.testimonial-shell,.spotlight-shell,.streak-panel,.leaderboard-panel,.start-here-body,.path-body,.module-card,.dir-card,.conn-card,.testimonial-card,.win-post,.spotlight-post-body,.audit-cta,.ai-info{padding:14px 16px !important;}
+  .verify-panel,.safety-notice,.bh-ask,.suggestion-strip,.wins-shell,.testimonial-shell,.spotlight-shell{margin-bottom:14px !important;margin-top:0 !important;}
+  .audit-cta{gap:10px !important;}
+  .audit-cta-btn{padding:11px 16px !important;display:inline-block;}
+  .thread-feed,.lounge-feed{padding:12px 14px !important;}
+  .thread-head,.thread-composer{padding:10px 14px !important;}
+  .empty-note{padding:14px !important;}
+  /* footer: one tidy line instead of a big box */
+  footer{padding:14px 0 12px !important;margin-top:16px !important;}
+  .footer-social{display:flex !important;flex-wrap:nowrap !important;justify-content:center !important;gap:12px !important;margin-bottom:8px !important;}
+  .footer-social a{font-size:9.5px !important;letter-spacing:.05em !important;padding:0 !important;}
+  .footer-bottom{font-size:10px !important;gap:2px !important;padding-top:8px !important;border-top:0 !important;line-height:1.5;}
+}
+</style>
 </head>
 <body>
 
@@ -241,7 +264,7 @@ form button[type="submit"]{flex-shrink:0;}
     <div class="messages-shell">
       <div class="convo-list" id="convoList"></div>
       <div class="thread-col" id="threadCol">
-        <div class="thread-empty">Pick a conversation on the left. BYINFORGH messages, including your Business Hour link, are the first one.</div>
+        <div class="thread-empty">Pick a conversation to open it. BYINFORGH messages, including your Business Hour link, are the first one.</div>
       </div>
     </div>
   </div>
@@ -1116,6 +1139,24 @@ function subscribeToDMs(otherId){
       await sb.from('session_joins').insert({ user_id: session.user.id, event_id: hit.ev.id, session_start: new Date(hit.start).toISOString(), source: 'in-app link' });
     } catch(err){ /* duplicate row or missing table: never block the member */ }
   }, true);
+})();
+</script>
+<script>
+(function(){
+  var col = document.getElementById('threadCol'), shell = document.querySelector('.messages-shell');
+  if (!col || !shell) return;
+  function sync(){
+    var head = col.querySelector('.thread-head');
+    var open = !!head && window.innerWidth <= 860;
+    shell.classList.toggle('thread-open', open);
+    if (head && !head.querySelector('.thread-back')) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'thread-back'; b.textContent = '\u2039 All messages';
+      b.addEventListener('click', function(){ shell.classList.remove('thread-open'); col.innerHTML = '<div class="thread-empty">Pick a conversation to open it.</div>'; window.scrollTo({top: shell.offsetTop - 80, behavior: 'smooth'}); });
+      head.insertBefore(b, head.firstChild);
+    }
+    if (open) { var r = shell.getBoundingClientRect(); if (r.top < 0 || r.top > 140) window.scrollTo({top: window.scrollY + r.top - 90}); }
+  }
+  new MutationObserver(function(){ sync(); }).observe(col, {childList:true});
 })();
 </script>
 <script src="tecxfra-widget.js" defer></script>
