@@ -313,6 +313,17 @@ footer{border-top:1px solid var(--line);padding:56px 0 32px;background:var(--sur
   .truth-strip{margin-top:40px;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:18px 0;overflow:hidden;}
   .truth-strip.inline{margin-top:0;}
   .marquee{display:flex;gap:48px;white-space:nowrap;animation:appscroll 34s linear infinite;width:max-content;}
+  .truth-strip .wrap{scrollbar-width:none;-webkit-overflow-scrolling:touch;}
+  .truth-strip .wrap::-webkit-scrollbar{display:none;}
+  .marq-ctl{display:flex;justify-content:flex-end;gap:8px;max-width:1180px;margin:8px auto 0;padding:0 28px;}
+  .marq-ctl button{background:none;border:1px solid var(--line);color:var(--ink-dim);font:600 10.5px/1 Inter,Arial,sans-serif;letter-spacing:.04em;text-transform:uppercase;padding:7px 10px;border-radius:14px;cursor:pointer;}
+  .marq-ctl button:active{border-color:var(--teal);color:var(--teal);}
+  @media(max-width:700px){
+    .marquee{gap:30px;}
+    .truth-strip .marquee span{font-size:11.5px;}
+    .truth-strip{padding:10px 0 8px;}
+    .marq-ctl{padding:0 16px;margin-top:6px;}
+  }
   .marquee span{font-family:'Inter',sans-serif;font-size:13px;color:var(--ink-dim);letter-spacing:.02em;}
   .marquee span b{color:var(--gold);}
   .marquee-item{cursor:pointer;transition:color .15s;}
@@ -1570,6 +1581,7 @@ function initAskHour(){
     input.value = '';
     status.textContent = 'Received. We will answer it at the Business Hour.';
     loadMyHourQuestions();
+    try { status.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
   });
 }
 
@@ -1695,12 +1707,19 @@ async function initNextStep(){
 function bhHandleDeepLinks(){
   const q = new URLSearchParams(location.search);
   if (q.get('ask') === '1') {
-    setTimeout(() => {
+    // The page keeps growing as sections load, so one early scroll lands in the wrong place.
+    // Jump to the question box, then correct a few times as the layout settles, and stop the moment the member touches the screen.
+    let userMoved = false;
+    ['touchstart', 'wheel', 'mousedown', 'keydown'].forEach(ev => window.addEventListener(ev, () => { userMoved = true; }, { once: true, passive: true }));
+    const goAsk = () => {
+      if (userMoved) return;
       const el = document.getElementById('ask-hour');
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      const t = document.getElementById('askHourInput');
-      if (t) t.focus({ preventScroll: true });
-    }, 900);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + (window.scrollY || document.documentElement.scrollTop) - 90;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'auto' });
+    };
+    [700, 1600, 2800, 4500].forEach(ms => setTimeout(goAsk, ms));
+    setTimeout(() => { const t = document.getElementById('askHourInput'); if (t && !userMoved) t.focus({ preventScroll: true }); }, 1800);
   } else if (q.get('idea') === '1') {
     setTimeout(() => {
       const el = document.getElementById('next-step');
@@ -2355,6 +2374,19 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
     already_sent: 'Your request is already waiting for a reply.',
     cooldown: 'This member has not accepted your last request. You can try again in a few weeks.'
   };
+  // Bring a cancelled or old request back to life instead of failing on the one-row-per-pair rule.
+  async function reviveConnection(c, targetId){
+    var r = await c.sb.from('connections').select('*').or('and(requester_id.eq.' + c.user.id + ',addressee_id.eq.' + targetId + '),and(requester_id.eq.' + targetId + ',addressee_id.eq.' + c.user.id + ')');
+    var row = (r.data || [])[0]; if (!row) return null;
+    if (row.status === 'accepted') return { ok: false, error: 'You are already connected with this member.' };
+    if (row.status === 'pending') return row.requester_id === c.user.id ? { ok: false, error: 'Your request is already waiting for a reply.' } : { ok: false, error: 'This member already sent you a request. Open Requests and accept it.' };
+    if (row.status === 'declined' && row.requester_id === c.user.id && row.responded_at && Date.now() - new Date(row.responded_at).getTime() < 30 * 86400000) return { ok: false, error: MSG.cooldown };
+    var u = await c.sb.from('connections').update({ requester_id: c.user.id, addressee_id: targetId, status: 'pending', responded_at: null, created_at: new Date().toISOString() }).eq('id', row.id).select('id');
+    if (u.error || !u.data || !u.data.length) return { ok: false, error: (u.error && u.error.message) || 'The database did not allow sending again. Run admin-controls.sql in Supabase.' };
+    refresh(); fire('bgs:connections-changed');
+    return { ok: true, status: 'sent', message: '' };
+  }
+  function isDup(err){ return err && (err.code === '23505' || /duplicate|already exists|unique/i.test(err.message || '')); }
   window.bgsSendConnection = async function(targetId){
     var c = ctx(); if (!c) return { ok: false, error: 'Please log in again.' };
     var r = await c.sb.rpc('send_connection_request', { target: targetId });
@@ -2363,10 +2395,11 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
       refresh(); fire('bgs:connections-changed');
       return { ok: st !== 'cooldown', status: st, message: MSG[st] || '' };
     }
-    if (!missingFn(r.error)) return { ok: false, error: r.error.message || 'Could not send the request.' };
+    if (!missingFn(r.error)) { if (isDup(r.error)) { var rv0 = await reviveConnection(c, targetId); if (rv0) return rv0; } return { ok: false, error: r.error.message || 'Could not send the request.' }; }
     var ins = await c.sb.from('connections').insert({ requester_id: c.user.id, addressee_id: targetId, status: 'pending' });
     if (ins.error) {
       var dup = ins.error.code === '23505';
+      if (dup) { var rv1 = await reviveConnection(c, targetId); if (rv1) return rv1; }
       return { ok: false, error: dup ? 'A request with this member already exists. Check Requests and Sent on the Connections page.' : (ins.error.message || 'Could not send the request.') };
     }
     refresh(); fire('bgs:connections-changed');
@@ -2612,7 +2645,7 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
     }
     var buttons =
       status === 'accepted' ? '<a class="bgsp-btn" href="messages.html?with=' + encodeURIComponent(id) + '">Message</a>' :
-      status === 'pending'  ? '<button class="bgsp-btn ghost" disabled>Request sent</button>' :
+      status === 'pending'  ? '<button class="bgsp-btn ghost" data-a="cancel">Cancel request</button>' :
       status === 'incoming' ? '<button class="bgsp-btn" data-a="accept">Accept request</button><button class="bgsp-btn ghost" data-a="decline">Decline</button>' :
       status === 'none'     ? '<button class="bgsp-btn" data-a="connect">Connect</button>' : '';
     var canReport = status !== 'self' && typeof openReportModal === 'function';
@@ -2701,5 +2734,72 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
 })();
 </script>
 <script src="tecxfra-widget.js" defer></script>
+<script>
+// Business Truth strips: one steady speed everywhere, pause and swipe, restart from the first line.
+(function(){
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function speed(){ return window.innerWidth < 700 ? 30 : 48; } // pixels per second, same for every strip
+  document.querySelectorAll('.truth-strip').forEach(function(strip){
+    var m = strip.querySelector('.marquee'); if (!m) return;
+    var scroller = m.parentElement;
+    // rebuild as one set repeated, so the loop point is exact (the first strip used to jump)
+    var seen = {}, orig = [];
+    Array.prototype.forEach.call(m.children, function(el){ var k = el.getAttribute('data-lesson') + '|' + el.textContent; if (!seen[k]) { seen[k] = 1; orig.push(el.cloneNode(true)); } });
+    if (!orig.length) return;
+    function build(){
+      m.innerHTML = '';
+      var reps = 1;
+      function fill(){ m.innerHTML = ''; for (var r = 0; r < reps * 2; r++) orig.forEach(function(o){ m.appendChild(o.cloneNode(true)); }); }
+      fill();
+      while (m.scrollWidth / 2 < strip.clientWidth * 1.1 && reps < 6) { reps++; fill(); }
+    }
+    build();
+    var paused = reduce, half = 0;
+    function run(offsetPx){
+      half = m.scrollWidth / 2;
+      var dur = half / speed();
+      m.style.animation = 'none'; void m.offsetWidth;
+      m.style.transform = '';
+      m.style.animation = 'appscroll ' + dur + 's linear infinite';
+      m.style.animationDelay = '-' + ((offsetPx % half) / speed()) + 's';
+    }
+    var ctl = document.createElement('div');
+    ctl.className = 'marq-ctl';
+    ctl.innerHTML = '<button type="button" data-a="toggle">Pause</button><button type="button" data-a="restart">Back to start</button>';
+    strip.appendChild(ctl);
+    var tog = ctl.querySelector('[data-a="toggle"]');
+    function pause(){
+      var tx = 0; try { tx = -new DOMMatrix(getComputedStyle(m).transform).m41; } catch(e){}
+      m.style.animation = 'none'; m.style.transform = 'none';
+      scroller.style.overflowX = 'auto'; scroller.scrollLeft = Math.max(0, tx);
+      paused = true; tog.textContent = 'Play'; strip.classList.add('manual');
+    }
+    function play(){
+      var pos = scroller.scrollLeft; scroller.style.overflowX = ''; scroller.scrollLeft = 0;
+      paused = false; tog.textContent = 'Pause'; strip.classList.remove('manual'); run(pos);
+    }
+    if (paused) { m.style.animation = 'none'; scroller.style.overflowX = 'auto'; tog.textContent = 'Play'; strip.classList.add('manual'); } else run(0);
+    ctl.addEventListener('click', function(e){
+      var b = e.target.closest('button'); if (!b) return;
+      if (b.getAttribute('data-a') === 'toggle') { paused ? play() : pause(); }
+      else { if (paused) { scroller.scrollLeft = 0; } else run(0); }
+    });
+    var rt; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ if (!paused) { build(); run(0); } }, 250); });
+  });
+})();
+</script>
+<button id="bgsTop" type="button" aria-label="Back to top">&#8593; Top</button>
+<style>
+#bgsTop{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:900;display:none;background:#0F4C5C;color:#fff;border:none;border-radius:22px;padding:11px 16px;font:700 12px/1 Inter,Poppins,Arial,sans-serif;letter-spacing:.03em;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;}
+#bgsTop.show{display:block;}
+</style>
+<script>
+(function(){
+  var b = document.getElementById('bgsTop'); if (!b) return;
+  function t(){ b.classList.toggle('show', (window.scrollY || document.documentElement.scrollTop) > 500); }
+  window.addEventListener('scroll', t, { passive: true }); t();
+  b.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
 </body>
 </html>
