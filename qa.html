@@ -643,6 +643,19 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
     already_sent: 'Your request is already waiting for a reply.',
     cooldown: 'This member has not accepted your last request. You can try again in a few weeks.'
   };
+  // Bring a cancelled or old request back to life instead of failing on the one-row-per-pair rule.
+  async function reviveConnection(c, targetId){
+    var r = await c.sb.from('connections').select('*').or('and(requester_id.eq.' + c.user.id + ',addressee_id.eq.' + targetId + '),and(requester_id.eq.' + targetId + ',addressee_id.eq.' + c.user.id + ')');
+    var row = (r.data || [])[0]; if (!row) return null;
+    if (row.status === 'accepted') return { ok: false, error: 'You are already connected with this member.' };
+    if (row.status === 'pending') return row.requester_id === c.user.id ? { ok: false, error: 'Your request is already waiting for a reply.' } : { ok: false, error: 'This member already sent you a request. Open Requests and accept it.' };
+    if (row.status === 'declined' && row.requester_id === c.user.id && row.responded_at && Date.now() - new Date(row.responded_at).getTime() < 30 * 86400000) return { ok: false, error: MSG.cooldown };
+    var u = await c.sb.from('connections').update({ requester_id: c.user.id, addressee_id: targetId, status: 'pending', responded_at: null, created_at: new Date().toISOString() }).eq('id', row.id).select('id');
+    if (u.error || !u.data || !u.data.length) return { ok: false, error: (u.error && u.error.message) || 'The database did not allow sending again. Run admin-controls.sql in Supabase.' };
+    refresh(); fire('bgs:connections-changed');
+    return { ok: true, status: 'sent', message: '' };
+  }
+  function isDup(err){ return err && (err.code === '23505' || /duplicate|already exists|unique/i.test(err.message || '')); }
   window.bgsSendConnection = async function(targetId){
     var c = ctx(); if (!c) return { ok: false, error: 'Please log in again.' };
     var r = await c.sb.rpc('send_connection_request', { target: targetId });
@@ -651,10 +664,11 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
       refresh(); fire('bgs:connections-changed');
       return { ok: st !== 'cooldown', status: st, message: MSG[st] || '' };
     }
-    if (!missingFn(r.error)) return { ok: false, error: r.error.message || 'Could not send the request.' };
+    if (!missingFn(r.error)) { if (isDup(r.error)) { var rv0 = await reviveConnection(c, targetId); if (rv0) return rv0; } return { ok: false, error: r.error.message || 'Could not send the request.' }; }
     var ins = await c.sb.from('connections').insert({ requester_id: c.user.id, addressee_id: targetId, status: 'pending' });
     if (ins.error) {
       var dup = ins.error.code === '23505';
+      if (dup) { var rv1 = await reviveConnection(c, targetId); if (rv1) return rv1; }
       return { ok: false, error: dup ? 'A request with this member already exists. Check Requests and Sent on the Connections page.' : (ins.error.message || 'Could not send the request.') };
     }
     refresh(); fire('bgs:connections-changed');
@@ -900,7 +914,7 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
     }
     var buttons =
       status === 'accepted' ? '<a class="bgsp-btn" href="messages.html?with=' + encodeURIComponent(id) + '">Message</a>' :
-      status === 'pending'  ? '<button class="bgsp-btn ghost" disabled>Request sent</button>' :
+      status === 'pending'  ? '<button class="bgsp-btn ghost" data-a="cancel">Cancel request</button>' :
       status === 'incoming' ? '<button class="bgsp-btn" data-a="accept">Accept request</button><button class="bgsp-btn ghost" data-a="decline">Decline</button>' :
       status === 'none'     ? '<button class="bgsp-btn" data-a="connect">Connect</button>' : '';
     var canReport = status !== 'self' && typeof openReportModal === 'function';
@@ -989,5 +1003,18 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
 })();
 </script>
 <script src="tecxfra-widget.js" defer></script>
+<button id="bgsTop" type="button" aria-label="Back to top">&#8593; Top</button>
+<style>
+#bgsTop{position:fixed;right:14px;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:900;display:none;background:#0F4C5C;color:#fff;border:none;border-radius:22px;padding:11px 16px;font:700 12px/1 Inter,Poppins,Arial,sans-serif;letter-spacing:.03em;box-shadow:0 4px 14px rgba(0,0,0,.25);cursor:pointer;}
+#bgsTop.show{display:block;}
+</style>
+<script>
+(function(){
+  var b = document.getElementById('bgsTop'); if (!b) return;
+  function t(){ b.classList.toggle('show', (window.scrollY || document.documentElement.scrollTop) > 500); }
+  window.addEventListener('scroll', t, { passive: true }); t();
+  b.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
 </body>
 </html>
