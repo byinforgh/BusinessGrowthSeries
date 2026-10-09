@@ -820,7 +820,8 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
           'Resend key: ' + ok(c.RESEND_API_KEY_set) + ' · Sender address: ' + ok(c.FROM_EMAIL_set) + (c.FROM_EMAIL_value ? ' ' + esc(c.FROM_EMAIL_value) : '') + ' · Cron secret: ' + ok(c.CRON_SECRET_set) + '<br>' +
           'Message table columns: ' + ok(c.notification_columns_ok) + (c.notification_columns_error ? ' ' + esc(c.notification_columns_error) : '') + '<br>' +
           'Members: ' + c.total_members + ' · incomplete: <b>' + c.incomplete_members + '</b> (with an email: ' + c.incomplete_with_email + ', emails switched off: ' + c.incomplete_emails_off + ') · reminders created in last 7 days: <b>' + c.profile_reminders_last_7_days + '</b>';
-        if (c.resend_domains) h += '<br>Resend sending domains: ' + (Array.isArray(c.resend_domains) ? c.resend_domains.map(esc).join(', ') : esc(c.resend_domains));
+        if (c.resend_key_status) { const bad = /^REJECTED/.test(c.resend_key_status); h += '<br>Resend key: <span style="color:' + (bad ? 'var(--m7)' : 'var(--teal)') + ';font-weight:700;">' + esc(c.resend_key_status) + '</span>' + (c.resend_key_length ? ' (length ' + c.resend_key_length + ')' : ''); }
+        if (c.resend_domains && Array.isArray(c.resend_domains)) h += '<br>Resend sending domains: ' + (Array.isArray(c.resend_domains) ? c.resend_domains.map(esc).join(', ') : esc(c.resend_domains));
         setNudgeStatus(SID, h);
       } else if (mode === 'delivery') {
         const cnt = Object.entries(data.counts || {}).map(([k, v]) => k + ': <b>' + v + '</b>').join(' · ') || 'no emails found';
