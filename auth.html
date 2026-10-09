@@ -800,5 +800,44 @@ setTimeout(() => {
 })();
 </script>
 
+
+<script>
+// DRAFT AUTOSAVE (added): while someone fills in the profile, what they have typed so far is saved to their
+// own profile row. It does NOT unlock anything: the profile still counts as incomplete until every required
+// answer is real. The point is that people who give up half way are no longer blank, so BYINFORGH can see how
+// far they got and reach them on WhatsApp.
+(function(){
+  if (typeof sb === 'undefined' || !sb) return;
+  var timer = null, lastSent = '';
+  function val(id){ var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
+  async function saveDraft(){
+    try {
+      var step = document.getElementById('stepProfile');
+      if (!step || !step.classList.contains('active')) return;
+      var sess = (await sb.auth.getSession()).data.session;
+      if (!sess) return;
+      var d = {};
+      function put(k, v){ if (v) d[k] = v; }
+      put('name', val('pName')); put('phone', val('pPhone')); put('location', val('pLocation')); put('landmark', val('pLandmark'));
+      put('series_goal', val('pSeriesGoal')); put('looking_for', val('pLookingFor')); put('struggle', val('pStruggle'));
+      if (typeof stage !== 'undefined' && stage) {
+        d.business_stage = stage; d.has_business = (stage === 'running');
+        if (stage === 'running') { put('business_name', val('pBusinessName')); put('category', val('pCategory')); put('sells', val('pSells')); }
+        if (stage === 'starting') { put('business_idea', val('pBusinessIdea')); }
+      }
+      var key = JSON.stringify(d);
+      if (key === '{}' || key === lastSent) return;
+      var res = await sb.from('profiles').update(d).eq('id', sess.user.id);
+      if (res.error && res.error.code === '23505' && d.phone) { delete d.phone; res = await sb.from('profiles').update(d).eq('id', sess.user.id); }
+      if (!res.error) lastSent = key;
+    } catch (e) { /* a draft save must never disturb the form */ }
+  }
+  function queue(){ clearTimeout(timer); timer = setTimeout(saveDraft, 1500); }
+  var form = document.getElementById('profileForm');
+  if (form) { form.addEventListener('input', queue); form.addEventListener('change', queue); }
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) saveDraft(); });
+  window.addEventListener('pagehide', saveDraft);
+})();
+</script>
 </body>
 </html>
