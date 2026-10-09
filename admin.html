@@ -317,6 +317,8 @@ async function loadAdminConsole(){
     sb.from('events').select('*').order('event_at', { ascending: true, nullsFirst: false }),
     sb.rpc('online_member_count'),
   ]);
+  const liveSpotRes = await sb.from('spotlights').select('*').eq('status', 'approved').order('created_at', { ascending: false });
+  window._liveSpotlights = liveSpotRes.data || [];
   window._adminData = { verifs: verifs || [], reports: reports || [], content: [
     ...(spotlights || []).map(s => ({ ...s, kind: 'spotlight' })),
     ...(testimonials || []).map(t => ({ ...t, kind: 'testimonial' })),
@@ -451,6 +453,19 @@ function renderAdminPanel(){
           <button class="btn-danger admin-content-reject" data-id="${esc(c.id)}" data-kind="${esc(c.kind)}">Reject</button>
         </div>
       </div>`).join('') || '<p class="empty-note">Nothing pending.</p>';
+    const live = window._liveSpotlights || [];
+    body.innerHTML += `<h3 style="font-family:'Inter',sans-serif;text-transform:uppercase;font-size:13px;letter-spacing:.04em;color:var(--teal);margin:28px 0 10px;">Live business spotlights (${live.length})</h3>` + (live.map(s => `
+      <div class="admin-queue-item">
+        <div class="admin-queue-main">
+          <div class="admin-queue-name">${esc(s.business_name)} <span style="font-weight:400;color:var(--ink-dim);">by ${esc(nameFor(s.user_id))}</span></div>
+          <div class="admin-queue-meta">${esc(s.location || '')} · live since ${new Date(s.created_at).toLocaleDateString('en-GB')}</div>
+          <div class="admin-queue-body">${esc((s.what_they_do || '').slice(0, 300))}</div>
+        </div>
+        <div class="admin-queue-actions">
+          <button class="btn-danger admin-spot-remove" data-id="${esc(s.id)}">Take off spotlight</button>
+          <button class="btn-ghost admin-spot-delete" data-id="${esc(s.id)}">Delete forever</button>
+        </div>
+      </div>`).join('') || '<p class="empty-note">No live spotlights.</p>');
   } else if (activeAdminTab === 'community') {
     const postsHtml = d.posts.map(p => `
       <div class="admin-queue-item">
@@ -820,6 +835,9 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
           'Resend key: ' + ok(c.RESEND_API_KEY_set) + ' · Sender address: ' + ok(c.FROM_EMAIL_set) + (c.FROM_EMAIL_value ? ' ' + esc(c.FROM_EMAIL_value) : '') + ' · Cron secret: ' + ok(c.CRON_SECRET_set) + '<br>' +
           'Message table columns: ' + ok(c.notification_columns_ok) + (c.notification_columns_error ? ' ' + esc(c.notification_columns_error) : '') + '<br>' +
           'Members: ' + c.total_members + ' · incomplete: <b>' + c.incomplete_members + '</b> (with an email: ' + c.incomplete_with_email + ', emails switched off: ' + c.incomplete_emails_off + ') · reminders created in last 7 days: <b>' + c.profile_reminders_last_7_days + '</b>';
+        if (c.resend_key_looks_complete === false) h += '<br><span style="color:var(--m7);font-weight:700;">The Resend key in Supabase is only ' + c.resend_key_length + ' characters. A real key starts with re_ and is about 36 characters, so it was cut short when pasted.</span>';
+        h += '<br>Q&A in the database: <b>' + esc(c.qa_questions_in_database) + '</b> question(s), <b>' + esc(c.qa_answers_in_database) + '</b> answer(s). Newest: ' + ((c.qa_latest || []).map(esc).join(' | ') || 'none');
+        if (c.signup_funnel) { const f = c.signup_funnel; h += '<br>Stuck signups: <b>' + f.never_opened_form + '</b> never opened the form, <b>' + f.started_but_no_whatsapp + '</b> started but gave no WhatsApp number, <b>' + f.chose_no_stage + '</b> never chose a stage. Last 7 days: <b>' + f.joined_last_7_days + '</b> joined, <b>' + f.of_those_complete + '</b> finished. Incomplete for over a week: <b>' + f.incomplete_older_than_7_days + '</b>.'; }
         if (c.resend_key_status) { const bad = /^REJECTED/.test(c.resend_key_status); h += '<br>Resend key: <span style="color:' + (bad ? 'var(--m7)' : 'var(--teal)') + ';font-weight:700;">' + esc(c.resend_key_status) + '</span>' + (c.resend_key_length ? ' (length ' + c.resend_key_length + ')' : ''); }
         if (c.resend_domains && Array.isArray(c.resend_domains)) h += '<br>Resend sending domains: ' + (Array.isArray(c.resend_domains) ? c.resend_domains.map(esc).join(', ') : esc(c.resend_domains));
         setNudgeStatus(SID, h);
@@ -884,6 +902,18 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
   } else if (btn.classList.contains('admin-content-reject')) {
     await sb.from(btn.dataset.kind === 'ai_document' ? 'ai_documents' : btn.dataset.kind + 's').update({ status: 'rejected' }).eq('id', btn.dataset.id);
     loadAdminConsole();
+  } else if (btn.classList.contains('admin-spot-remove')) {
+    if (!confirm('Take this business off the spotlight? Members will stop seeing it straight away. You can approve it again later.')) return;
+    const { data: done, error } = await sb.from('spotlights').update({ status: 'rejected' }).eq('id', btn.dataset.id).select('id');
+    if (error) alert('Could not take it off: ' + error.message);
+    else if (!done || !done.length) alert('The database did not allow that change. Run admin-controls.sql in Supabase, then try again.');
+    else loadAdminConsole();
+  } else if (btn.classList.contains('admin-spot-delete')) {
+    if (!confirm('Delete this spotlight permanently? This cannot be undone.')) return;
+    const { data: done, error } = await sb.from('spotlights').delete().eq('id', btn.dataset.id).select('id');
+    if (error) alert('Could not delete: ' + error.message);
+    else if (!done || !done.length) alert('The database did not allow that change. Run admin-controls.sql in Supabase, then try again.');
+    else loadAdminConsole();
   } else if (btn.classList.contains('admin-post-delete')) {
     if (!confirm('Delete this community post? This cannot be undone.')) return;
     const { error } = await sb.from('community_posts').delete().eq('id', btn.dataset.id);
@@ -1082,6 +1112,12 @@ function openMemberModal(userId){
       ${m.phone ? `<a class="btn-ghost" id="memberWhatsappNudge" href="https://wa.me/${esc((m.phone||'').replace(/[^0-9]/g,''))}?text=${encodeURIComponent(`Hi ${m.name || 'there'}, this is BYINFORGH. We noticed you started signing up for the Business Growth Series but haven't finished your profile yet, it only takes two minutes and unlocks everything. Here's the link: https://businessgrowthseries.byinforgh.com/auth.html`)}" target="_blank" rel="noopener">Nudge on WhatsApp</a>` : ''}
     </div>
     <div id="memberResendStatus" style="font-size:12px;color:var(--teal);margin-top:8px;"></div>` : ''}
+    ${(m.business_name || m.sells || m.category) ? `
+    <div style="margin-top:20px;border:1px dashed var(--line);padding:14px 16px;">
+      <div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">Used a personal email and wants to register a business instead? This clears the business name, category, what they sell, what they are looking for and the logo. They leave the directory straight away and are asked to register their business the next time they open the platform.</div>
+      <button class="btn-danger" id="memberClearBizBtn">Clear business details</button>
+      <div id="memberClearStatus" style="font-size:12px;color:var(--teal);margin-top:8px;"></div>
+    </div>` : ''}
     <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
       ${m.banned
         ? `<button class="btn-primary" id="memberUnbanBtn">Lift suspension</button>`
@@ -1089,6 +1125,21 @@ function openMemberModal(userId){
     </div>`;
   document.getElementById('memberModal').style.display = 'flex';
   loadMemberActivity(m.id);
+  const clearBtn = document.getElementById('memberClearBizBtn');
+  if (clearBtn) clearBtn.addEventListener('click', async () => {
+    if (!confirm('Clear the business details for ' + (m.name || 'this member') + '? They will leave the directory and be asked to register their business again.')) return;
+    const st = document.getElementById('memberClearStatus');
+    clearBtn.disabled = true; st.textContent = 'Clearing...';
+    const { data: done, error } = await sb.from('profiles').update({
+      business_name: null, category: null, sells: null, looking_for: null, logo_url: null, business_stage: null, has_business: null
+    }).eq('id', m.id).select('id');
+    if (error || !done || !done.length) { clearBtn.disabled = false; st.style.color = 'var(--m7)'; st.textContent = error ? ('Could not clear: ' + error.message) : 'The database did not allow that change. Run admin-controls.sql in Supabase, then try again.'; return; }
+    try { await sb.from('member_notifications').insert({ user_id: m.id, kind: 'business_reset', title: 'Register your business', body: 'BYINFORGH cleared your old business details so you can register under your business. Open your profile, add the business details and you will appear in the directory automatically.', action_url: 'auth.html', action_label: 'Register my business' }); } catch (e) {}
+    st.textContent = 'Cleared. They are out of the directory and will be asked to register their business.';
+    const idx = (window._adminData.members || []).findIndex(x => x.id === m.id);
+    if (idx >= 0) Object.assign(window._adminData.members[idx], { business_name: null, category: null, sells: null, looking_for: null, logo_url: null, business_stage: null, has_business: null });
+    loadAdminConsole();
+  });
   const banBtn = document.getElementById('memberBanBtn');
   if (banBtn) banBtn.addEventListener('click', async () => {
     const reason = prompt('Reason for suspension (shown to the member):');
