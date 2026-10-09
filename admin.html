@@ -690,7 +690,10 @@ function renderHourQuestionsTab(body, d){
       <div style="display:flex;gap:8px;flex-wrap:wrap;">
         <button class="btn-ghost" data-profile-nudge="test">Send me a test</button>
         <button class="btn-danger" data-profile-nudge="all">Send to all incomplete profiles now</button>
+        <button class="btn-ghost" data-profile-nudge="diagnose">Check the reminder system</button>
+        <button class="btn-ghost" data-profile-nudge="delivery">Email delivery report</button>
       </div>
+      <div id="profileNudgeStatus" style="font-size:12.5px;color:var(--teal);margin-top:12px;min-height:16px;line-height:1.6;"></div>
     </div>
     <div style="border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;margin-bottom:18px;">
       <div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);margin-bottom:6px;">TecXFRA interest: latest trial clicks</div>
@@ -732,6 +735,36 @@ function renderHourQuestionsTab(body, d){
     }).join('') || '<p class="empty-note">No questions yet. Members can send them from the dashboard, and the Wednesday reminder points them there.</p>'}`;
 }
 
+async function fnError(error){
+  try {
+    if (error && error.context && typeof error.context.json === 'function') {
+      const b = await error.context.json();
+      if (b && b.error) return b.error;
+    }
+  } catch (e) {}
+  return (error && error.message) || String(error);
+}
+function setNudgeStatus(id, html){
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = html;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function renderReminderResult(r){
+  const bits = [];
+  bits.push('<b>' + (r.queued || 0) + '</b> in-app message(s) created');
+  bits.push('<b>' + (r.sent || 0) + '</b> email(s) sent');
+  if (r.incompleteFound != null) bits.push(r.incompleteFound + ' incomplete found');
+  if (r.skipped) bits.push(r.skipped + ' skipped (reminded in last 3 days)');
+  if (r.noEmail) bits.push(r.noEmail + ' with no email on file');
+  if (r.optedOut) bits.push(r.optedOut + ' with emails switched off');
+  let html = bits.join(' · ');
+  if (r.testSentTo) html += '<br>Test email sent to <b>' + esc(r.testSentTo) + '</b>. Check inbox and spam, then open Messages.';
+  if ((r.errors || []).length) html += '<div style="color:var(--m7);margin-top:8px;"><b>Problems:</b><br>' + r.errors.map(esc).join('<br>') + '</div>';
+  if ((r.warnings || []).length) html += '<div style="color:var(--ink-dim);margin-top:6px;">Notes: ' + r.warnings.map(esc).join('; ') + '</div>';
+  return html;
+}
+
 async function runNudge(kind, onlyMe){
   const status = document.getElementById('nudgeTestStatus');
   if (status) status.textContent = 'Working...';
@@ -741,7 +774,8 @@ async function runNudge(kind, onlyMe){
     if (status) status.textContent = data && data.note ? data.note : `Done. ${data.queued || 0} in-app message(s) created, ${data.sent || 0} email(s) sent.` + (onlyMe ? ' Check your Messages page.' : '');
     loadAdminConsole();
   } catch (e) {
-    if (status) status.textContent = 'Could not run it: ' + (e.message || e) + '. Check that the send-nudge-emails function is deployed.';
+    const real = await fnError(e);
+    if (status) status.textContent = 'Could not run it: ' + real + '. Check that the send-nudge-emails function is deployed.';
   }
 }
 
@@ -766,12 +800,43 @@ document.getElementById('adminPanelBody').addEventListener('click', async (e) =>
   if (!btn) return;
 
   if (btn.dataset.profileNudge) {
-    if (btn.dataset.profileNudge === 'all' && !confirm('Email every member with an incomplete profile now? Anyone reminded in the last 3 days is skipped.')) return;
-    const status = document.getElementById('nudgeTestStatus');
-    if (status) status.textContent = 'Working...';
-    sb.functions.invoke('send-profile-reminders', { body: { only_me: btn.dataset.profileNudge === 'test', force: btn.dataset.profileNudge === 'test' } })
-      .then(({ data, error }) => { if (error) throw error; if (status) status.textContent = 'Done. ' + (data.queued || 0) + ' in-app message(s), ' + (data.sent || 0) + ' email(s) sent, ' + (data.skipped || 0) + ' skipped (reminded in last 3 days).'; loadAdminConsole(); })
-      .catch(e => { if (status) status.textContent = 'Could not run it: ' + (e.message || e) + '. Check that the send-profile-reminders function is deployed.'; });
+    const mode = btn.dataset.profileNudge;
+    if (mode === 'all' && !confirm('Email every member with an incomplete profile now? Anyone reminded in the last 3 days is skipped.')) return;
+    const SID = 'profileNudgeStatus';
+    setNudgeStatus(SID, 'Working...');
+    btn.disabled = true;
+    try {
+      let payload;
+      if (mode === 'diagnose') payload = { action: 'diagnose' };
+      else if (mode === 'delivery') payload = { action: 'delivery_report' };
+      else payload = { only_me: mode === 'test', force: mode === 'test' };
+      const { data, error } = await sb.functions.invoke('send-profile-reminders', { body: payload });
+      if (error) throw error;
+      if (data && data.error) throw new Error(data.error);
+      if (mode === 'diagnose') {
+        const c = data.checks || {};
+        const ok = v => v ? '<span style="color:var(--teal);font-weight:700;">OK</span>' : '<span style="color:var(--m7);font-weight:700;">MISSING</span>';
+        let h = '<b>Reminder system check</b><br>' +
+          'Resend key: ' + ok(c.RESEND_API_KEY_set) + ' · Sender address: ' + ok(c.FROM_EMAIL_set) + (c.FROM_EMAIL_value ? ' ' + esc(c.FROM_EMAIL_value) : '') + ' · Cron secret: ' + ok(c.CRON_SECRET_set) + '<br>' +
+          'Message table columns: ' + ok(c.notification_columns_ok) + (c.notification_columns_error ? ' ' + esc(c.notification_columns_error) : '') + '<br>' +
+          'Members: ' + c.total_members + ' · incomplete: <b>' + c.incomplete_members + '</b> (with an email: ' + c.incomplete_with_email + ', emails switched off: ' + c.incomplete_emails_off + ') · reminders created in last 7 days: <b>' + c.profile_reminders_last_7_days + '</b>';
+        if (c.resend_domains) h += '<br>Resend sending domains: ' + (Array.isArray(c.resend_domains) ? c.resend_domains.map(esc).join(', ') : esc(c.resend_domains));
+        setNudgeStatus(SID, h);
+      } else if (mode === 'delivery') {
+        const cnt = Object.entries(data.counts || {}).map(([k, v]) => k + ': <b>' + v + '</b>').join(' · ') || 'no emails found';
+        let h = '<b>Last ' + (data.checked || 0) + ' emails sent through Resend</b> (includes the Business Hour Sunday and Wednesday emails)<br>' + cnt;
+        if ((data.problems || []).length) h += '<div style="color:var(--m7);margin-top:8px;"><b>Not delivered:</b><br>' + data.problems.map(p => esc(p.to) + ' · ' + esc(p.event) + ' · ' + esc((p.subject || '').slice(0, 50))).join('<br>') + '</div>';
+        else h += '<br>No bounces or failures in this batch.';
+        if ((data.recent || []).length) h += '<div style="color:var(--ink-dim);margin-top:8px;"><b>Most recent:</b><br>' + data.recent.map(p => esc(p.to) + ' · ' + esc(p.event) + ' · ' + esc((p.subject || '').slice(0, 50))).join('<br>') + '</div>';
+        setNudgeStatus(SID, h);
+      } else {
+        setNudgeStatus(SID, renderReminderResult(data));
+        loadAdminConsole();
+      }
+    } catch (e) {
+      const real = await fnError(e);
+      setNudgeStatus(SID, '<span style="color:var(--m7);"><b>Did not work:</b> ' + esc(real) + '</span><br>If this says "Failed to send a request" or 404, the function is not deployed under the exact name <b>send-profile-reminders</b>. If it says "Not allowed", switch OFF "Verify JWT with legacy secret" for that function and confirm your profile has is_admin = true.');
+    } finally { btn.disabled = false; }
     return;
   }
   if (btn.dataset.nudgeTest) { runNudge(btn.dataset.nudgeTest, true); return; }
@@ -943,7 +1008,7 @@ function openStatModal(key){
   }
   else if (key === 'idea') { title = 'Idea-stage members'; intro = 'Members who do not have a running business yet.'; rows = members.filter(m => m.has_business === false).map(m => row(m.id, m.business_idea ? 'Idea: ' + m.business_idea : 'No idea written yet')); }
   else if (key === 'optout') { title = 'Emails switched off'; intro = 'These members only get in-app messages.'; rows = members.filter(m => m.email_reminders === false).map(m => row(m.id, m.location || 'No location')); }
-  else if (key === 'incomplete') { title = 'Incomplete profiles'; intro = 'Each row shows exactly what is still missing. Tap a row for the full profile.'; rows = members.filter(m => !isComplete(m)).map(m => row(m.id, 'Missing: ' + missingFor(m).join(', '))); }
+  else if (key === 'incomplete') { title = 'Incomplete profiles'; intro = 'Each row shows exactly what is still missing. Tap a row for the full profile.'; rows = members.filter(m => !isComplete(m)).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0)).map(m => row(m.id, (m.phone ? m.phone + ' · ' : 'no phone · ') + 'joined ' + (m.created_at ? new Date(m.created_at).toLocaleDateString('en-GB', { day:'2-digit', month:'short' }) : '?') + ' · missing: ' + missingFor(m).join(', '))); }
   else if (key === 'trial') { title = 'TecXFRA trial clicks'; intro = 'Every time a member pressed "Start my 14-day free trial".'; rows = tx.filter(r => r.kind === 'trial_click').map(r => row(r.user_id, 'from ' + (r.page || 'a page') + ' · ' + when(r.created_at))); }
   else if (key === 'trialpeople') {
     title = 'Members who clicked the trial'; intro = 'One row per member. These are your warmest TecXFRA leads: follow up with them.';
@@ -958,6 +1023,16 @@ function openStatModal(key){
   const list = rows.length ? rows.map(r => `<div class="admin-member-row" data-user="${esc(r.uid)}" style="padding:11px 4px;border-bottom:1px solid var(--line);cursor:pointer;"><div style="font-weight:700;font-size:14px;">${esc(r.name)}</div><div style="font-size:12px;color:var(--ink-dim);margin-top:2px;">${esc(r.sub)}</div></div>`).join('') : '<p style="padding:24px 0;text-align:center;color:var(--ink-dim);font-size:13.5px;margin:0;">Nothing here yet.</p>';
   ov.innerHTML = `<div style="background:var(--bg);max-width:560px;width:100%;max-height:82vh;overflow:auto;border:1px solid var(--line);padding:24px 26px;"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;"><div><div style="font-family:'Inter',sans-serif;font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--teal);">${rows.length} ${rows.length === 1 ? 'entry' : 'entries'}</div><h3 style="margin:4px 0 6px;font-size:20px;">${esc(title)}</h3></div><button type="button" class="btn-ghost" data-stat-close style="padding:6px 12px;">Close</button></div><p style="font-size:13px;color:var(--ink-dim);line-height:1.55;margin:0 0 10px;">${esc(intro)}</p>${list}</div>`;
   ov.style.display = 'flex';
+  if (key === 'incomplete' && rows.length) {
+    const inner = ov.firstElementChild;
+    const b = document.createElement('button');
+    b.className = 'btn-ghost'; b.style.marginTop = '14px'; b.textContent = 'Copy names, numbers and what is missing';
+    b.addEventListener('click', () => {
+      const text = members.filter(m => !isComplete(m)).map(m => `${nameFor(m.id)} | ${m.phone || 'no phone'} | missing: ${missingFor(m).join(', ')}`).join('\n');
+      navigator.clipboard?.writeText(text).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy names, numbers and what is missing', 1500); });
+    });
+    inner.appendChild(b);
+  }
 }
 document.addEventListener('click', e => { const c = e.target.closest('[data-stat]'); if (c && c.dataset.stat) openStatModal(c.dataset.stat); });
 document.addEventListener('keydown', e => { if ((e.key === 'Enter' || e.key === ' ') && e.target.dataset && e.target.dataset.stat) { e.preventDefault(); openStatModal(e.target.dataset.stat); } if (e.key === 'Escape') { const o = document.getElementById('statModal'); if (o) o.style.display = 'none'; } });
