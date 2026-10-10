@@ -571,7 +571,7 @@ async function openProfileCard(userId){
     <div class="pf-actions">
       ${userId === currentUser.id ? '' :
         status === 'accepted' ? `<a class="btn-primary" href="messages.html?with=${encodeURIComponent(userId)}">Message</a>`
-        : status === 'pending' ? `<button class="btn-ghost" disabled>Request sent</button>`
+        : status === 'pending' ? `<button class="btn-ghost" id="pfCancelBtn">Cancel request</button>`
         : status === 'incoming' ? `<button class="btn-primary" id="pfAcceptBtn">Accept request</button>`
         : `<button class="btn-primary" id="pfConnectBtn">Connect</button>`}
       <a class="btn-ghost" href="directory.html">Directory</a>
@@ -583,6 +583,14 @@ async function openProfileCard(userId){
     const res = await window.bgsSendConnection(userId);
     document.getElementById('pfStatus').textContent = !res.ok ? (res.error || res.message || 'Could not send the request.') : (res.message || 'Request sent. You can message once they accept.');
     if (!res.ok) cb.disabled = false; else cb.textContent = res.status === 'accepted' ? 'Connected' : 'Request sent';
+  });
+  const xb = document.getElementById('pfCancelBtn');
+  if (xb) xb.addEventListener('click', async () => {
+    if (!confirm('Cancel your request to this member? You can send a new one afterwards.')) return;
+    xb.disabled = true;
+    const res = await window.bgsRespondConnection(c.id, 'cancel');
+    if (!res.ok) { xb.disabled = false; document.getElementById('pfStatus').textContent = res.error || 'Could not cancel, please try again.'; return; }
+    openProfileCard(userId);
   });
   const ab = document.getElementById('pfAcceptBtn');
   if (ab) ab.addEventListener('click', async () => {
