@@ -343,14 +343,22 @@ async function loadQA(){
   const feed = document.getElementById('qaFeed');
   // Questions and answers are loaded separately, so a problem reading answers can never hide the questions,
   // and any error is shown on the page instead of leaving it blank.
-  const { data: qRows, error } = await sb.from('qa_questions').select('*').order('created_at', { ascending: false }).limit(30);
+  // Preferred path: one server call that returns every question with its answers to any member with a complete profile.
+  // It cannot be hidden by a table read rule, so a question asked here always stays here for everyone to see.
+  let qRows = null, error = null, viaRpc = false;
+  const feedRes = await sb.rpc('bgs_qa_feed');
+  if (!feedRes.error && Array.isArray(feedRes.data)) { qRows = feedRes.data; viaRpc = true; }
+  else {
+    const r = await sb.from('qa_questions').select('*').order('created_at', { ascending: false }).limit(30);
+    qRows = r.data; error = r.error;
+  }
   if (error) {
     console.error(error);
     feed.innerHTML = '<p style="color:#b3402f;padding:20px;"><b>Questions could not load.</b> ' + esc(error.message || 'Unknown error') + ' (code ' + esc(error.code || 'none') + '). Send this line to BYINFORGH support.</p>';
     return;
   }
   const data = qRows || [];
-  if (data.length) {
+  if (data.length && !viaRpc) {
     const { data: aRows, error: aErr } = await sb.from('qa_answers').select('*').in('question_id', data.map(q => q.id));
     if (aErr) {
       console.error(aErr);
@@ -462,7 +470,11 @@ async function loadQA(){
       const status = el.querySelector('.qa-answer-status');
       if (!answer || !currentUser) return;
       status.textContent = 'Posting...';
-      const { data: saved, error: insErr } = await sb.from('qa_answers').insert({ question_id: form.dataset.q, user_id: currentUser.id, answer }).select().single();
+      let saved = null, insErr = null;
+      const repRes = await sb.rpc('bgs_qa_reply', { qid: form.dataset.q, a: answer });
+      if (!repRes.error && repRes.data) saved = repRes.data;
+      else if (repRes.error && !/could not find the function|schema cache|PGRST202|42883/i.test((repRes.error.message || '') + ' ' + (repRes.error.code || ''))) insErr = repRes.error;
+      else { const r = await sb.from('qa_answers').insert({ question_id: form.dataset.q, user_id: currentUser.id, answer }).select().single(); saved = r.data; insErr = r.error; }
       if (insErr) {
         console.error(insErr);
         status.textContent = 'Could not post your answer: ' + insErr.message;
@@ -505,7 +517,11 @@ document.getElementById('qaForm').addEventListener('submit', async function(e){
   const statusEl = document.getElementById('qaStatus');
   if (!question || !sb || !currentUser) return;
   statusEl.textContent = 'Posting...';
-  const { data: made, error } = await sb.from('qa_questions').insert({ user_id: currentUser.id, question }).select().single();
+  let made = null, error = null;
+  const askRes = await sb.rpc('bgs_qa_ask', { q: question });
+  if (!askRes.error && askRes.data) made = askRes.data;
+  else if (askRes.error && !/could not find the function|schema cache|PGRST202|42883/i.test((askRes.error.message || '') + ' ' + (askRes.error.code || ''))) error = askRes.error;
+  else { const r = await sb.from('qa_questions').insert({ user_id: currentUser.id, question }).select().single(); made = r.data; error = r.error; }
   if (error) { console.error(error); statusEl.textContent = 'Not posted: ' + (error.message || 'unknown error') + ' (code ' + (error.code || 'none') + ').'; return; }
   statusEl.textContent = 'Posted.';
   input.value = '';
