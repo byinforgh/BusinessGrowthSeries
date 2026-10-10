@@ -1072,7 +1072,7 @@ function openStatModal(key){
         if (dry.error) throw dry.error;
         const d = dry.data || {};
         if (d.error) throw new Error(d.error);
-        if (!d.candidates) { alert('Nothing to remove. ' + (d.tooNew ? d.tooNew + ' incomplete profile(s) are under 24 hours old, so they are left alone.' : '')); rm.disabled = false; return; }
+        if (!d.candidates) { alert('Nothing to remove. ' + (d.tooNew ? d.tooNew + ' incomplete profile(s) are under 24 hours old, so they are left alone. ' : '') + (d.keptDbSaysComplete ? d.keptDbSaysComplete + ' are complete according to the database, so they are kept. ' : '') + (d.keptUnknown ? d.keptUnknown + ' could not be confirmed and are kept' + ((d.failed || [])[0] ? ': ' + d.failed[0] : '') + '. ' : '')); rm.disabled = false; return; }
         if (!confirm('Delete ' + d.candidates + ' incomplete account(s) for good? ' + (d.tooNew ? d.tooNew + ' newer than 24 hours are kept. ' : '') + 'They can sign up again any time. This cannot be undone.')) { rm.disabled = false; return; }
         const run = await sb.functions.invoke('send-profile-reminders', { body: { action: 'remove_incomplete', all: true } });
         if (run.error) throw run.error;
