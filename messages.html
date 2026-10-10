@@ -565,7 +565,7 @@ function renderSystemThread(){
   const col = document.getElementById('threadCol');
   const unreadIds = sysNotes.filter(n => !n.read_at).map(n => n.id);
   col.innerHTML = `
-    <div class="thread-head"><div><div class="thread-head-name">BYINFORGH <span style="font-family:Inter,sans-serif;font-size:9px;color:var(--teal);border:1px solid var(--teal);padding:2px 6px;margin-left:6px;">OFFICIAL</span></div><div id="threadPresence" style="font-size:11px;color:var(--ink-dim);margin-top:2px;">${esc(presenceLabel(p))}</div></div></div>
+    <div class="thread-head"><div><div class="thread-head-name">BYINFORGH <span style="font-family:Inter,sans-serif;font-size:9px;color:var(--teal);border:1px solid var(--teal);padding:2px 6px;margin-left:6px;">OFFICIAL</span></div><div id="threadPresence" style="font-size:11px;color:var(--ink-dim);margin-top:2px;">Official messages and reminders</div></div></div>
     <div class="thread-feed" id="threadFeed">${
       sysNotes.length ? sysNotes.map(n => {
         const url = safeActionUrl(n.action_url);
