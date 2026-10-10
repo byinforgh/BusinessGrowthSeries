@@ -2739,6 +2739,8 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
 <script>
 // Business Truth strips: always moving at one steady speed. Hover (or press and hold on a phone) to stop and read.
 // "Back to start" brings the strip back to its first line.
+// The members area is hidden until the session check finishes, and a hidden strip has no width, so each strip
+// is set up the moment it becomes visible (and again if the screen size changes), never before.
 (function(){
   var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function speed(){ return window.innerWidth < 700 ? 30 : 48; } // pixels per second, same for every strip
@@ -2751,21 +2753,30 @@ document.getElementById('suggestionForm').addEventListener('submit', async funct
     function build(){ var reps = 1; fill(reps); while (m.scrollWidth / 2 < strip.clientWidth * 1.1 && reps < 6) { reps++; fill(reps); } }
     function run(){
       var half = m.scrollWidth / 2;
+      if (!half) return false;
       m.style.animation = 'none'; void m.offsetWidth;
       m.style.animation = 'appscroll ' + (half / speed()) + 's linear infinite';
       m.style.animationDelay = '0s';
+      return true;
     }
-    build(); if (!reduce) run();
+    var lastW = 0;
+    function setup(){
+      var w = strip.clientWidth;
+      if (!w || w === lastW) return;   // hidden, or nothing changed
+      lastW = w; build(); if (!reduce) run();
+    }
     var ctl = document.createElement('div');
     ctl.className = 'marq-ctl';
     ctl.innerHTML = '<button type="button">Back to start</button>';
     strip.appendChild(ctl);
     ctl.querySelector('button').addEventListener('click', function(){ if (!reduce) run(); strip.classList.remove('holding'); });
-    // touch: stopped while a finger is on the strip, runs again shortly after letting go
     var resumeT;
     strip.addEventListener('touchstart', function(){ clearTimeout(resumeT); strip.classList.add('holding'); }, { passive: true });
     ['touchend', 'touchcancel'].forEach(function(ev){ strip.addEventListener(ev, function(){ clearTimeout(resumeT); resumeT = setTimeout(function(){ strip.classList.remove('holding'); }, 1500); }, { passive: true }); });
-    var rt; window.addEventListener('resize', function(){ clearTimeout(rt); rt = setTimeout(function(){ build(); if (!reduce) run(); }, 250); });
+    if (window.ResizeObserver) new ResizeObserver(setup).observe(strip);
+    window.addEventListener('resize', setup);
+    window.addEventListener('load', function(){ setup(); setTimeout(setup, 600); setTimeout(setup, 2000); });
+    setup();
   });
 })();
 </script>
