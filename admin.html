@@ -1063,6 +1063,25 @@ function openStatModal(key){
       navigator.clipboard?.writeText(text).then(() => { b.textContent = 'Copied'; setTimeout(() => b.textContent = 'Copy names, numbers and what is missing', 1500); });
     });
     inner.appendChild(b);
+    const rm = document.createElement('button');
+    rm.className = 'btn-danger'; rm.style.cssText = 'margin:14px 0 0 8px;'; rm.textContent = 'Remove all incomplete profiles older than 24 hours';
+    rm.addEventListener('click', async () => {
+      rm.disabled = true;
+      try {
+        const dry = await sb.functions.invoke('send-profile-reminders', { body: { action: 'remove_incomplete', all: true, dry_run: true } });
+        if (dry.error) throw dry.error;
+        const d = dry.data || {};
+        if (d.error) throw new Error(d.error);
+        if (!d.candidates) { alert('Nothing to remove. ' + (d.tooNew ? d.tooNew + ' incomplete profile(s) are under 24 hours old, so they are left alone.' : '')); rm.disabled = false; return; }
+        if (!confirm('Delete ' + d.candidates + ' incomplete account(s) for good? ' + (d.tooNew ? d.tooNew + ' newer than 24 hours are kept. ' : '') + 'They can sign up again any time. This cannot be undone.')) { rm.disabled = false; return; }
+        const run = await sb.functions.invoke('send-profile-reminders', { body: { action: 'remove_incomplete', all: true } });
+        if (run.error) throw run.error;
+        const r = run.data || {};
+        alert('Removed ' + (r.removed || 0) + '.' + ((r.failed || []).length ? ' Could not remove: ' + r.failed.join('; ') : ''));
+        ov.style.display = 'none'; loadAdminConsole();
+      } catch (e) { alert('Could not remove: ' + await fnError(e)); rm.disabled = false; }
+    });
+    inner.appendChild(rm);
   }
 }
 document.addEventListener('click', e => { const c = e.target.closest('[data-stat]'); if (c && c.dataset.stat) openStatModal(c.dataset.stat); });
@@ -1118,6 +1137,12 @@ function openMemberModal(userId){
       <button class="btn-danger" id="memberClearBizBtn">Clear business details</button>
       <div id="memberClearStatus" style="font-size:12px;color:var(--teal);margin-top:8px;"></div>
     </div>` : ''}
+    ${!isComplete(m) && !m.is_admin ? `
+    <div style="margin-top:20px;border:1px dashed var(--m7);padding:14px 16px;">
+      <div style="font-size:12.5px;color:var(--ink-dim);margin-bottom:10px;line-height:1.5;">This profile is not complete. Removing it deletes the account completely, so the person can sign up again fresh whenever they are ready. Use it for abandoned signups and test accounts.</div>
+      <button class="btn-danger" id="memberRemoveIncompleteBtn">Remove this incomplete profile</button>
+      <div id="memberRemoveStatus" style="font-size:12px;color:var(--teal);margin-top:8px;"></div>
+    </div>` : ''}
     <div style="display:flex;gap:8px;margin-top:20px;flex-wrap:wrap;">
       ${m.banned
         ? `<button class="btn-primary" id="memberUnbanBtn">Lift suspension</button>`
@@ -1139,6 +1164,21 @@ function openMemberModal(userId){
     const idx = (window._adminData.members || []).findIndex(x => x.id === m.id);
     if (idx >= 0) Object.assign(window._adminData.members[idx], { business_name: null, category: null, sells: null, looking_for: null, logo_url: null, business_stage: null, has_business: null });
     loadAdminConsole();
+  });
+  const rmBtn = document.getElementById('memberRemoveIncompleteBtn');
+  if (rmBtn) rmBtn.addEventListener('click', async () => {
+    if (!confirm('Remove this incomplete profile for good? The account is deleted and the person can sign up again later.')) return;
+    const st = document.getElementById('memberRemoveStatus');
+    rmBtn.disabled = true; st.textContent = 'Removing...';
+    try {
+      const { data, error } = await sb.functions.invoke('send-profile-reminders', { body: { action: 'remove_incomplete', ids: [m.id] } });
+      if (error) throw error;
+      if (data && data.error) throw new Error(data.error);
+      if (!data.removed) throw new Error((data.failed && data.failed[0]) || 'Nothing was removed. It may already be complete.');
+      st.textContent = 'Removed.';
+      document.querySelectorAll('.admin-modal-overlay, #memberModal').forEach(el => { if (el.style) el.style.display = 'none'; });
+      loadAdminConsole();
+    } catch (e) { rmBtn.disabled = false; st.style.color = 'var(--m7)'; st.textContent = 'Could not remove: ' + await fnError(e); }
   });
   const banBtn = document.getElementById('memberBanBtn');
   if (banBtn) banBtn.addEventListener('click', async () => {
