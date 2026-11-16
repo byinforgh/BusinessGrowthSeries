@@ -3,38 +3,96 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Privacy Policy & Terms: BYINFORGH Business Growth Series</title>
+<title>Join or Log In: BYINFORGH Business Growth Series</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
-  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F; --gold:#B08D3F; --blue:#3F93A8;
+  --ink:#1C1C1C; --ink-dim:rgba(28,28,28,0.62); --teal:#0F4C5C; --teal-deep:#0A363F;
+  --gold:#B08D3F; --blue:#3F93A8; --radius:6px;
 }
 *{box-sizing:border-box;}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
-a{color:var(--teal);}
-h1,h2{font-family:'Inter',sans-serif;font-weight:800;text-transform:uppercase;letter-spacing:-0.01em;}
-h2{font-size:20px;margin-top:48px;margin-bottom:14px;}
-p, li{color:var(--ink-dim);font-size:15px;line-height:1.7;}
-.wrap{max-width:760px;margin:0 auto;padding:56px 28px 100px;}
+::selection{background:var(--teal);color:var(--bg);}
+a{color:inherit;}
+h1,h2{font-family:'Inter',sans-serif;font-weight:800;line-height:1.02;margin:0;text-transform:uppercase;letter-spacing:-0.01em;}
+.eyebrow{font-family:'Inter',sans-serif;letter-spacing:.14em;text-transform:uppercase;font-size:12px;font-weight:600;color:var(--teal);}
+
 .kente-stripe{height:6px;display:flex;}
 .kente-stripe span{flex:1;}
 .kente-stripe span:nth-child(4n+1){background:var(--teal);}
 .kente-stripe span:nth-child(4n+2){background:var(--gold);}
 .kente-stripe span:nth-child(4n+3){background:var(--blue);}
 .kente-stripe span:nth-child(4n+4){background:var(--surface-2);}
-.brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;color:var(--ink);margin-bottom:8px;}
-.brand-mark{width:30px;height:30px;border-radius:50%;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--gold);;overflow:hidden;background:var(--surface);}
-.updated{font-family:'Inter',sans-serif;font-size:12px;color:var(--ink-dim);margin-bottom:40px;}
-.notice{
-  border:1px solid var(--gold);background:rgba(176,141,63,0.08);padding:20px 22px;margin-bottom:40px;border-radius:2px;
+
+.brand-mark{
+  width:34px;height:34px;border-radius:50%;border:2px solid var(--gold);
+  display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--gold);position:relative;flex-shrink:0;;overflow:hidden;background:var(--surface);}
+
+.auth-shell{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:40px 20px;
+  background:radial-gradient(ellipse 900px 560px at 50% -10%, rgba(15,76,92,0.10), transparent 60%),
+             radial-gradient(ellipse 600px 400px at 100% 100%, rgba(176,141,63,0.06), transparent 60%);
 }
-.notice p{color:var(--ink);margin:0;font-size:13.5px;}
-ul{padding-left:20px;}
-.back-link{display:inline-flex;gap:8px;color:var(--ink-dim);text-decoration:none;font-size:12.5px;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.05em;margin-bottom:24px;}
+.auth-card{width:100%;max-width:480px;transition:max-width .2s;}
+.auth-card.wide{max-width:760px;}
+.auth-brand{display:flex;align-items:center;gap:10px;justify-content:center;margin-bottom:32px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;letter-spacing:.02em;}
+.auth-box{border:1px solid var(--line);background:var(--surface-2);overflow:hidden;}
+.auth-box-inner{padding:40px;}
+.auth-box h2{font-size:25px;text-transform:none;letter-spacing:0;margin-bottom:10px;}
+.auth-box .sub{font-size:14px;color:var(--ink-dim);line-height:1.55;margin-bottom:26px;}
+.auth-step{display:none;}
+.auth-step.active{display:block;}
+
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;}
+.field label{font-family:'Inter',sans-serif;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-dim);}
+.field input, .field select, .field textarea{
+  background:var(--bg);border:1px solid var(--line);color:var(--ink);padding:14px 16px;
+  font-family:'Poppins',sans-serif;font-size:14.5px;outline:none;border-radius:2px;width:100%;
+}
+.field input::placeholder, .field textarea::placeholder{color:var(--ink-dim);}
+.field input:focus, .field select:focus, .field textarea:focus{border-color:var(--teal);}
+.field-hint{font-size:11.5px;color:var(--ink-dim);}
+.biz-toggle{display:flex;gap:10px;flex-wrap:wrap;}
+.biz-toggle-opt{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--line);color:var(--ink-dim);padding:14px 16px;font-family:'Poppins',sans-serif;font-size:13.5px;border-radius:2px;cursor:pointer;text-align:left;transition:border-color .15s,color .15s;}
+.biz-toggle-opt.active{border-color:var(--teal);color:var(--ink);background:rgba(15,76,92,0.06);font-weight:600;}
+.form-status{font-family:'Inter',sans-serif;font-size:12.5px;color:var(--teal);min-height:18px;margin-top:10px;}
+
+.btn-primary{
+  background:var(--teal);color:var(--bg);padding:16px 24px;font-weight:800;text-transform:uppercase;
+  letter-spacing:.04em;font-size:13.5px;border:none;border-radius:2px;cursor:pointer;width:100%;
+  transition:transform .15s, box-shadow .15s;
+}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(15,76,92,0.25);}
+.btn-primary:disabled{opacity:.5;cursor:default;transform:none;box-shadow:none;}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:520px){.grid2{grid-template-columns:1fr;}}
+
+.auth-links{display:flex;justify-content:center;margin-top:18px;font-size:12.5px;}
+.auth-links button{color:var(--ink-dim);text-decoration:underline;cursor:pointer;background:none;border:none;font-size:12.5px;font-family:'Poppins',sans-serif;padding:0;}
+.auth-links button:hover{color:var(--teal);}
+
+.back-link{display:flex;align-items:center;gap:8px;color:var(--ink-dim);text-decoration:none;font-size:12.5px;margin-bottom:22px;font-family:'Inter',sans-serif;text-transform:uppercase;letter-spacing:.05em;}
 .back-link:hover{color:var(--teal);}
+
+.mail-icon{
+  width:56px;height:56px;border-radius:50%;background:rgba(15,76,92,0.12);border:1px solid var(--teal);
+  display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 20px;
+}
+.center{text-align:center;}
+.logo-upload-row{display:flex;align-items:center;gap:16px;}
+.logo-preview{
+  width:56px;height:56px;border-radius:50%;background:var(--bg);border:1px dashed var(--line);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-family:'Inter',sans-serif;font-weight:800;color:var(--gold);
+  font-size:18px;overflow:hidden;
+}
+.logo-preview img{width:100%;height:100%;object-fit:cover;}
+.spinner{width:32px;height:32px;border:3px solid var(--line);border-top-color:var(--teal);border-radius:50%;margin:0 auto 18px;animation:byg-spin .8s linear infinite;}
+@keyframes byg-spin{to{transform:rotate(360deg);}}
 
 footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface);margin-top:40px;}
 .footer-social{display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin-bottom:16px;}
@@ -45,109 +103,602 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
 .footer-bottom a:hover{color:var(--teal);}
 
 .brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+/* ===================================================================
+   BYINFORGH BUSINESS HOUR — floating countdown bubble (every page)
+   =================================================================== */
+.biz-hour-bubble{position:fixed;top:72px;right:16px;z-index:120;background:var(--teal-deep);color:var(--bg);border-radius:18px;box-shadow:0 8px 22px rgba(10,54,63,0.38);display:none;align-items:center;animation:bizHourIn .4s ease;max-width:calc(100vw - 24px);transition:top .15s ease;}
+.biz-hour-bubble.is-live{background:var(--m7);}
+@keyframes bizHourIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.biz-hour-inner{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--bg);padding:10px 16px;border-radius:18px;}
+.biz-hour-dot{width:9px;height:9px;border-radius:50%;background:var(--gold);flex-shrink:0;animation:bizHourPulse 1.6s infinite;}
+.biz-hour-bubble.is-live .biz-hour-dot{background:#fff;}
+@keyframes bizHourPulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.biz-hour-text{display:flex;flex-direction:column;line-height:1.3;}
+.biz-hour-text b{font-family:'Inter',sans-serif;font-size:10px;text-transform:uppercase;letter-spacing:.05em;opacity:.85;}
+.biz-hour-text .biz-hour-when{font-family:'Inter',sans-serif;font-size:10.5px;opacity:.75;white-space:nowrap;}
+.biz-hour-text .biz-hour-count{font-family:'Inter',sans-serif;font-size:13px;font-weight:800;white-space:nowrap;}
+@media(max-width:700px){.biz-hour-inner{padding:8px 12px;}}
+/* Force 16px on every text input/textarea/select on mobile. Below 16px,
+   iOS Safari auto-zooms the page when the field is focused and often
+   fails to zoom back out cleanly, that's the "pinch to reset" bug. */
+@media(max-width:700px){
+  input[type="text"],input[type="email"],input[type="tel"],input[type="search"],
+  input[type="password"],input[type="number"],input[type="url"],textarea,select{
+    font-size:16px !important;
+  }
+}
+.biz-hour-bubble{position:fixed;}
+.biz-hour-close{position:absolute;top:-7px;right:-7px;width:19px;height:19px;border-radius:50%;background:var(--surface,#fff);color:var(--ink-dim,#666);border:1px solid var(--line,rgba(0,0,0,.15));font-size:12px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:"Inter",sans-serif;padding:0;z-index:2;}
+.biz-hour-bubble.is-minimized .biz-hour-inner,.biz-hour-bubble.is-minimized .biz-hour-close{display:none;}
+.biz-hour-mini-tab{display:none;position:fixed;top:72px;right:0;z-index:120;background:var(--teal-deep);color:var(--bg);padding:9px 8px 9px 12px;border-radius:14px 0 0 14px;cursor:pointer;box-shadow:0 4px 14px rgba(10,54,63,0.3);font-size:15px;transition:top .15s ease;}
+.biz-hour-mini-tab.show{display:flex;align-items:center;}
+</style>
+<style id="mobile-fit-fix">
+/* Mobile fit fix: stops form rows and grids from pushing the page wider than the phone screen.
+   overflow-x:clip is used (not hidden) so the sticky top bar keeps working. */
+html,body{max-width:100%;overflow-x:clip;}
+input,textarea,select{max-width:100%;box-sizing:border-box;}
+form input,form textarea,form select,.ai-input input,.suggestion-strip input,.qa-shell input{min-width:0;}
+form button[type="submit"]{flex-shrink:0;}
+.suggestion-strip form{min-width:0 !important;width:100%;}
+.suggestion-strip{box-sizing:border-box;max-width:100%;}
+.ai-shell > *,[style*="display:grid"] > *,[style*="display: grid"] > *{min-width:0;}
+@media(max-width:700px){
+  input[type="text"],input[type="email"],input[type="tel"],input[type="search"],input[type="url"],input[type="number"],input[type="date"],input[type="datetime-local"],input[type="time"],textarea,select{font-size:16px !important;}
+  img,video,iframe,table{max-width:100%;}
+}
 </style>
 </head>
 <body>
-<div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
-
-<div class="wrap">
-  <a href="index.html" class="back-link">&larr; Back to byinforgh.com</a>
-  <a href="index.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='inline';"><span style="display:none;">B</span></div>BYINFORGH</a>
-  <h1 style="font-size:34px;">Privacy Policy &amp; Terms of Use</h1>
-  <div class="updated">Business Growth Series &middot; Last updated 30 September 2026</div>
-
-  <div class="notice">
-    <p><b>Plain language, written for you:</b> this policy tells you exactly what BYINFORGH collects, why, who can see it, and how it's protected. It is written to be genuinely understandable, not filled with legal jargon, and it follows the principles of Ghana's Data Protection Act, 2012 (Act 843).</p>
-  </div>
-
-  <h2>Data controller</h2>
-  <p>BYINFORGH is the data controller for everything collected on this platform, as defined under Ghana's Data Protection Act, 2012 (Act 843). That means BYINFORGH is responsible for how your data is handled, and that responsibility isn't outsourced to Supabase or any other provider used behind the scenes.</p>
-
-  <h2>The eight data protection principles we follow (Act 843, Section 17)</h2>
-  <ul>
-    <li><b>Accountability:</b> BYINFORGH is responsible for how member data is handled, and that responsibility isn't outsourced to Supabase or any other provider we use.</li>
-    <li><b>Lawfulness of processing:</b> data is only processed with a member's knowledge, through the signup and profile forms they fill in themselves.</li>
-    <li><b>Specification of purpose:</b> each piece of data is collected for a stated reason, listed in "Why we collect it" below, not for undefined future use.</li>
-    <li><b>Compatibility of further processing:</b> we don't repurpose data for something a member wouldn't reasonably expect from a business growth platform.</li>
-    <li><b>Quality of information:</b> members can correct their own profile at any time, and can ask BYINFORGH to fix anything they can't edit themselves.</li>
-    <li><b>Openness:</b> this page states plainly what's collected, why, and who can see it, matching the notice requirements in Section 35.</li>
-    <li><b>Data security safeguards:</b> enforced at the database level through Row Level Security, not just hidden in the interface. See "Where your data lives" below.</li>
-    <li><b>Data subject participation:</b> members can access, correct, or request deletion of their own data at any time. See "Your rights" below.</li>
-  </ul>
-
-  <h2>What we collect</h2>
-  <p>When you join, we collect your name, WhatsApp or phone number, email address, and location and nearest landmark. If you already have a running business, we also collect your business name, category, and what you sell. If you're joining without a business yet, we instead ask what your business idea is. Either way, we ask what you're looking for right now, what you want to get out of the Business Growth Series, and your biggest current struggle. If you choose to add one, we also store a business logo or photo you upload. We automatically record when you were last active, so the community can show who's online, and when you first saw our in-app welcome message.</p>
-  <p>If you use the Business Hour features, we also collect the questions you send in for the Business Hour, the business ideas you write down if you don't have a business yet, and your choice about receiving reminder emails. Messages BYINFORGH sends you (your Business Hour link, reminders and next-step prompts) are stored in your account so they show in your Messages inbox.</p>
-  <p>We also record when you visit the site and roughly how long each visit lasts (a short signal every minute while a page is open on your screen). BYINFORGH admins can see this to understand how members use the Series and to support you. It is not shown to other members, other than a general online indicator.</p>
-
-  <h2>Why we collect it</h2>
-  <ul>
-    <li>To create your business profile so other members and the AI assistant can actually help you</li>
-    <li>To point you to the right lessons and people, whether you already run a business or are just starting from an idea</li>
-    <li>To show you in the business directory so other members can find, trade, or partner with you</li>
-    <li>To calculate your accountability streak and the community leaderboard</li>
-    <li>To send you your login link by email</li>
-    <li>To send you the Business Hour link every Sunday, a reminder on Wednesday to send in your questions, and a few helpful prompts if you haven't yet connected with another member, added your business to the directory, or finished your profile, by email and in your Messages inbox</li>
-    <li>To read and answer the questions you send in for the Business Hour</li>
-    <li>To improve the AI assistant, only using documents and questions you or other members explicitly submit and BYINFORGH reviews and approves, never your private profile fields</li>
-  </ul>
-
-  <h2>Who can see what</h2>
-  <p>Your name, business name, category, location, landmark, what you sell, what you're looking for, phone number, and logo are visible to other logged in members, since that visibility is the point of the directory and community. Your email address, your business idea (if you joined without a business yet), what you want to get out of the Series, and what you told us about your biggest struggle are private, visible only to you and to BYINFORGH for support purposes, never shown to other members. The questions you send in for the Business Hour are also visible only to you and BYINFORGH; we may answer them live during the session. What you write as "what you're looking for" is visible to other members, so only write what you're happy to share. This is enforced by Supabase's row-level security at the database level, not just by what the interface happens to display, which is what lets us make that private/public split reliable: only you can see your own private account details, and other members only ever see the fields you're told are shared.</p>
-  <p>Content you post in the community feed, the Q&amp;A hub, the Live Lounge (including your replies and likes), or submit as a business spotlight is visible to other logged in members, since those are public spaces by design. Nothing you post there is private.</p>
-
-  <h2>Where your data lives</h2>
-  <p>Your account and profile data is stored with Supabase, a database and authentication provider, inside a project controlled by BYINFORGH. Photos and logos are stored the same way, in a dedicated storage bucket. The website pages themselves (what you see when you visit businessgrowthseries.byinforgh.com) are served through GitHub Pages, and the byinforgh.com domain is managed with Hostinger; like any web host, they may keep standard technical access logs (such as IP address and browser type) as part of running the site, separate from your BYINFORGH profile data. Reminder and login emails are delivered through an email provider (Resend), which receives your email address and the message text only for the purpose of delivering it. Your data may be processed on infrastructure located outside Ghana as part of using these providers; BYINFORGH only works with providers that maintain their own data security standards for this reason.</p>
-
-  <h2>Security measures</h2>
-  <p>Your data is protected at the database level, not just hidden behind a login screen in the interface:</p>
-  <ul>
-    <li><b>Row-level access control</b> on every table, enforced by Supabase at the database itself, not just by what the app chooses to display. In plain terms: only you can see your own account details, and other members only ever see the information you choose to make visible in your profile. A request for anything else is refused before it ever reaches the interface</li>
-    <li><b>Private fields stay private</b> — your login email and what you told us as your biggest struggle are restricted to your own account at the database level, so they can't be retrieved even by directly querying the platform's API</li>
-    <li><b>No passwords stored anywhere</b> — login is a one-time emailed link, so there is no password for anyone to leak or guess</li>
-    <li><b>Every piece of content members submit</b> — posts, questions, answers, profile fields, spotlight entries, chat messages — is sanitised before it's ever displayed, so it can't be used to run code in another member's browser</li>
-    <li><b>Pending review queues</b> for anything public-facing that a member submits — a business spotlight, a testimonial, a document that trains the AI assistant — so nothing goes live without BYINFORGH reviewing it first</li>
-  </ul>
-
-  <h2>Risk prevention</h2>
-  <p>Beyond technical safeguards, the platform is built to limit harm if something does go wrong:</p>
-  <ul>
-    <li>A reporting system lets any member flag a message, post, or profile that crosses a line, reviewed by BYINFORGH</li>
-    <li>A three-strike system automatically suspends an account after repeated, reviewed violations</li>
-    <li>Admin moderation tools allow BYINFORGH to remove any post, question, answer, or chat message that shouldn't be there</li>
-    <li>You can switch off reminder emails at any time from your dashboard. In-app reminders in your Messages inbox will continue, and login emails are unaffected</li>
-    <li>We do not collect passwords, financial account numbers, or national ID numbers anywhere on this platform</li>
-    <li>We do not sell your data to anyone, and we do not share it with advertisers, under any circumstance</li>
-  </ul>
-
-  <h2>Your rights</h2>
-  <p>You can ask to see everything we hold about you, correct anything that's wrong, withdraw consent, object to how your data is used, or have your account and data deleted entirely. To do any of this, message BYINFORGH directly on WhatsApp or email, using the contact details on the main site. In line with Section 35 of Act 843, we aim to respond to any request within 40 days at the very most, and usually much sooner. Deletion removes your profile, posts, and photos from the platform.</p>
-
-  <h2>If something goes wrong (breach notification)</h2>
-  <p>If member data is ever compromised in a way that puts you at risk, BYINFORGH will notify the Data Protection Commission as soon as possible, and will notify affected members directly, explaining what happened and what we're doing about it. We don't wait for a complaint to act on a known security issue.</p>
-
-  <h2>How long we keep your data</h2>
-  <p>We keep your data for as long as your account is active, since that's what makes the directory, community, and progress tracking work. If you ask us to delete your account, we remove your profile, posts, and photos within a reasonable time, except where we're required to keep limited records for legal or security reasons.</p>
-
-  <h2>Children</h2>
-  <p>This platform is built for business owners and is not intended for anyone under 18.</p>
-
-  <h2>Changes to this policy</h2>
-  <p>If this policy changes in a way that matters, we'll make a reasonable effort to let members know, for example through the community feed or a direct message.</p>
-
-  <h2>Terms of use, in short</h2>
-  <ul>
-    <li>Everything you post should be honest and about your actual business, no fake profiles or fake reviews</li>
-    <li>Be respectful in the community, no harassment, hate speech, or scam attempts against other members</li>
-    <li>Content you submit to train the AI assistant is reviewed by BYINFORGH before it's used, and should be genuinely yours to share</li>
-    <li>BYINFORGH can remove content or suspend accounts that break these terms</li>
-    <li>The 203 lessons, playbooks, and resources are for your own business use, not for resale</li>
-    <li>Lessons, playbooks, and guides are read inside the platform and aren't provided as downloadable files, so the community, questions, and shared experience around them stay part of the same space</li>
-  </ul>
-
-  <h2>Contact</h2>
-  <p>For any privacy question, data request, or concern, reach BYINFORGH directly through the contact details on the main site.</p>
+<div id="bizHourBubble" class="biz-hour-bubble">
+  <button type="button" id="bizHourMinBtn" class="biz-hour-close" title="Minimize" aria-label="Minimize">&minus;</button>
+  <a id="bizHourLink" href="#" target="_blank" rel="noopener" class="biz-hour-inner">
+    <span class="biz-hour-dot"></span>
+    <span class="biz-hour-text"><b>BYINFORGH Business Hour</b><span class="biz-hour-when" id="bizHourWhen"></span><span class="biz-hour-count" id="bizHourCountdown">&hellip;</span></span>
+  </a>
 </div>
+<div id="bizHourMiniTab" class="biz-hour-mini-tab" title="Show Business Hour countdown">&#9200;</div>
+
+
+<div class="auth-shell">
+  <div class="auth-card" id="authCard">
+    <a href="index.html" class="back-link">&larr; Back to byinforgh.com</a>
+    <div class="auth-brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH BUSINESS GROWTH SERIES</div>
+
+    <div class="auth-box">
+      <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="auth-box-inner">
+
+        <!-- STEP 0: checking for an existing session first, so a member
+             who is already logged in never sees the email step at all -->
+        <div class="auth-step active" id="stepChecking">
+          <div class="center">
+            <div class="spinner"></div>
+            <p class="sub" style="margin-bottom:0;">Checking your session&hellip;</p>
+          </div>
+        </div>
+
+        <!-- STEP 1: email -->
+        <div class="auth-step" id="stepEmail">
+          <h2 id="emailStepTitle">Join or log in</h2>
+          <p class="sub" id="emailStepSub">Enter your email. We'll send you a magic link, no password to remember, completely free.</p>
+          <form id="emailForm">
+            <div class="field">
+              <label>Email address</label>
+              <input type="email" id="emailInput" placeholder="you@example.com" required>
+              <span class="field-hint">Don't have one? A free Gmail account takes about two minutes at gmail.com, then come back here.</span>
+            </div>
+            <button type="submit" class="btn-primary" id="sendLinkBtn">Send Magic Link</button>
+          </form>
+          <div class="form-status" id="emailStatus"></div>
+        </div>
+
+        <!-- STEP 2: waiting for the link -->
+        <div class="auth-step" id="stepWaiting">
+          <div class="center">
+            <div class="mail-icon">✉</div>
+            <h2>Check your email</h2>
+            <p class="sub">We sent a login link to <b id="emailDisplay" style="color:var(--ink);"></b>. Open it on this device to continue, this tab will pick it up automatically.</p>
+            <p class="sub" style="margin-top:-14px;">Don't see it after a minute or two? Check your <b style="color:var(--ink);">spam or junk folder</b>, it sometimes lands there the first time.</p>
+          </div>
+          <div class="form-status center" id="waitingStatus"></div>
+          <div class="form-status center" id="existingAccountNote"></div>
+          <div class="auth-links">
+            <button type="button" id="resendBtn">Resend link</button>
+            &nbsp;&middot;&nbsp;
+            <button type="button" id="changeEmailBtn">Use a different email</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: business profile (first login only) -->
+        <div class="auth-step" id="stepProfile">
+          <div id="profileReturningNote" style="display:none;border:1px solid var(--gold);background:rgba(176,141,63,0.1);padding:14px 16px;margin-bottom:20px;border-radius:2px;">
+            <p style="margin:0;font-size:13.5px;color:var(--ink);"><b>Welcome back!</b> You're just a couple of details away from your dashboard, community, and the 203 lessons. Won't take long.</p>
+          </div>
+          <h2>Complete your profile to enter</h2>
+          <p class="sub">Every question below is required before you can enter the platform. Pick the option that fits you, then answer everything. Takes two minutes.</p>
+          <form id="profileForm" novalidate>
+            <div class="field">
+              <label>Where are you right now (pick one to continue)</label>
+              <div class="biz-toggle" id="bizToggle" role="group">
+                <button type="button" class="biz-toggle-opt" data-stage="running">I have a running business</button>
+                <button type="button" class="biz-toggle-opt" data-stage="starting">I'm starting a business</button>
+                <button type="button" class="biz-toggle-opt" data-stage="education">I don't have a business, I just want the education</button>
+              </div>
+            </div>
+            <div id="profileFields" style="display:none;">
+              <div class="grid2">
+                <div class="field">
+                  <label>Your name</label>
+                  <input type="text" id="pName" placeholder="Full name">
+                </div>
+                <div class="field" id="fieldBusinessName">
+                  <label>Business name</label>
+                  <input type="text" id="pBusinessName" placeholder="Business name">
+                </div>
+              </div>
+              <div class="grid2">
+                <div class="field" id="fieldCategory">
+                  <label>Category</label>
+                  <select id="pCategory">
+                    <option value="">Select one</option>
+                    <option>Fashion</option><option>Food</option><option>Retail</option>
+                    <option>Services</option><option>Logistics</option><option>Other</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label>WhatsApp / phone number</label>
+                  <input type="tel" id="pPhone" placeholder="+233 XX XXX XXXX">
+                  <span class="field-hint">Other members will be able to see this in the directory, so real customers and contacts can reach you.</span>
+                </div>
+              </div>
+              <div class="grid2">
+                <div class="field">
+                  <label>Location</label>
+                  <input type="text" id="pLocation" placeholder="e.g. Kumasi">
+                </div>
+                <div class="field">
+                  <label>Nearest landmark</label>
+                  <input type="text" id="pLandmark" placeholder="e.g. Near Adum Market">
+                </div>
+              </div>
+              <div class="field" id="fieldSells">
+                <label>What do you sell or offer</label>
+                <textarea id="pSells" rows="2" placeholder="e.g. Ready to wear dresses and custom tailoring"></textarea>
+              </div>
+              <div class="field" id="fieldIdea" style="display:none;">
+                <label>What's your business idea</label>
+                <textarea id="pBusinessIdea" rows="2" placeholder="e.g. I want to start selling handmade jewelry online"></textarea>
+                <span class="field-hint">Starting out is completely fine, this just helps us point you to the right lessons and people.</span>
+              </div>
+              <div class="field">
+                <label>What are you looking for right now</label>
+                <textarea id="pLookingFor" rows="2" placeholder="e.g. More customers, a supplier, a business partner, or skills to learn"></textarea>
+              </div>
+              <div class="field" id="fieldSeriesGoal">
+                <label id="lblSeriesGoal">What do you want to get out of the Business Growth Series</label>
+                <textarea id="pSeriesGoal" rows="2" placeholder="e.g. Learn how to price my products and find my first 10 customers"></textarea>
+              </div>
+              <div class="field">
+                <label>Business logo or photo (optional)</label>
+                <div class="logo-upload-row">
+                  <div class="logo-preview" id="logoPreview">B</div>
+                  <div style="flex:1;">
+                    <input type="file" id="pLogo" accept="image/*" style="font-size:12.5px;color:var(--ink-dim);">
+                    <span class="field-hint" style="display:block;margin-top:6px;">The only optional item. Shows on your directory card. You can add it later.</span>
+                  </div>
+                </div>
+              </div>
+              <div class="field">
+                <label>What's your biggest struggle right now</label>
+                <textarea id="pStruggle" rows="2" placeholder="e.g. Customers don't reply after I quote a price"></textarea>
+                <span class="field-hint">This helps the AI assistant and the community actually help you, be specific.</span>
+              </div>
+              <button type="submit" class="btn-primary" id="saveProfileBtn">Enter Business Growth Series &rarr;</button>
+            </div>
+          </form>
+          <div class="form-status" id="profileStatus"></div>
+          <p style="font-size:11.5px;color:var(--ink-dim);margin-top:16px;text-align:center;">By joining you agree to our <a href="privacy.html" style="color:var(--teal);">Privacy Policy &amp; Terms</a>. Your struggle and email stay private, only visible to you and BYINFORGH.</p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// =====================================================================
+// SUPABASE CONFIG: replace with your own project URL and anon public key
+// (Supabase dashboard: Project Settings > API). If you change this,
+// update the same two lines in index.html and app.html.
+// =====================================================================
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = (SUPABASE_URL.startsWith('http') && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null;
+if (!sb) console.warn('BYINFORGH: Supabase is not configured yet, edit the CONFIG block at the top of this script.');
+
+let pendingEmail = '';
+
+function showStep(id){
+  document.querySelectorAll('.auth-step').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  // The profile step has far more fields than a single email input, so it
+  // gets a wider card on larger screens instead of the same narrow column
+  // used for the one-field login step, where a wide card would look odd.
+  document.getElementById('authCard').classList.toggle('wide', id === 'stepProfile');
+}
+
+function currentRedirectUrl(){
+  return location.origin + location.pathname;
+}
+
+// ---- "Join Free" and "Log In" land on the same passwordless email
+// step (that's how magic links work, there's no separate password
+// screen), but the wording should match what the member actually
+// clicked so it never feels like the same generic page every time ----
+const urlMode = new URLSearchParams(location.search).get('mode');
+function applyModeCopy(){
+  const title = document.getElementById('emailStepTitle');
+  const sub = document.getElementById('emailStepSub');
+  const btn = document.getElementById('sendLinkBtn');
+  if (urlMode === 'login') {
+    title.textContent = 'Log in';
+    sub.textContent = "Enter the email you joined with. We'll send a fresh login link straight to your inbox.";
+    btn.textContent = 'Send Login Link';
+  } else {
+    title.textContent = 'Join or log in';
+    sub.textContent = "Enter your email. We'll send you a magic link, no password to remember, completely free.";
+    btn.textContent = 'Send Magic Link';
+  }
+}
+
+// ---- Step 1: send magic link ----
+const emailForm = document.getElementById('emailForm');
+const emailStatus = document.getElementById('emailStatus');
+// Basic email format check before we ever send it to Supabase, catches
+// typos early and reduces wasted send attempts.
+function isValidEmail(email){
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+// Supabase's own auth server returns a handful of generic strings when
+// something on its side fails, they're accurate but not something a
+// business owner trying to log in should have to decode. This turns
+// them into plain language, and always logs the real error to the
+// console so it's still fully debuggable.
+function friendlyAuthError(error){
+  console.error('Auth error:', error);
+  const msg = (error && error.message) || '';
+  if (/error sending .*email/i.test(msg) || /error sending confirmation/i.test(msg)) {
+    return "We couldn't get that email out just now, this is a setup issue on our side, not your address. Please try again in a minute, or reach us on WhatsApp if it keeps happening.";
+  }
+  if (/rate limit/i.test(msg)) {
+    return "That's one too many requests in a short time. Please wait a minute and try again.";
+  }
+  if (/invalid/i.test(msg) && /email/i.test(msg)) {
+    return "That email address doesn't look right, check it and try again.";
+  }
+  return msg || 'Something went wrong sending that link, please try again.';
+}
+
+emailForm.addEventListener('submit', async function(e){
+  e.preventDefault();
+  const email = document.getElementById('emailInput').value.trim();
+  if (!email) return;
+  if (!isValidEmail(email)) { emailStatus.textContent = 'That email address doesn\'t look complete, check it and try again.'; return; }
+  if (!sb) { emailStatus.textContent = 'Supabase is not connected yet.'; return; }
+  document.getElementById('sendLinkBtn').disabled = true;
+  emailStatus.textContent = 'Sending...';
+
+  // Same email, whatever the capitalization, is always the same
+  // member, this only checks (no data returned) so the messaging on
+  // the next screen is accurate: "welcome back" vs "you're in".
+  let alreadyMember = false;
+  try {
+    const { data: exists } = await sb.rpc('email_has_account', { check_email: email });
+    alreadyMember = !!exists;
+  } catch (rpcErr) {
+    console.warn('email_has_account check failed, continuing anyway:', rpcErr);
+  }
+
+  const { error } = await sb.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: currentRedirectUrl() }
+  });
+  document.getElementById('sendLinkBtn').disabled = false;
+  if (error) { emailStatus.textContent = friendlyAuthError(error); return; }
+  pendingEmail = email;
+  document.getElementById('emailDisplay').textContent = email;
+  emailStatus.textContent = '';
+  document.getElementById('existingAccountNote').textContent = alreadyMember
+    ? "Looks like you already have an account with this email, no new one is being made, this link will just log you straight back in."
+    : '';
+  showStep('stepWaiting');
+  startResendCooldown();
+});
+
+// Cooldown on resend so the page itself can't be used to spam someone's
+// inbox with repeated login links, on top of whatever limits Supabase
+// applies server side.
+let resendCooldownTimer = null;
+function startResendCooldown(seconds = 30){
+  const btn = document.getElementById('resendBtn');
+  let remaining = seconds;
+  btn.disabled = true;
+  btn.textContent = `Resend link (${remaining}s)`;
+  clearInterval(resendCooldownTimer);
+  resendCooldownTimer = setInterval(() => {
+    remaining--;
+    if (remaining <= 0) {
+      clearInterval(resendCooldownTimer);
+      btn.disabled = false;
+      btn.textContent = 'Resend link';
+    } else {
+      btn.textContent = `Resend link (${remaining}s)`;
+    }
+  }, 1000);
+}
+
+document.getElementById('resendBtn').addEventListener('click', async () => {
+  if (!pendingEmail || !sb) return;
+  const statusEl = document.getElementById('waitingStatus');
+  statusEl.textContent = 'Resending...';
+  const { error } = await sb.auth.signInWithOtp({ email: pendingEmail, options: { emailRedirectTo: currentRedirectUrl() } });
+  statusEl.textContent = error ? friendlyAuthError(error) : 'Link resent, check your inbox.';
+  startResendCooldown();
+});
+document.getElementById('changeEmailBtn').addEventListener('click', () => {
+  showStep('stepEmail');
+  emailStatus.textContent = '';
+  clearInterval(resendCooldownTimer);
+});
+
+// ---- Business stage: nothing is pre-selected. The member must pick one of
+// three paths (running business, starting a business, just the education)
+// before any other question appears, and every question is then required. ----
+let stage = null;
+const stageBtns = document.querySelectorAll('#bizToggle .biz-toggle-opt');
+function applyStage(){
+  const g = id => document.getElementById(id);
+  stageBtns.forEach(b => b.classList.toggle('active', b.dataset.stage === stage));
+  g('profileFields').style.display = stage ? '' : 'none';
+  if (stage) {
+    g('fieldBusinessName').style.display = stage === 'running' ? '' : 'none';
+    g('fieldCategory').style.display = stage === 'running' ? '' : 'none';
+    g('fieldSells').style.display = stage === 'running' ? '' : 'none';
+    g('fieldIdea').style.display = stage === 'starting' ? '' : 'none';
+    g('lblSeriesGoal').textContent = stage === 'education'
+      ? 'What do you want to learn from the Business Growth Series'
+      : 'What do you want to get out of the Business Growth Series';
+  }
+  updateProfileProgress();
+}
+stageBtns.forEach(b => b.addEventListener('click', () => { stage = b.dataset.stage; applyStage(); }));
+
+// ---- Required fields, live progress, and pre-fill for returning members ----
+const _junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test((v || '').trim());
+function profileRequiredList(){
+  const v = id => (document.getElementById(id).value || '').trim();
+  const list = [['Where you are right now', !!stage]];
+  if (!stage) return list;
+  list.push(['Your name', v('pName').length >= 2 && !_junk(v('pName'))]);
+  list.push(['WhatsApp / phone number (at least 9 digits)', v('pPhone').replace(/\D/g, '').length >= 9]);
+  list.push(['Location', v('pLocation').length >= 2 && !_junk(v('pLocation'))]);
+  list.push(['Nearest landmark', v('pLandmark').length >= 3 && !_junk(v('pLandmark'))]);
+  if (stage === 'running') {
+    list.push(['Business name', v('pBusinessName').length >= 2 && !_junk(v('pBusinessName'))]);
+    list.push(['Category', v('pCategory') !== '']);
+    list.push(['What you sell or offer', v('pSells').length >= 3 && !_junk(v('pSells'))]);
+  } else if (stage === 'starting') {
+    list.push(['Your business idea', v('pBusinessIdea').length >= 5 && !_junk(v('pBusinessIdea'))]);
+  }
+  list.push([stage === 'education' ? 'What you want to learn' : 'What you want from the Series', v('pSeriesGoal').length >= 5 && !_junk(v('pSeriesGoal'))]);
+  list.push(['What you are looking for', v('pLookingFor').length >= 3 && !_junk(v('pLookingFor'))]);
+  list.push(['Your biggest struggle', v('pStruggle').length >= 3 && !_junk(v('pStruggle'))]);
+  return list;
+}
+function profileMissingFields(){ return profileRequiredList().filter(x => !x[1]).map(x => x[0]); }
+function updateProfileProgress(){
+  const box = document.getElementById('profileProgress'); if (!box) return;
+  const list = profileRequiredList(), done = list.filter(x => x[1]).length;
+  const left = list.filter(x => !x[1]).map(x => x[0]);
+  box.innerHTML = `<div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:var(--teal);margin-bottom:6px;"><span>${done} of ${list.length} required details done</span><span>${Math.round(done / list.length * 100)}%</span></div>` +
+    `<div style="height:6px;background:var(--line);"><div style="height:6px;width:${done / list.length * 100}%;background:var(--gold);transition:width .2s;"></div></div>` +
+    (left.length ? `<div style="font-size:12px;color:var(--ink-dim);margin-top:8px;">Still needed: ${left.map(x => x.replace(/ \(.*\)/, '')).join(', ')}</div>` : '<div style="font-size:12px;color:var(--teal);margin-top:8px;">All done. Tap the button below to enter.</div>');
+}
+(function(){
+  const btn = document.getElementById('saveProfileBtn');
+  const box = document.createElement('div'); box.id = 'profileProgress'; box.style.margin = '4px 0 16px';
+  btn.parentNode.insertBefore(box, btn);
+  document.getElementById('profileForm').addEventListener('input', updateProfileProgress);
+  document.getElementById('profileForm').addEventListener('change', updateProfileProgress);
+  updateProfileProgress();
+})();
+function prefillProfileForm(p){
+  if (!p) return;
+  if (!stage) stage = p.business_stage || (p.has_business === false ? 'starting' : (p.sells ? 'running' : null));
+  const set = (id, val) => { const el = document.getElementById(id); if (el && val && !el.value) el.value = val; };
+  set('pName', p.name === 'New member' ? '' : p.name); set('pBusinessName', p.business_name); set('pCategory', p.category);
+  set('pPhone', p.phone); set('pLocation', p.location); set('pLandmark', p.landmark);
+  set('pSells', p.sells); set('pBusinessIdea', p.business_idea); set('pSeriesGoal', p.series_goal);
+  set('pLookingFor', p.looking_for); set('pStruggle', p.struggle);
+  if (p.logo_url) document.getElementById('logoPreview').innerHTML = `<img src="${p.logo_url.replace(/"/g, '')}" alt="Your logo">`;
+  applyStage();
+}
+
+// ---- Logo preview ----
+document.getElementById('pLogo').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.getElementById('logoPreview').innerHTML = `<img src="${reader.result}" alt="Logo preview">`;
+  };
+  reader.readAsDataURL(file);
+});
+
+// ---- Step 3: business profile ----
+const profileForm = document.getElementById('profileForm');
+const profileStatus = document.getElementById('profileStatus');
+profileForm.addEventListener('submit', async function(e){
+  e.preventDefault();
+  const missingNow = profileMissingFields();
+  if (missingNow.length) {
+    profileStatus.textContent = 'Please complete: ' + missingNow.join(', ') + '.';
+    profileStatus.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+  const { data: { user } } = await sb.auth.getUser();
+  if (!user) { profileStatus.textContent = 'Session expired, please log in again.'; return; }
+  document.getElementById('saveProfileBtn').disabled = true;
+  profileStatus.textContent = 'Saving...';
+
+  let logoUrl = null;
+  const logoFile = document.getElementById('pLogo').files[0];
+  if (logoFile) {
+    profileStatus.textContent = 'Uploading photo...';
+    const ext = logoFile.name.split('.').pop();
+    const path = `${user.id}/logo-${Date.now()}.${ext}`;
+    const { error: uploadError } = await sb.storage.from('member-photos').upload(path, logoFile, { upsert: true });
+    if (uploadError) {
+      console.error(uploadError);
+      profileStatus.textContent = 'Photo upload failed, saving the rest of your profile without it.';
+    } else {
+      const { data: publicUrlData } = sb.storage.from('member-photos').getPublicUrl(path);
+      logoUrl = publicUrlData.publicUrl;
+    }
+  }
+
+  profileStatus.textContent = 'Saving...';
+  const { error } = await sb.from('profiles').update({
+    name: document.getElementById('pName').value.trim(),
+    business_name: stage === 'running' ? document.getElementById('pBusinessName').value.trim() : null,
+    category: stage === 'running' ? document.getElementById('pCategory').value : null,
+    phone: document.getElementById('pPhone').value.trim(),
+    location: document.getElementById('pLocation').value.trim(),
+    landmark: document.getElementById('pLandmark').value.trim(),
+    has_business: stage === 'running',
+    business_stage: stage,
+    sells: stage === 'running' ? document.getElementById('pSells').value.trim() : null,
+    business_idea: stage === 'starting' ? document.getElementById('pBusinessIdea').value.trim() : null,
+    series_goal: document.getElementById('pSeriesGoal').value.trim(),
+    looking_for: document.getElementById('pLookingFor').value.trim() || null,
+    struggle: document.getElementById('pStruggle').value.trim(),
+    ...(logoUrl ? { logo_url: logoUrl } : {}),
+    last_seen: new Date().toISOString(),
+  }).eq('id', user.id);
+  document.getElementById('saveProfileBtn').disabled = false;
+  if (error) {
+    console.error('Profile save error:', error);
+    if (error.code === '23505') {
+      profileStatus.textContent = "That phone number or detail is already in use on another profile, please check and try again.";
+    } else if (error.code === '42501' || /row-level security/i.test(error.message || '')) {
+      profileStatus.textContent = "Your session expired while filling this in, please log in again and it'll be quick the second time.";
+    } else if (error.message) {
+      profileStatus.textContent = error.message;
+    } else {
+      profileStatus.textContent = 'Something went wrong saving that, please try again.';
+    }
+    return;
+  }
+  goToApp();
+});
+
+function goToApp(){
+  const redirect = sessionStorage.getItem('byg_redirect');
+  sessionStorage.removeItem('byg_redirect');
+  location.href = redirect && redirect.endsWith('.html') ? redirect : 'app.html';
+}
+
+// ---- On load: handle an already active session, or a magic link return ----
+// This is what makes a returning member skip the email step entirely,
+// once they've logged in once on a device, they stay logged in on it
+// (same as any normal site), they only ever need a fresh magic link
+// again if that browser session is gone (signed out, cleared data, or
+// a different device). The email/link step is never optional for a
+// *new* device or after signing out, that's simply what "no password"
+// login means, but it should never reappear for a device that's
+// already signed in.
+let sessionRouted = false;
+async function routeForSession(session){
+  if (!session) {
+    if (!sessionRouted) { sessionRouted = true; showStep('stepEmail'); applyModeCopy(); }
+    return;
+  }
+  const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  sessionRouted = true;
+  if (isProfileComplete(profile)) {
+    goToApp();
+  } else {
+    // Returning to finish an in-progress profile: restore whichever
+    // path they were on so the form doesn't silently reset to "yes".
+    prefillProfileForm(profile);
+    const note = document.getElementById('profileReturningNote');
+    const left = profileMissingFields();
+    if (note) {
+      note.style.display = 'block';
+      note.innerHTML = '<p style="margin:0;font-size:13.5px;color:var(--ink);"><b>Your profile is not finished yet.</b> The dashboard, community, directory, messages and the 203 lessons open as soon as it is complete.' +
+        (left.length ? ' Still needed: <b>' + left.map(x => x.replace(/ \(.*\)/, '')).join(', ') + '</b>.' : '') + '</p>';
+    }
+    showStep('stepProfile');
+  }
+}
+
+// A profile counts as complete once it has the basics, plus either
+// what they sell (business path) or their idea + series goal (no
+// business yet). Existing members who filled "sells" before this
+// change was made are never sent back through the form again.
+function isProfileComplete(p){
+  // Strict rule, same as the database lock (bgs_profile_complete): real values, not blanks or filler.
+  if (!p) return false;
+  const t = v => (v == null ? '' : String(v)).trim();
+  const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
+  if (t(p.name).length < 2 || junk(p.name)) return false;
+  if (t(p.phone).replace(/\D/g, '').length < 9) return false;
+  if (t(p.location).length < 2 || junk(p.location)) return false;
+  const stage = p.business_stage || (p.has_business === false ? 'starting' : 'running');
+  if (stage === 'education') return t(p.series_goal).length >= 5;
+  if (stage === 'starting') return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
+  if (stage === 'running') return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
+  return false;
+}
+
+// A magic link lands back here with tokens in the URL (hash or PKCE
+// "code" param) that supabase-js needs a moment to parse before a
+// session exists. Detect that case so the spinner stays up instead of
+// briefly flashing the email form while that parsing finishes.
+const hasIncomingAuthParams = /access_token=|refresh_token=|type=magiclink|type=recovery|[?&]code=/.test(location.hash + location.search);
+
+if (sb) {
+  sb.auth.onAuthStateChange((event, session) => {
+    if (event === 'INITIAL_SESSION') {
+      if (session || !hasIncomingAuthParams) routeForSession(session);
+      // else: tokens are present in the URL but not parsed yet, wait for SIGNED_IN below
+    } else if (event === 'SIGNED_IN') {
+      routeForSession(session);
+    }
+  });
+} else {
+  showStep('stepEmail');
+  applyModeCopy();
+  emailStatus.textContent = 'Supabase is not connected yet.';
+}
+
+// Safety net: if nothing has resolved after a few seconds (slow
+// network, an expired or already-used link, or a blocked script),
+// fall back to the email step instead of leaving the spinner running
+// forever with no way forward.
+setTimeout(() => {
+  if (!sessionRouted && document.getElementById('stepChecking').classList.contains('active')) {
+    sessionRouted = true;
+    showStep('stepEmail');
+    applyModeCopy();
+  }
+}, 5000);
+</script>
+
 <footer>
   <div class="wrap">
     <div class="footer-social">
@@ -163,5 +714,129 @@ footer{border-top:1px solid var(--line);padding:32px 0;background:var(--surface)
     </div>
   </div>
 </footer>
+<script>
+// BYINFORGH BUSINESS HOUR — floating countdown bubble, on every page.
+// Reads the `events` table (only rows with a meet_url and an event_at).
+// Sessions repeat weekly: once a session's start (+90 min live window)
+// has passed, the bubble rolls forward to the same day/time next week,
+// so it is always visible with a live countdown and the Meet link.
+//
+// Position: this page has no top nav to anchor under, so the bubble
+// just sits near the top of the screen at a small fixed offset.
+// =====================================================================
+(function(){
+  const WEEK = 7 * 24 * 60 * 60 * 1000;
+  const LIVE_MS = 90 * 60 * 1000;
+  function nextStart(ev, now){
+    const s = new Date(ev.event_at).getTime();
+    if (now <= s + LIVE_MS) return s;
+    return s + Math.ceil((now - s - LIVE_MS) / WEEK) * WEEK;
+  }
+  async function initBizHourBubble(){
+    if (typeof sb === 'undefined' || !sb) return;
+    const bubble = document.getElementById('bizHourBubble');
+    if (!bubble) return;
+    // Public page — shown to every visitor, signed in or not.
+
+    const { data, error } = await sb.from('events').select('*')
+      .not('meet_url', 'is', null).not('event_at', 'is', null);
+    if (error || !data || !data.length) return;
+
+    const link = document.getElementById('bizHourLink');
+    const when = document.getElementById('bizHourWhen');
+    const label = document.getElementById('bizHourCountdown');
+
+    function render(){
+      const now = Date.now();
+      let best = null;
+      data.forEach(ev => {
+        const start = nextStart(ev, now);
+        if (!best || start < best.start) best = { ev, start };
+      });
+      if (!best) return;
+      link.href = best.ev.meet_url;
+      when.textContent = new Date(best.start).toLocaleString('en-GB', { timeZone: 'Africa/Accra', weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit', hour12: true }) + ' \u00b7 Ghana time';
+      const diff = best.start - now;
+      if (diff <= 0) {
+        bubble.classList.add('is-live');
+        label.textContent = 'Live now \u2014 join \u2192';
+      } else {
+        bubble.classList.remove('is-live');
+        const s = Math.floor(diff / 1000);
+        const d = Math.floor(s / 86400), h = Math.floor((s % 86400) / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+        label.textContent = 'Starts in ' + (d > 0 ? d + 'd ' + h + 'h ' + m + 'm' : h + 'h ' + m + 'm ' + String(sec).padStart(2, '0') + 's');
+      }
+      bubble.style.display = 'flex';
+    }
+    render();
+    initBizHourMinimize(bubble);
+    setInterval(render, 1000);
+  }
+  // Minimize/expand: click the bubble's - to dock it as a small tab at
+  // the screen edge, click the tab to bring it back. Persisted across
+  // pages via localStorage, since each page is a separate load.
+  function initBizHourMinimize(bubble){
+    const minBtn = document.getElementById('bizHourMinBtn');
+    const miniTab = document.getElementById('bizHourMiniTab');
+    if (!minBtn || !miniTab) return;
+    function applyState(){
+      const minimized = localStorage.getItem('bizHourMinimized') === 'true';
+      bubble.classList.toggle('is-minimized', minimized);
+      miniTab.classList.toggle('show', minimized && bubble.style.display !== 'none');
+    }
+    minBtn.addEventListener('click', (e) => {
+      e.preventDefault(); e.stopPropagation();
+      localStorage.setItem('bizHourMinimized', 'true');
+      applyState();
+    });
+    miniTab.addEventListener('click', () => {
+      localStorage.setItem('bizHourMinimized', 'false');
+      applyState();
+    });
+    applyState();
+  }
+  window.addEventListener('load', () => setTimeout(initBizHourBubble, 300));
+})();
+</script>
+
+
+<script>
+// DRAFT AUTOSAVE (added): while someone fills in the profile, what they have typed so far is saved to their
+// own profile row. It does NOT unlock anything: the profile still counts as incomplete until every required
+// answer is real. The point is that people who give up half way are no longer blank, so BYINFORGH can see how
+// far they got and reach them on WhatsApp.
+(function(){
+  if (typeof sb === 'undefined' || !sb) return;
+  var timer = null, lastSent = '';
+  function val(id){ var el = document.getElementById(id); return el ? String(el.value || '').trim() : ''; }
+  async function saveDraft(){
+    try {
+      var step = document.getElementById('stepProfile');
+      if (!step || !step.classList.contains('active')) return;
+      var sess = (await sb.auth.getSession()).data.session;
+      if (!sess) return;
+      var d = {};
+      function put(k, v){ if (v) d[k] = v; }
+      put('name', val('pName')); put('phone', val('pPhone')); put('location', val('pLocation')); put('landmark', val('pLandmark'));
+      put('series_goal', val('pSeriesGoal')); put('looking_for', val('pLookingFor')); put('struggle', val('pStruggle'));
+      if (typeof stage !== 'undefined' && stage) {
+        d.business_stage = stage; d.has_business = (stage === 'running');
+        if (stage === 'running') { put('business_name', val('pBusinessName')); put('category', val('pCategory')); put('sells', val('pSells')); }
+        if (stage === 'starting') { put('business_idea', val('pBusinessIdea')); }
+      }
+      var key = JSON.stringify(d);
+      if (key === '{}' || key === lastSent) return;
+      var res = await sb.from('profiles').update(d).eq('id', sess.user.id);
+      if (res.error && res.error.code === '23505' && d.phone) { delete d.phone; res = await sb.from('profiles').update(d).eq('id', sess.user.id); }
+      if (!res.error) lastSent = key;
+    } catch (e) { /* a draft save must never disturb the form */ }
+  }
+  function queue(){ clearTimeout(timer); timer = setTimeout(saveDraft, 1500); }
+  var form = document.getElementById('profileForm');
+  if (form) { form.addEventListener('input', queue); form.addEventListener('change', queue); }
+  document.addEventListener('visibilitychange', function(){ if (document.hidden) saveDraft(); });
+  window.addEventListener('pagehide', saveDraft);
+})();
+</script>
 </body>
 </html>
