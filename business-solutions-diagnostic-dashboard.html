@@ -1,0 +1,1895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BYINFORGH — Business Maturity Levels (Corporate)</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --teal:#3f9fae; --teal-dark:#1a6670; --teal-deep:#123f47;
+  --cream:#faf6ec; --panel:#ffffff; --line:#e3ddc9; --highlight:#f3ecd8;
+  --ink:#16333a; --ink-dim:#5b6b6d; --gold:#c9a24a;
+  --red:#c0463b; --green:#2f8a5c; --orange:#c9791f;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{overflow-x:hidden;width:100%;}
+body{background:var(--cream);color:var(--ink);font-family:'Syne',sans-serif;min-height:100vh;overflow-x:hidden;width:100%;word-wrap:break-word;overflow-wrap:break-word;}
+.hidden{display:none !important;}
+.mono{font-family:'Space Mono',monospace;}
+a{color:inherit;}
+img,svg{max-width:100%;}
+
+.topbar{background:var(--teal-dark);color:#fff;padding:14px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;flex-wrap:wrap;gap:10px;}
+.brandrow{display:flex;align-items:center;gap:12px;cursor:pointer;min-width:0;}
+.logo-mark{width:38px;height:38px;flex-shrink:0;}
+.brand-name{font-weight:800;font-size:16px;letter-spacing:1px;white-space:nowrap;}
+.brand-tag{font-size:10px;letter-spacing:2px;color:#cfe9e6;text-transform:uppercase;white-space:nowrap;}
+.tier-badge{background:var(--gold);color:var(--teal-deep);font-size:10px;font-weight:800;letter-spacing:1px;padding:5px 10px;border-radius:20px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.topbar-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+
+.stagenav{background:var(--panel);border-bottom:1px solid var(--line);display:flex;overflow-x:auto;position:sticky;top:64px;z-index:99;-webkit-overflow-scrolling:touch;}
+.stagenav button{background:none;border:none;padding:14px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:11.5px;
+color:var(--ink-dim);white-space:nowrap;cursor:pointer;border-bottom:3px solid transparent;letter-spacing:.4px;flex-shrink:0;}
+.stagenav button.active{color:var(--teal-dark);border-bottom-color:var(--teal);}
+.stagenav button:hover:not(.active){color:var(--ink);}
+
+.page{max-width:1300px;margin:0 auto;padding:36px 28px 90px;width:100%;}
+.eyebrow{font-size:11px;letter-spacing:3px;color:var(--teal-dark);text-transform:uppercase;font-weight:700;margin-bottom:10px;}
+h1{font-size:34px;font-weight:800;line-height:1.2;margin-bottom:12px;color:var(--ink);word-wrap:break-word;}
+h1 span{color:var(--teal-dark);}
+.lead{font-size:15px;color:var(--ink-dim);line-height:1.75;max-width:800px;margin-bottom:26px;}
+.section-label{font-size:11px;font-weight:800;letter-spacing:2px;color:var(--teal-dark);text-transform:uppercase;margin:0 0 14px;}
+
+.corp-banner{background:var(--teal-deep);color:#fff;border-radius:14px;padding:18px 22px;margin-bottom:30px;font-size:13px;line-height:1.7;display:flex;gap:14px;align-items:flex-start;}
+.corp-banner b{color:var(--gold);}
+.corp-banner .x{flex-shrink:0;font-weight:800;font-size:11px;letter-spacing:1px;background:var(--gold);color:var(--teal-deep);padding:4px 9px;border-radius:6px;}
+
+.ladder-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:44px;}
+.ladder-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;cursor:pointer;transition:transform .15s,border-color .15s;border-top:4px solid var(--teal);}
+.ladder-card.free{border-top-color:var(--gold);}
+.ladder-card:hover{transform:translateY(-3px);border-color:var(--teal);}
+.ladder-card .sn{font-family:'Space Mono',monospace;font-size:12px;color:var(--teal-dark);font-weight:700;}
+.ladder-card h3{font-size:19px;margin:6px 0 8px;}
+.ladder-card p{font-size:12.5px;color:var(--ink-dim);line-height:1.6;}
+.ladder-card .price{margin-top:12px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:var(--gold-dark,#a3781f);}
+.ladder-card .arrow{margin-top:10px;font-size:12px;font-weight:700;color:var(--teal-dark);}
+
+.cta-row{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:14px 26px;border-radius:10px;
+border:none;font-family:'Syne',sans-serif;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;max-width:100%;}
+.btn-primary{background:var(--teal-dark);color:#fff;}
+.btn-gold{background:var(--gold);color:var(--teal-deep);}
+.btn-ghost{background:transparent;color:var(--teal-dark);border:1.5px solid var(--teal-dark);}
+
+.stage-hero{background:linear-gradient(120deg,var(--teal-dark),var(--teal-deep));color:#fff;border-radius:16px;padding:36px;margin-bottom:24px;}
+.stage-hero .sn{font-family:'Space Mono',monospace;font-size:13px;letter-spacing:2px;color:#bfe6e2;font-weight:700;}
+.stage-hero h1{color:#fff;margin:10px 0 8px;font-size:32px;}
+.stage-hero .tagline{font-size:15px;color:#dff2ef;font-style:italic;}
+.stage-hero .pricebox{margin-top:18px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:10px;padding:14px 18px;display:inline-block;}
+.stage-hero .pricebox .lbl{font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#bfe6e2;}
+.stage-hero .pricebox .val{font-family:'Space Mono',monospace;font-size:20px;font-weight:700;color:var(--gold);margin-top:4px;}
+
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-bottom:34px;}
+@media(max-width:860px){.two-col{grid-template-columns:1fr;}}
+.info-panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;}
+.info-panel.reality{border-left:4px solid var(--orange);}
+.info-panel.outcome{border-left:4px solid var(--green);}
+.info-panel h4{font-size:13px;letter-spacing:1px;text-transform:uppercase;color:var(--teal-dark);margin-bottom:12px;}
+.info-panel p{font-size:13.5px;line-height:1.8;color:var(--ink);}
+
+.deliv-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px;margin-bottom:34px;}
+.deliv-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;cursor:pointer;transition:border-color .15s;}
+.deliv-card:hover{border-color:var(--teal);}
+.deliv-card .dic{font-size:20px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;}
+.deliv-card .toggle{font-size:11px;font-weight:700;color:var(--teal-dark);font-family:'Space Mono',monospace;}
+.deliv-card h5{font-size:13.5px;font-weight:700;margin-bottom:6px;}
+.deliv-card p{font-size:12px;color:var(--ink-dim);line-height:1.6;}
+.deliv-card .detail{font-size:12px;color:var(--ink);line-height:1.7;margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);}
+.detail-row{margin-bottom:8px;}
+.detail-row b{color:var(--teal-dark);font-size:10px;letter-spacing:.5px;text-transform:uppercase;display:block;margin-bottom:2px;}
+.detail-row.tip{background:var(--highlight);border-radius:6px;padding:8px 10px;margin-top:10px;}
+.detail-row.tip b{color:var(--orange);}
+
+.select-toggle{display:flex;align-items:center;gap:8px;margin-top:14px;padding:10px 14px;border-radius:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);cursor:pointer;width:fit-content;max-width:100%;}
+.select-toggle input{width:auto;margin:0;flex-shrink:0;}
+.select-toggle span{color:#fff;font-size:12px;font-weight:700;}
+.ladder-select{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;font-weight:700;color:var(--teal-dark);}
+.ladder-select input{width:auto;}
+
+.selbar{position:fixed;bottom:0;left:0;right:0;background:var(--teal-deep);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;z-index:200;gap:14px;flex-wrap:wrap;}
+.selbar.hidden{display:none !important;}
+.selbar .count{font-weight:800;font-size:13px;}
+.selbar .btn{padding:10px 18px;font-size:12px;}
+
+.sel-item{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid var(--line);font-size:13px;gap:10px;}
+.sel-item .rm{color:var(--red);font-weight:700;font-size:11px;cursor:pointer;background:none;border:none;flex-shrink:0;}
+.custom-group{margin-bottom:18px;}
+.custom-group .glabel{font-size:11px;font-weight:800;color:var(--teal-dark);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.custom-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;font-size:12.5px;border-bottom:1px solid var(--line);}
+.custom-item input{width:auto;margin-top:2px;flex-shrink:0;}
+.total-box{background:var(--highlight);border-radius:10px;padding:16px 18px;margin:16px 0;font-size:14px;font-weight:800;color:var(--teal-dark);font-family:'Space Mono',monospace;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--teal-dark);color:#fff;padding:10px 18px;border-radius:8px;font-size:12px;font-weight:700;opacity:0;transition:opacity .3s;z-index:999;pointer-events:none;max-width:90vw;text-align:center;}
+.toast.show{opacity:1;}
+
+.pkg-section{background:var(--highlight);border-radius:16px;padding:28px;}
+
+.compare-table{width:100%;border-collapse:separate;border-spacing:0 8px;margin-top:10px;table-layout:fixed;}
+.compare-table th{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--ink-dim);text-align:left;padding:0 14px 6px;}
+.compare-row td{background:#fff;border:1px solid var(--line);padding:14px;font-size:12.5px;line-height:1.6;vertical-align:top;word-wrap:break-word;}
+.compare-row td:first-child{border-radius:10px 0 0 10px;color:var(--ink-dim);border-right:none;}
+.compare-row td:last-child{border-radius:0 10px 10px 0;border-left:none;background:var(--highlight);font-weight:600;color:var(--ink);}
+
+.bonus-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px;margin-top:18px;}
+.bonus-card{background:var(--panel);border:1.5px solid var(--gold);border-radius:12px;padding:18px;position:relative;}
+.bonus-card .bnum{position:absolute;top:-10px;left:16px;background:var(--gold);color:var(--teal-deep);font-size:10px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.5px;}
+.bonus-card h5{font-size:13.5px;font-weight:800;margin:8px 0 6px;}
+.bonus-card p{font-size:12px;color:var(--ink-dim);line-height:1.6;}
+.bonus-card .bval{margin-top:10px;font-family:'Space Mono',monospace;font-size:12px;font-weight:700;color:#a3781f;}
+.bonus-total{margin-top:16px;background:var(--teal-deep);color:#fff;border-radius:10px;padding:16px 20px;font-size:14px;font-weight:800;text-align:center;}
+.bonus-total .amt{color:var(--gold);font-family:'Space Mono',monospace;font-size:22px;display:block;margin-top:4px;}
+
+.guarantee-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:16px;}
+.guarantee-card{background:var(--panel);border-left:4px solid var(--green);border:1px solid var(--line);border-radius:12px;padding:18px;}
+.guarantee-card h5{font-size:13px;font-weight:800;color:var(--green);margin-bottom:6px;}
+.guarantee-card p{font-size:12px;color:var(--ink);line-height:1.7;}
+
+.payment-row{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap;}
+.payment-step{flex:1;min-width:180px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;}
+.payment-step .pct{font-family:'Space Mono',monospace;font-size:26px;font-weight:800;color:var(--teal-dark);}
+.payment-step .plabel{font-size:11px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--ink-dim);margin:6px 0 6px;}
+.payment-step p{font-size:11.5px;color:var(--ink-dim);line-height:1.5;}
+.pkg-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:16px;}
+.pkg-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px;}
+.pkg-card .pn{font-size:14px;font-weight:800;color:var(--ink);}
+.pkg-card .pt{font-size:10px;color:var(--ink-dim);letter-spacing:1px;text-transform:uppercase;margin:2px 0 10px;}
+.pkg-card .pd{font-size:12px;color:var(--ink-dim);line-height:1.6;}
+.pkg-card .pp{margin-top:12px;font-size:15px;font-weight:800;color:var(--teal-dark);font-family:'Space Mono',monospace;}
+
+.stage-jump-row{display:flex;justify-content:space-between;margin-top:36px;gap:10px;flex-wrap:wrap;}
+
+/* ---------- AUDIT / DIAGNOSTIC ---------- */
+.page-narrow{max-width:640px;margin:0 auto;padding:36px 20px 90px;width:100%;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px;}
+label{display:block;font-size:10px;letter-spacing:1px;color:var(--teal-dark);text-transform:uppercase;margin:14px 0 5px;font-weight:700;}
+input,select,textarea{width:100%;background:#fff;border:1px solid var(--line);color:var(--ink);padding:12px 14px;
+border-radius:8px;font-family:'Syne',sans-serif;font-size:14px;outline:none;max-width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--teal);}
+.progress-track{background:var(--line);border-radius:4px;height:6px;overflow:hidden;margin:18px 0;}
+.progress-fill{height:100%;background:var(--teal);border-radius:4px;transition:width .4s ease;}
+.q-stage-tag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--teal-dark);
+background:var(--highlight);border:1px solid var(--teal);border-radius:20px;padding:4px 12px;margin-bottom:14px;}
+.q-text{font-size:18px;font-weight:700;line-height:1.4;margin-bottom:22px;}
+.ans-row{display:flex;gap:8px;margin-bottom:10px;}
+.ans-btn{flex:1;background:#fff;border:1px solid var(--line);color:var(--ink);padding:14px 10px;border-radius:9px;
+font-family:'Syne',sans-serif;font-weight:700;font-size:13px;cursor:pointer;}
+.ans-btn.yes.sel{border-color:var(--green);background:#eaf6ee;color:var(--green);}
+.ans-btn.partial.sel{border-color:var(--orange);background:#fbf1e2;color:var(--orange);}
+.ans-btn.no.sel{border-color:var(--red);background:#fbeceb;color:var(--red);}
+.rung{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid var(--line);background:#fff;margin-bottom:6px;}
+.rung.current{border-color:var(--teal);background:var(--highlight);}
+.rung .num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;font-family:'Space Mono',monospace;flex-shrink:0;background:var(--line);color:var(--ink-dim);}
+.rung.current .num{background:var(--teal-dark);color:#fff;}
+.rung .name{font-size:12px;font-weight:700;width:100px;flex-shrink:0;}
+.rung .barwrap{flex:1;height:8px;background:var(--line);border-radius:4px;overflow:hidden;}
+.rung .barfill{height:100%;border-radius:4px;}
+.rung .pct{font-size:11px;font-family:'Space Mono',monospace;color:var(--ink-dim);width:36px;text-align:right;}
+.gap-item{background:#fff;border-left:3px solid var(--red);border-radius:6px;padding:12px 14px;margin-bottom:8px;font-size:12px;line-height:1.6;}
+.err{color:var(--red);font-size:12px;margin-top:8px;min-height:14px;}
+.btn-full{width:100%;}
+.contact-strip{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--ink-dim);margin-top:10px;}
+.contact-strip a{color:var(--teal-dark);font-weight:700;text-decoration:none;}
+
+/* ---------- BYINFORGH STAFF CONSOLE ---------- */
+.staff-link{font-size:10.5px;color:var(--ink-dim);opacity:.55;text-decoration:none;letter-spacing:.5px;}
+.staff-link:hover{opacity:1;color:var(--teal-dark);}
+.staff-topbadge{background:#16333a;color:#f5c842;font-size:9.5px;font-weight:800;letter-spacing:1.5px;padding:4px 9px;border-radius:20px;text-transform:uppercase;}
+.gate-box{max-width:360px;margin:80px auto;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:30px 26px;text-align:center;}
+.gate-box .lock{font-size:34px;margin-bottom:10px;}
+.gate-box input{text-align:center;letter-spacing:6px;font-size:20px;font-family:'Space Mono',monospace;}
+.mode-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:24px 0;}
+.mode-card{background:var(--panel);border:1.5px solid var(--line);border-radius:14px;padding:24px;cursor:pointer;transition:transform .15s,border-color .15s;}
+.mode-card:hover{transform:translateY(-3px);border-color:var(--teal);}
+.mode-card .mic{font-size:28px;margin-bottom:10px;}
+.mode-card h3{font-size:16px;margin-bottom:6px;}
+.mode-card p{font-size:12.5px;color:var(--ink-dim);line-height:1.6;margin-bottom:10px;}
+.mode-card .tag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:1px;color:var(--teal-dark);background:var(--highlight);border-radius:20px;padding:3px 10px;}
+.sub-mode-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px;}
+.sub-mode-row button{flex:1;min-width:140px;}
+.session-meta{background:var(--highlight);border-radius:10px;padding:12px 16px;font-size:12px;color:var(--ink-dim);margin-bottom:16px;line-height:1.7;}
+.session-meta b{color:var(--teal-dark);}
+.section-stepper{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px;}
+.section-stepper .sstep{flex:1;min-width:36px;height:6px;border-radius:4px;background:var(--line);}
+.section-stepper .sstep.done{background:var(--teal);}
+.section-stepper .sstep.current{background:var(--gold);}
+.deep-item{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+.deep-item .dq{font-size:13.5px;font-weight:700;margin-bottom:4px;}
+.deep-item .dprompt{font-size:11.5px;color:var(--ink-dim);margin-bottom:10px;font-style:italic;}
+.deep-item .status-row{display:flex;gap:8px;margin-bottom:8px;}
+.deep-item .status-row button{flex:1;padding:9px 6px;font-size:11.5px;border-radius:7px;border:1px solid var(--line);background:#fff;font-family:'Syne',sans-serif;font-weight:700;cursor:pointer;}
+.deep-item .status-row button.sel-good{border-color:var(--green);background:#eaf6ee;color:var(--green);}
+.deep-item .status-row button.sel-partial{border-color:var(--orange);background:#fbf1e2;color:var(--orange);}
+.deep-item .status-row button.sel-missing{border-color:var(--red);background:#fbeceb;color:var(--red);}
+.deep-item textarea{font-size:12.5px;}
+.script-box{background:var(--teal-deep);color:#eafaf7;border-radius:12px;padding:18px 20px;font-size:13px;line-height:1.8;white-space:pre-wrap;margin-bottom:16px;}
+.script-box b{color:var(--gold);}
+.consult-open{margin-bottom:16px;}
+.consult-open label{margin-top:12px;}
+.notes-field{margin-top:8px;}
+
+/* ---------- MOBILE FIXES ---------- */
+@media (max-width: 640px){
+  .topbar{padding:10px 14px;gap:8px;}
+  .brandrow{gap:8px;}
+  .logo-mark{width:28px;height:28px;}
+  .brand-name{font-size:13px;letter-spacing:.5px;}
+  .brand-tag{font-size:7.5px;letter-spacing:1px;}
+  .topbar-right,
+  .topbar > div:last-child{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+  .tier-badge{font-size:9px;padding:4px 8px;}
+  .topbar .btn-gold{padding:8px 12px;font-size:11px;}
+
+  .stagenav{top:auto;position:static;}
+  .stagenav button{padding:12px 12px;font-size:11px;}
+
+  .page{padding:24px 16px 100px;}
+  .page-narrow{padding:24px 14px 100px;}
+  h1{font-size:26px;}
+  .stage-hero{padding:22px;}
+  .stage-hero h1{font-size:24px;}
+  .lead{font-size:13.5px;}
+  .cta-row{gap:10px;}
+  .cta-row .btn{font-size:12.5px;padding:12px 18px;}
+  .compare-table{table-layout:auto;}
+  .compare-table th, .compare-row td{font-size:11.5px;padding:10px;}
+  .selbar{padding:12px 16px;}
+  .selbar .btn{padding:9px 14px;font-size:11.5px;}
+  .rung .name{width:74px;font-size:11px;}
+
+  .gate-box{margin:40px auto;padding:24px 18px;}
+  .mode-grid{grid-template-columns:1fr;}
+  .staff-topbadge{font-size:8.5px;padding:3px 7px;}
+  .deep-item .status-row{flex-direction:column;}
+  .deep-item .status-row button{width:100%;}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brandrow" onclick="goHome()">
+    <svg class="logo-mark" viewBox="0 0 100 100"><circle cx="50" cy="50" r="46" fill="none" stroke="#cfe9e6" stroke-width="2"/>
+      <path d="M50 30 C38 45 40 65 50 82 C60 65 62 45 50 30 Z" fill="#3f9fae"/>
+      <circle cx="50" cy="42" r="14" fill="#3f9fae"/>
+      <path d="M42 36 a10 10 0 0 1 10 -6" stroke="#eaf7f5" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+    </svg>
+    <div><div class="brand-name">BYINFORGH</div><div class="brand-tag">Business Solutions</div></div>
+  </div>
+  <div class="topbar-right">
+    <button class="btn btn-gold" style="padding:9px 16px;font-size:12px;" onclick="goScreen('selection')">🧺 My Selection <span id="selCountTop">(0)</span></button>
+    <div class="tier-badge">Corporate Tier</div>
+    <div class="staff-topbadge hidden" id="staffBadge" onclick="goStaffScreen('staffhome')" style="cursor:pointer">🔒 Staff Mode</div>
+  </div>
+</div>
+
+<div class="stagenav" id="stageNav"></div>
+
+<div id="screen-home" class="page">
+  <div class="eyebrow">The BYINFORGH Business Maturity Model — Corporate Edition</div>
+  <h1>Eight levels. <span>One clear infrastructure roadmap.</span></h1>
+  <p class="lead">This is the corporate track — for established Ghanaian businesses (hospitality, manufacturing, multi-branch retail, healthcare, education) that need a full Business Infrastructure Audit and a staged transformation partnership, the same track used to build The White House GH Command Centre. If you run a small, single-location business looking for visibility, listings, or self-serve systems, ask about the separate SME Systems & Ecosystem track instead — this corporate pricing is not for that tier.</p>
+
+  <div class="corp-banner">
+    <div class="x">NOTE</div>
+    <div>Every engagement starts at <b>Level 0 — free</b>. From <b>Level 1 onward</b>, this is corporate-tier investment, priced for businesses with real operating complexity: multiple staff, multiple revenue lines, or multiple locations. It is intentionally priced above BYINFORGH's SME Ecosystem packages, because the scope of work — audits, custom builds, dashboards, staff training — is materially larger.</div>
+  </div>
+
+  <div class="section-label" style="margin-top:10px">WHY THIS ISN'T "JUST SOFTWARE"</div>
+  <p class="lead" style="font-size:13px;margin-bottom:14px;">Cheap agencies and freelancers sell code. BYINFORGH sells an infrastructure standard — audit-led, staff-tested, and 100% owned by you. This is why the price is different.</p>
+  <table class="compare-table">
+    <tr><th style="width:38%">Cheap Agencies & Freelancers</th><th>The BYINFORGH Infrastructure Standard</th></tr>
+    <tr class="compare-row"><td><b>Code-First</b> — build software without understanding how your staff actually operate on the ground.</td><td><b>Audit-First</b> — zero build work happens until a full Business Infrastructure Audit maps every gap and revenue leak.</td></tr>
+    <tr class="compare-row"><td><b>Vendor Lock-In</b> — custom proprietary code that breaks the moment the developer disappears.</td><td><b>100% Owned Infrastructure</b> — deployed directly to your own cloud accounts. You keep it even if BYINFORGH is never involved again.</td></tr>
+    <tr class="compare-row"><td><b>Handover & Hope</b> — software dumped on your team with a PDF manual nobody reads.</td><td><b>Enforced Adoption</b> — live staff stress-testing and hands-on SOP training until your team is certified, not just "shown."</td></tr>
+  </table>
+
+  <div class="cta-row">
+    <button class="btn btn-gold" onclick="goScreen('intake')">Take the Business Infrastructure Audit →</button>
+    <button class="btn btn-primary" onclick="scrollToLadder()">Browse the 8 levels ↓</button>
+    <button class="btn btn-ghost" onclick="openStage(1)">Learn about Level 1 →</button>
+  </div>
+  <div class="contact-strip">Prefer to talk it through first? Call/WhatsApp <a href="tel:0509960980">0509 960 980</a> or email <a href="mailto:solutions@byinforgh.com">solutions@byinforgh.com</a></div>
+  <div class="contact-strip" style="margin-top:4px;">Tick any level below to add it to <b>My Selection</b> — pick one, several, or build a fully custom package, then check out or book a consultation whenever you're ready.</div>
+
+  <div class="section-label" style="margin-top:40px" id="ladderAnchor">THE EIGHT BUSINESS MATURITY LEVELS</div>
+  <div class="ladder-grid" id="homeLadderGrid"></div>
+
+  <div style="margin-top:50px;text-align:right;">
+    <a href="#" class="staff-link" onclick="goStaffScreen('staffgate');return false;">🔒 BYINFORGH staff — run a Full-Day Audit or Consulting session →</a>
+  </div>
+</div>
+
+<div id="screen-stage" class="page hidden">
+  <div id="stageHeroWrap"></div>
+  <div class="two-col" id="stageTwoCol"></div>
+  <div class="section-label">KEY DELIVERABLES AT THIS LEVEL <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--ink-dim);">— click any card for detail</span></div>
+  <div class="deliv-grid" id="stageDelivGrid"></div>
+  <div class="pkg-section">
+    <div class="section-label" style="margin:0">CORPORATE PACKAGES AT THIS LEVEL</div>
+    <div class="pkg-grid" id="stagePkgGrid"></div>
+  </div>
+
+  <div id="stageBonusWrap"></div>
+
+  <div class="section-label" style="margin-top:34px">RISK-REVERSAL GUARANTEES</div>
+  <div class="guarantee-grid" id="stageGuaranteeGrid"></div>
+
+  <div class="section-label" style="margin-top:34px">HOW YOU PAY — THE 40/40/20 MODEL</div>
+  <p class="lead" style="font-size:13px;margin-bottom:0;">No full lump sum upfront on any build over GH₵15,000. Payment tracks delivery, not promises.</p>
+  <div class="payment-row" id="stagePaymentRow"></div>
+
+  <div class="stage-jump-row">
+    <button class="btn btn-ghost" id="stagePrevBtn" onclick="jumpStage(-1)">← Previous level</button>
+    <button class="btn btn-primary" id="stageNextBtn" onclick="jumpStage(1)">Next level →</button>
+  </div>
+</div>
+
+<!-- ======================= AUDIT — INTAKE ======================= -->
+<div id="screen-intake" class="page-narrow hidden">
+  <div class="eyebrow">Business Infrastructure Audit — Step 1 of 2</div>
+  <h1 style="font-size:22px">Tell us about the business</h1>
+  <p class="lead" style="font-size:13px">This is what makes the questions after this relevant to your business specifically — not a generic checklist.</p>
+  <label>Business name *</label><input id="in_business" placeholder="e.g. The White House GH">
+  <label>Owner / contact name *</label><input id="in_contact" placeholder="Full name">
+  <label>WhatsApp number *</label><input id="in_number" type="tel" placeholder="024 123 4567">
+  <label>Region / town *</label>
+  <select id="in_region"><option value="">Select region</option><option>Greater Accra</option><option>Ashanti</option>
+    <option>Eastern Region</option><option>Central Region</option><option>Western Region</option><option>Volta Region</option>
+    <option>Northern Region</option><option>Bono Region</option><option>Other</option></select>
+  <label>Industry / niche *</label>
+  <select id="in_industry"><option value="">Select industry</option><option>Retail & Fashion</option>
+    <option>Food & Beverage / Restaurant</option><option>Hospitality / Guest House / Hotel</option>
+    <option>Salon & Beauty</option><option>Transport & Logistics</option><option>Construction & Trade</option>
+    <option>Health & Wellness Clinic</option><option>Education / Training</option><option>Manufacturing / Agro-processing</option>
+    <option>Events</option><option>Real Estate</option><option>Automotive</option><option>Other</option></select>
+  <label>Years operating *</label>
+  <select id="in_years"><option value="">Select</option><option>Less than 6 months</option><option>6 months – 2 years</option>
+    <option>2 – 5 years</option><option>5 – 10 years</option><option>10+ years</option></select>
+  <label>Staff count (incl. you) *</label>
+  <select id="in_staff"><option value="">Select</option><option>Just me</option><option>2–5</option><option>6–15</option>
+    <option>16–50</option><option>50+</option></select>
+  <label>Approx. monthly revenue</label>
+  <select id="in_revenue"><option value="">Prefer not to say</option><option>Under GH₵10,000</option>
+    <option>GH₵10,000–30,000</option><option>GH₵30,000–100,000</option><option>GH₵100,000–300,000</option><option>GH₵300,000+</option></select>
+  <label>What's the single biggest headache right now?</label>
+  <textarea id="in_headache" rows="2" placeholder="e.g. Staff don't follow the same standard when I'm not there"></textarea>
+  <div class="err" id="intakeErr"></div>
+  <button class="btn btn-primary btn-full" onclick="startDiagnostic()">Continue to the audit →</button>
+  <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="goHome()">Back</button>
+</div>
+
+<!-- ======================= AUDIT — QUESTIONS ======================= -->
+<div id="screen-diagnostic" class="page-narrow hidden">
+  <div class="progress-track"><div class="progress-fill" id="diagProgressFill" style="width:0%"></div></div>
+  <div class="card">
+    <div class="q-stage-tag" id="qStageTag">LEVEL 1 — FOUNDATION</div>
+    <div class="q-text" id="qText">—</div>
+    <div class="ans-row">
+      <button class="ans-btn yes" onclick="answer(2)">Yes</button>
+      <button class="ans-btn partial" onclick="answer(1)">Partially</button>
+      <button class="ans-btn no" onclick="answer(0)">No</button>
+    </div>
+  </div>
+  <button class="btn btn-ghost btn-full" onclick="prevQuestion()">← Previous question</button>
+</div>
+
+<!-- ======================= AUDIT — RESULTS ======================= -->
+<div id="screen-results" class="page-narrow hidden">
+  <div class="eyebrow">Your Business Infrastructure Audit Results</div>
+  <h1 id="resHeadline" style="font-size:22px">—</h1>
+  <p class="lead" id="resExplainer" style="font-size:13px">—</p>
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:8px">MATURITY LADDER</div>
+    <div id="resLadder"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:10px">TOP 3 GAPS FOUND</div>
+    <div id="resGaps"></div>
+  </div>
+  <div class="card" id="resRecCard">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:8px">RECOMMENDATION</div>
+    <div id="resRecText" style="font-size:13px;line-height:1.7;"></div>
+    <div style="font-size:11.5px;color:var(--green);margin-top:10px;font-weight:700;">🛡️ Backed by the Leak Identification Guarantee — no operational or revenue leakage found worth the audit fee, and the audit fee is refunded in full.</div>
+  </div>
+  <button class="btn btn-primary btn-full" id="resGoStageBtn" onclick="goToRecommendedStage()">See the recommended level in detail →</button>
+  <button class="btn btn-gold btn-full" style="margin-top:8px" onclick="addRecommendedToSelection()">Add Level <span id="resRecLevelNum"></span> to My Selection →</button>
+  <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="bookConsultation()">Book a Full Consultation</button>
+  <div class="contact-strip" style="justify-content:center">Call/WhatsApp <a href="tel:0509960980">0509 960 980</a> · Email <a href="mailto:solutions@byinforgh.com">solutions@byinforgh.com</a></div>
+  <button class="btn btn-ghost btn-full" style="margin-top:14px" onclick="goHome()">Back to the 8 levels</button>
+</div>
+
+<!-- ======================= MY SELECTION / CUSTOM PACKAGE / CHECKOUT ======================= -->
+<div id="screen-selection" class="page-narrow hidden">
+  <div class="eyebrow">My Selection</div>
+  <h1 style="font-size:22px">Build your package.</h1>
+  <p class="lead" style="font-size:13px">Pick one level, several levels, or mix in individual deliverables to build a fully custom package. Nothing here is a final invoice — it's a clear, specific request that goes straight to a human at BYINFORGH.</p>
+
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:10px">LEVELS SELECTED</div>
+    <div id="selLevelsList"></div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:4px">BUILD A CUSTOM PACKAGE</div>
+    <p style="font-size:12px;color:var(--ink-dim);margin-bottom:10px">Don't need a whole level? Tick individual deliverables from any level instead — BYINFORGH will price the exact combination for you.</p>
+    <button class="btn btn-ghost btn-full" onclick="toggleCustomBuilder()" id="customToggleBtn">+ Show every deliverable, by level</button>
+    <div id="customBuilderList" class="hidden" style="margin-top:14px;"></div>
+  </div>
+
+  <div class="total-box" id="selTotalBox">Nothing selected yet.</div>
+  <p style="font-size:11.5px;color:var(--ink-dim);margin-bottom:10px;">💳 No lump sum upfront on any build over GH₵15,000 — payments follow the 40/40/20 model: 40% to mobilise, 40% after staff training and stress-testing, 20% only after 7 days of error-free live operation.</p>
+
+  <label>Business name *</label><input id="sel_business" placeholder="Business name">
+  <label>Your name *</label><input id="sel_contact" placeholder="Full name">
+  <label>WhatsApp number *</label><input id="sel_number" type="tel" placeholder="024 123 4567">
+  <label>Anything else to add?</label><textarea id="sel_notes" rows="2" placeholder="Timeline, budget, specific concerns..."></textarea>
+  <div class="err" id="selErr"></div>
+
+  <button class="btn btn-gold btn-full" onclick="checkoutSelection()">Send My Selection via WhatsApp — Checkout →</button>
+  <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="emailSelection()">Email My Selection Instead</button>
+  <button class="btn btn-primary btn-full" style="margin-top:8px" onclick="bookConsultation()">Book a Full Consultation Instead</button>
+  <div class="contact-strip" style="justify-content:center">Call/WhatsApp <a href="tel:0509960980">0509 960 980</a> · Email <a href="mailto:solutions@byinforgh.com">solutions@byinforgh.com</a></div>
+  <button class="btn btn-ghost btn-full" style="margin-top:14px" onclick="goHome()">Keep browsing the levels</button>
+</div>
+
+<!-- ======================= BYINFORGH STAFF CONSOLE ======================= -->
+<!-- Light client-side gate. This hides the console from casual visitors —
+     it is NOT real authentication (the PIN check runs in this file, in the
+     browser). Do not treat it as securing sensitive data; the same public
+     backend endpoint is used either way. See the "Staff Console — Backend
+     Notes" document for how to upgrade this to real login if you want it. -->
+<div id="screen-staffgate" class="page-narrow hidden">
+  <div class="gate-box">
+    <div class="lock">🔒</div>
+    <h1 style="font-size:18px;margin-bottom:6px;">BYINFORGH Staff Console</h1>
+    <p style="font-size:12px;color:var(--ink-dim);margin-bottom:18px;">Enter your PIN to run a Full-Day Audit or Consulting session.</p>
+    <input id="staffPinInput" type="password" inputmode="numeric" maxlength="8" placeholder="••••" onkeydown="if(event.key==='Enter')checkStaffPin()">
+    <div class="err" id="staffPinErr"></div>
+    <button class="btn btn-primary btn-full" style="margin-top:14px" onclick="checkStaffPin()">Enter →</button>
+    <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="goHome()">Back to the public site</button>
+  </div>
+</div>
+
+<div id="screen-staffhome" class="page hidden">
+  <div class="eyebrow">BYINFORGH Staff Console</div>
+  <h1 style="font-size:26px">What are you running today?</h1>
+  <p class="lead" style="font-size:13px">Pick a mode. Both feed the same recommendation engine and land in the Command Centre's Biz Solutions tab, tagged by session type so they never get mixed up with self-serve customer submissions.</p>
+
+  <div class="mode-grid">
+    <div class="mode-card" onclick="goStaffScreen('staffintake');pendingStaffMode='consulting';pendingStaffDepth='';">
+      <div class="mic">💬</div>
+      <h3>Consulting Session</h3>
+      <p>A shorter, conversational discovery meeting — 30–45 min. Good for a first meeting, a phone/video call, or a walk-in. Ends with a clear recommendation and a pitch script.</p>
+      <span class="tag">~14 questions · fast</span>
+      <div style="margin-top:10px;font-family:'Space Mono',monospace;font-weight:700;color:var(--teal-dark);font-size:15px">GH₵600</div>
+    </div>
+    <div class="mode-card" onclick="goStaffScreen('staffintake');pendingStaffMode='audit';pendingStaffDepth='quick';">
+      <div class="mic">🗓️</div>
+      <h3>Half-Day Audit — Quick</h3>
+      <p>The full 34-question maturity audit, on-site, with a consultant notes field on every question. Use this for simpler, single-location businesses.</p>
+      <span class="tag">34 questions · ~2–3 hrs</span>
+      <div style="margin-top:10px;font-family:'Space Mono',monospace;font-weight:700;color:var(--teal-dark);font-size:15px">GH₵1,800</div>
+    </div>
+    <div class="mode-card" onclick="goStaffScreen('staffintake');pendingStaffMode='audit';pendingStaffDepth='deep';">
+      <div class="mic">🏗️</div>
+      <h3>Full-Day Audit — Deep</h3>
+      <p>The full operational walkthrough across 7 departments — Digital Presence, Operations, Customer Experience, Facilities, Management, Training, Support. Use this for multi-staff, multi-location or complex operations (hospitality, manufacturing, multi-branch).</p>
+      <span class="tag">7 sections · full day on-site</span>
+      <div style="margin-top:10px;font-family:'Space Mono',monospace;font-weight:700;color:var(--teal-dark);font-size:15px">GH₵3,200</div>
+    </div>
+  </div>
+  <p style="font-size:11.5px;color:var(--ink-dim);max-width:640px;margin-bottom:10px">The Half-Day Audit is GH₵1,800 and the Full-Day Audit is GH₵3,200. Depth is chosen by operational complexity. This fee covers the audit/consulting session itself; any resulting build is scoped and quoted separately, and the client can choose to implement the recommendations themselves or have BYINFORGH implement them.</p>
+  <button class="btn btn-ghost" onclick="goHome()">← Back to the public site</button>
+  <button class="btn btn-ghost" style="margin-left:8px" onclick="lockStaffConsole()">🔒 Lock console</button>
+</div>
+
+<div id="screen-staffintake" class="page-narrow hidden">
+  <div class="eyebrow" id="staffIntakeEyebrow">Session Setup</div>
+  <h1 style="font-size:22px">Business & session details</h1>
+  <p class="lead" style="font-size:13px">Same intake as the public audit, plus who's running the session.</p>
+  <label>Consultant name *</label><input id="st_consultant" placeholder="Your name">
+  <label>Business name *</label><input id="st_business" placeholder="e.g. The White House GH">
+  <label>Owner / contact name *</label><input id="st_contact" placeholder="Full name">
+  <label>WhatsApp number *</label><input id="st_number" type="tel" placeholder="024 123 4567">
+  <label>Email (optional, needed to send report by email)</label><input id="st_email" type="email" placeholder="owner@business.com">
+  <label>Region / town *</label>
+  <select id="st_region"><option value="">Select region</option><option>Greater Accra</option><option>Ashanti</option>
+    <option>Eastern Region</option><option>Central Region</option><option>Western Region</option><option>Volta Region</option>
+    <option>Northern Region</option><option>Bono Region</option><option>Other</option></select>
+  <label>Industry / niche *</label>
+  <select id="st_industry"><option value="">Select industry</option><option>Retail & Fashion</option>
+    <option>Food & Beverage / Restaurant</option><option>Hospitality / Guest House / Hotel</option>
+    <option>Salon & Beauty</option><option>Transport & Logistics</option><option>Construction & Trade</option>
+    <option>Health & Wellness Clinic</option><option>Education / Training</option><option>Manufacturing / Agro-processing</option>
+    <option>Events</option><option>Real Estate</option><option>Automotive</option><option>Other</option></select>
+  <label>Years operating *</label>
+  <select id="st_years"><option value="">Select</option><option>Less than 6 months</option><option>6 months – 2 years</option>
+    <option>2 – 5 years</option><option>5 – 10 years</option><option>10+ years</option></select>
+  <label>Staff count (incl. owner) *</label>
+  <select id="st_staff"><option value="">Select</option><option>Just me</option><option>2–5</option><option>6–15</option>
+    <option>16–50</option><option>50+</option></select>
+  <label>Approx. monthly revenue</label>
+  <select id="st_revenue"><option value="">Prefer not to say</option><option>Under GH₵10,000</option>
+    <option>GH₵10,000–30,000</option><option>GH₵30,000–100,000</option><option>GH₵100,000–300,000</option><option>GH₵300,000+</option></select>
+  <label>Single biggest headache (in their words)</label>
+  <textarea id="st_headache" rows="2" placeholder="What they said when you asked"></textarea>
+  <div class="err" id="staffIntakeErr"></div>
+  <button class="btn btn-primary btn-full" onclick="startStaffSession()">Start the session →</button>
+  <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="goStaffScreen('staffhome')">Back</button>
+</div>
+
+<!-- Quick Audit / Consulting question flow (reuses the same yes/partial/no engine) -->
+<div id="screen-staffdiag" class="page-narrow hidden">
+  <div class="session-meta" id="staffDiagMeta"></div>
+  <div class="progress-track"><div class="progress-fill" id="staffDiagProgressFill" style="width:0%"></div></div>
+  <div class="card">
+    <div class="q-stage-tag" id="staffQStageTag">—</div>
+    <div class="q-text" id="staffQText">—</div>
+    <div class="ans-row">
+      <button class="ans-btn yes" onclick="staffAnswer(2)">Yes</button>
+      <button class="ans-btn partial" onclick="staffAnswer(1)">Partially</button>
+      <button class="ans-btn no" onclick="staffAnswer(0)">No</button>
+    </div>
+    <label>Consultant notes (what you saw/heard — optional but recommended)</label>
+    <textarea id="staffQNotes" rows="2" class="notes-field" placeholder="e.g. Owner tracks stock in a WhatsApp voice note to herself" oninput="saveStaffNote(this.value)"></textarea>
+  </div>
+  <button class="btn btn-ghost btn-full" onclick="staffPrevQuestion()">← Previous question</button>
+</div>
+
+<!-- Deep Full-Day Audit — section by section -->
+<div id="screen-deepaudit" class="page-narrow hidden">
+  <div class="session-meta" id="deepAuditMeta"></div>
+  <div class="section-stepper" id="deepStepper"></div>
+  <div class="card">
+    <div class="q-stage-tag" id="deepSectionTag">—</div>
+    <h2 id="deepSectionName" style="font-size:19px;margin-bottom:14px;">—</h2>
+    <div id="deepItemsList"></div>
+  </div>
+  <div style="display:flex;gap:10px;">
+    <button class="btn btn-ghost btn-full" onclick="deepPrevSection()">← Previous section</button>
+    <button class="btn btn-primary btn-full" id="deepNextBtn" onclick="deepNextSection()">Next section →</button>
+  </div>
+</div>
+
+<!-- Consultant-only results / report screen -->
+<div id="screen-staffresults" class="page-narrow hidden">
+  <div class="eyebrow">Consultant Report</div>
+  <h1 id="staffResHeadline" style="font-size:22px">—</h1>
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:8px">MATURITY LADDER</div>
+    <div id="staffResLadder"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:10px">GAPS FOUND (WITH YOUR NOTES)</div>
+    <div id="staffResGaps"></div>
+  </div>
+  <div class="card" id="staffResIndustry">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:10px" class="ind-title">INDUSTRY-SPECIFIC FINDINGS</div>
+    <div class="ind-list"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:var(--ink-dim);margin-bottom:10px">HOW DOES THE BUSINESS WANT TO ACT ON THIS?</div>
+    <div class="sub-mode-row">
+      <button class="btn btn-ghost" id="implDiyBtn" onclick="setImplementationChoice('diy')">🧑‍🔧 They implement it themselves</button>
+      <button class="btn btn-ghost" id="implDoneBtn" onclick="setImplementationChoice('done_for_you')">🏗️ BYINFORGH implements it</button>
+    </div>
+    <p style="font-size:11.5px;color:var(--ink-dim);margin-top:8px">Either way the audit/consulting fee stands — this only changes what happens next and what the report says.</p>
+  </div>
+  <div class="script-box" id="staffScriptBox">—</div>
+  <label>Anything to add before saving?</label>
+  <textarea id="staffFinalNotes" rows="2" placeholder="Overall impression, red flags, opportunity size..."></textarea>
+  <div class="err" id="staffSaveErr"></div>
+  <button class="btn btn-gold btn-full" onclick="saveSessionToCommandCentre()">💾 Save to Command Centre →</button>
+  <div class="sub-mode-row" style="margin-top:8px">
+    <button class="btn btn-primary" onclick="sendRecommendationWhatsApp()">🟢 Send via WhatsApp</button>
+    <button class="btn btn-primary" onclick="sendRecommendationEmail()">✉️ Send via Email</button>
+  </div>
+  <button class="btn btn-ghost btn-full" style="margin-top:8px" onclick="copyStaffReport()">📋 Copy Full Report</button>
+  <button class="btn btn-ghost btn-full" style="margin-top:14px" onclick="goStaffScreen('staffhome')">New session</button>
+</div>
+
+<div class="selbar hidden" id="selBar">
+  <div class="count"><span id="selBarCount">0</span> item(s) in My Selection</div>
+  <button class="btn btn-gold" onclick="goScreen('selection')">View & Checkout →</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// LIVE BACKEND SYNC — connects to the BYINFORGH Business Solutions
+// Apps Script (Code.gs), which independently bridges into the
+// Command Centre CRM via its own addManualContact call. Paste the
+// deployed /exec URL below. Until it's set, every backend call is
+// silently skipped and the WhatsApp/email links still work exactly
+// as before — nothing here can block a real submission.
+// ============================================================
+const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzQcFIitJAH-ezedgxmaUotkVcalQDuaHorMIbZ_NBxNiVP4dPYk4yb6SOQsKuOTFwIww/exec';
+
+function backendCall(params){
+  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf('PASTE_YOUR')===0) return Promise.resolve(null);
+  const qs=Object.keys(params).map(k=>encodeURIComponent(k)+'='+encodeURIComponent(params[k]==null?'':params[k])).join('&');
+  return fetch(APPS_SCRIPT_URL+'?'+qs+'&t='+Date.now()).then(r=>r.json()).catch(()=>null);
+}
+
+const QUESTIONS = [
+  {level:1, text:"Do you have a written mission or 'why we exist' statement — not just in your head, but somewhere staff can see it?"},
+  {level:1, text:"If a new staff member joined tomorrow, is there a document explaining how customers should be treated, without you telling them yourself?"},
+  {level:1, text:"Do you have written rules for staff conduct — lateness, dress code, phone use, cash handling?"},
+  {level:1, text:"If you were away for a week, would every staff member give a customer the same answer about your prices, hours and policies?"},
+  {level:1, text:"Have you ever written down who your ideal customer actually is — age, need, budget — rather than 'anyone who comes'?"},
+  {level:1, text:"Do you have a clear name/brand you use consistently everywhere — signage, WhatsApp, social media, receipts?"},
+  {level:2, text:"Do you track stock/inventory somewhere other than 'I can see what's on the shelf'?"},
+  {level:2, text:"Is your business findable on Google Maps with correct hours, location and phone number?"},
+  {level:2, text:"Do you use WhatsApp Business — catalog, quick replies, labels — rather than a personal WhatsApp number?"},
+  {level:2, text:"Do you have a written record of who owes you money and who you owe?"},
+  {level:2, text:"Is payroll calculated the same way every time — on paper or a sheet — or does it depend on you remembering?"},
+  {level:2, text:"Do you have any place customers can leave a review, or proof of past work such as photos or testimonials?"},
+  {level:2, text:"Do you post about your business online at least a few times a week?"},
+  {level:3, text:"Have you ever watched a staff member serve a customer start-to-finish and written down what went wrong?"},
+  {level:3, text:"If you introduced a new process — new order form, new price list — did you test it with a few customers or staff before rolling it out to everyone?"},
+  {level:3, text:"Do you know your most common customer complaint, backed by actual notes — not a guess?"},
+  {level:3, text:"Has any system you use — WhatsApp ordering, booking, POS — ever broken under real busy-period pressure, and did you fix the actual cause?"},
+  {level:4, text:"Are your current systems — ordering, booking, payment — being used by all staff, or only some?"},
+  {level:4, text:"In the last month, did you change anything about how the business runs because of customer or staff feedback?"},
+  {level:4, text:"Do you review how the week went — even informally — on a regular schedule?"},
+  {level:4, text:"Are new staff trained using a written process, or do they 'just learn by watching'?"},
+  {level:5, text:"Can you say, right now, what your business made in profit last month — an actual number, not a feeling?"},
+  {level:5, text:"Do you know your cost per item/service sold — ingredients, materials, labour — separately from your selling price?"},
+  {level:5, text:"Do you track cash and MoMo/bank income separately and reconcile them against what you sold?"},
+  {level:5, text:"Do you know which product/service line makes you the most money, and which barely breaks even?"},
+  {level:5, text:"Do you have a rough idea of your monthly fixed costs — rent, salaries, utilities — versus variable costs?"},
+  {level:6, text:"If you disappeared for two weeks, is there a manager or system that would keep the business running at the same standard?"},
+  {level:6, text:"Do you get a regular report — daily/weekly — on sales and stock without personally checking everything yourself?"},
+  {level:6, text:"Are staff held accountable to written standards, or only to what you personally notice?"},
+  {level:6, text:"Is your monthly revenue roughly predictable month to month, or does it swing wildly with no clear pattern?"},
+  {level:7, text:"If an investor or bank asked for your last 12 months of financial records today, could you produce them in an organised form?"},
+  {level:7, text:"Could you open a second location tomorrow and hand someone a playbook that recreates what makes this business work?"},
+  {level:7, text:"Have you thought about what happens to this business if something happened to you — a succession plan, even informal?"},
+  {level:7, text:"Have you ever been approached by, or considered, an investor, partner or franchise opportunity?"}
+];
+let qIndex=0, answers=new Array(QUESTIONS.length).fill(null), intake={}, diagResult=null;
+
+function startDiagnostic(){
+  const business=document.getElementById('in_business').value.trim();
+  const contact=document.getElementById('in_contact').value.trim();
+  const number=document.getElementById('in_number').value.trim();
+  const region=document.getElementById('in_region').value;
+  const industry=document.getElementById('in_industry').value;
+  const years=document.getElementById('in_years').value;
+  const staff=document.getElementById('in_staff').value;
+  const revenue=document.getElementById('in_revenue').value;
+  const headache=document.getElementById('in_headache').value.trim();
+  const err=document.getElementById('intakeErr');
+  if(!business||!contact||!number||!region||!industry||!years||!staff){ err.textContent='Please fill in every field marked *.'; return; }
+  err.textContent='';
+  intake={business,contact,number,region,industry,years,staff,revenue,headache};
+  qIndex=0; answers=new Array(QUESTIONS.length).fill(null);
+  goScreen('diagnostic'); renderQuestion();
+}
+function renderQuestion(){
+  const q=QUESTIONS[qIndex];
+  const lvl=LEVEL_CONTENT.find(s=>s.n===q.level);
+  document.getElementById('qStageTag').textContent='LEVEL '+q.level+' — '+lvl.name.toUpperCase();
+  document.getElementById('qText').textContent=q.text;
+  document.getElementById('diagProgressFill').style.width=Math.round((qIndex/QUESTIONS.length)*100)+'%';
+  document.querySelectorAll('.ans-btn').forEach(b=>b.classList.remove('sel'));
+  if(answers[qIndex]!==null){
+    const val=answers[qIndex]; const cls=val===2?'yes':val===1?'partial':'no';
+    document.querySelector('.ans-btn.'+cls).classList.add('sel');
+  }
+}
+function answer(points){
+  answers[qIndex]=points;
+  if(qIndex<QUESTIONS.length-1){ qIndex++; renderQuestion(); }
+  else{ computeResults(); goScreen('results'); renderResults(); submitDiagnosticToBackend(); }
+}
+function submitDiagnosticToBackend(){
+  const scores={};
+  for(let n=1;n<=7;n++) scores['stage'+n]=diagResult.levelScores[n];
+  const rec=LEVEL_CONTENT.find(s=>s.n===diagResult.overallLevel);
+  return backendCall({
+    action:'submitDiagnostic',
+    business:intake.business||'', contactName:intake.contact||'', number:intake.number||'',
+    region:intake.region||'', industry:intake.industry||'', years:intake.years||'', staff:intake.staff||'',
+    revenueBand:intake.revenue||'', headache:intake.headache||'',
+    answers:JSON.stringify(answers),
+    scores:JSON.stringify(scores),
+    overallStage:diagResult.overallLevel, overallScore:diagResult.overallScore,
+    topGaps:diagResult.topGaps.join(' | '),
+    recommendedPackage:rec?rec.name:'',
+    ctaChosen:''
+  });
+}
+function prevQuestion(){ if(qIndex>0){ qIndex--; renderQuestion(); } else goScreen('intake'); }
+
+function computeResults(){
+  const levelScores={};
+  for(let n=1;n<=7;n++){
+    const qs=QUESTIONS.map((q,i)=>({q,i})).filter(x=>x.q.level===n);
+    const earned=qs.reduce((sum,x)=>sum+(answers[x.i]||0),0);
+    levelScores[n]=Math.round((earned/(qs.length*2))*100);
+  }
+  let overallLevel=7;
+  for(let n=1;n<=7;n++){ if(levelScores[n]<60){ overallLevel=n; break; } }
+  const overallScore=Math.round(Object.values(levelScores).reduce((a,b)=>a+b,0)/7);
+  const gapCandidates=QUESTIONS.map((q,i)=>({q,i,val:answers[i]})).filter(x=>x.val<2);
+  gapCandidates.sort((a,b)=>a.val-b.val || a.q.level-b.q.level);
+  const topGaps=gapCandidates.slice(0,3).map(x=>x.q.text);
+  diagResult={levelScores,overallLevel,overallScore,topGaps};
+}
+function renderResults(){
+  const lvl=LEVEL_CONTENT.find(s=>s.n===diagResult.overallLevel);
+  document.getElementById('resHeadline').textContent=(intake.business||'Your business')+' is currently operating at Level '+lvl.label+' — '+lvl.name+'.';
+  document.getElementById('resExplainer').textContent=lvl.reality;
+  document.getElementById('resLadder').innerHTML=[1,2,3,4,5,6,7].map(n=>{
+    const s=LEVEL_CONTENT.find(x=>x.n===n);
+    const score=diagResult.levelScores[n];
+    const color=score>=80?'var(--green)':score>=50?'var(--orange)':'var(--red)';
+    const isCurrent=n===diagResult.overallLevel;
+    return `<div class="rung ${isCurrent?'current':''}">
+      <div class="num">${n}</div><div class="name">${s.name}</div>
+      <div class="barwrap"><div class="barfill" style="width:${score}%;background:${color}"></div></div>
+      <div class="pct" style="color:${color}">${score}%</div></div>`;
+  }).join('');
+  document.getElementById('resGaps').innerHTML=diagResult.topGaps.length
+    ? diagResult.topGaps.map(g=>`<div class="gap-item">${g}</div>`).join('')
+    : '<div class="gap-item" style="border-color:var(--green)">No major gaps found — strong across the board.</div>';
+  const pkgs=CORP_PACKAGES[diagResult.overallLevel]||[];
+  const pkgLine=pkgs.length ? 'Start with: <b>'+pkgs[0].name+'</b> ('+pkgs[0].price+').' : '';
+  document.getElementById('resRecText').innerHTML=
+    `Based on this audit, ${intake.business||'this business'} should start at <b>Level ${lvl.label} — ${lvl.name}</b>. ${pkgLine} `+
+    `A Business Infrastructure Audit consultation with BYINFORGH will confirm this in person and scope the exact engagement — nothing here is a final quote.`;
+  document.getElementById('resRecLevelNum').textContent=lvl.label;
+}
+function goToRecommendedStage(){ openStage(diagResult.overallLevel); }
+function addRecommendedToSelection(){
+  toggleLevelSelection(diagResult.overallLevel, true);
+  showToast('Level '+diagResult.overallLevel+' added to My Selection');
+  goScreen('selection');
+}
+function bookConsultation(){
+  const msg='Hi BYINFORGH, I just completed the Business Infrastructure Audit for '+(intake.business||'my business')+
+    ' — it came out at Level '+diagResult.overallLevel+' ('+diagResult.overallScore+'%). I would like to book a full consultation.';
+  window.open('https://wa.me/233509960980?text='+encodeURIComponent(msg),'_blank');
+  backendCall({
+    action:'bookConsultation',
+    business:intake.business||'', contactName:intake.contact||'', number:intake.number||'',
+    region:intake.region||'', preferredTime:'',
+    diagStage:diagResult?diagResult.overallLevel:'', diagScore:diagResult?diagResult.overallScore:'',
+    notes:'Requested from the audit results screen'
+  });
+}
+function goScreen(id){
+  ['home','stage','intake','diagnostic','results','selection','staffgate','staffhome','staffintake','staffdiag','deepaudit','staffresults']
+    .forEach(s=>{const el=document.getElementById('screen-'+s); if(el) el.classList.add('hidden');});
+  document.getElementById('screen-'+id).classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='selection') renderSelectionScreen();
+}
+
+</script>
+<script>
+const LEVEL_CONTENT = [
+{
+  n:0, label:'0', name:'The Signal', tagline:'Free. The entry point before any paid engagement.',
+  price:'Free', priceNote:'Lead magnet / education',
+  purpose:'To demonstrate BYINFORGH\'s standard of thinking before any money changes hands, and to give the business owner a free, honest first look at where they stand.',
+  reality:'Most businesses have never had anyone explain the difference between a website and an infrastructure. Level 0 exists so a business can self-assess for free — a Business Health Checklist, a short guide, a diagnostic conversation — before deciding whether a paid audit is worth it.',
+  outcome:'The business owner understands the Business Maturity Model and can see, roughly, where their business sits on it.',
+  deliverables:[
+    {ic:'📘',t:'The Signal Guide',d:'A free 10-chapter guide covering visibility, WhatsApp, sales and systems.',
+      why:'Gives an owner real, usable tools before they ever spend a cedi, so trust is earned rather than asked for.',
+      how:'Delivered instantly as a downloadable guide covering AI for business, social media, WhatsApp growth, video content, personal branding, sales and content systems.',
+      who:'Any Ghanaian business owner, whatever stage they are at — this is the front door for everyone.',
+      when:'Day one, before any conversation about paid work.',
+      tip:'Read it once fully, then come back to the chapter that matches your lowest Health Checklist score.'},
+    {ic:'✅',t:'Business Health Checklist',d:'A free self-scored checklist across 5 categories.',
+      why:'Turns a vague feeling of "something is wrong" into a specific, honest number you can act on.',
+      how:'25 yes/no statements across Visibility, Trust, WhatsApp Business, Sales, and Authority, scored 0–25.',
+      who:'The owner or the most senior manager — whoever actually sees the whole business.',
+      when:'Takes under 5 minutes; do it before the free diagnostic call so the conversation starts from real numbers.',
+      tip:'Score 0–9 means start with WhatsApp and social media first — those are the fastest wins.'},
+    {ic:'💬',t:'Free Diagnostic Conversation',d:'A short, no-obligation call to place the business on the maturity ladder.',
+      why:'A checklist tells you a score; a conversation tells you which score actually matters right now.',
+      how:'BYINFORGH asks pointed questions about documentation, systems and staff consistency and gives an honest read on the real Level, not the one the owner assumes.',
+      who:'Owners who want a second opinion before committing to a paid audit.',
+      when:'Book any time via WhatsApp — no obligation to buy anything after.',
+      tip:'Bring your single biggest headache to the call; it usually points straight at the real gap.'}
+  ]
+},
+{
+  n:1, label:'1', name:'Foundation', tagline:'Know who you are before deciding how you operate.',
+  price:'GH₵8,500 – GH₵20,000', priceNote:'Corporate Business Infrastructure Audit: GH₵5,000 – GH₵25,000 separately',
+  purpose:'To create the permanent foundation every future decision follows — the living reference point for the business itself, not the owner\'s memory.',
+  reality:'Almost every established business skips this. People rush to open, brand, sell, and hire — but never define the business. When staff arrive, everyone teaches differently, managers make different decisions, customers receive inconsistent service, and everything depends on the owner being physically present. This is exactly what BYINFORGH found on the ground at The White House GH: a running, profitable business with no documented standards.',
+  outcome:'The business finally knows why it exists, who it serves, where it is going, and how decisions are made — independent of any one person.',
+  deliverables:[
+    {ic:'🔍',t:'Full Business Infrastructure Audit',d:'The audit that determines everything after it.',
+      why:'You cannot fix what you have not measured — this replaces guessing with an evidenced starting point.',
+      how:'Maps current maturity stage, infrastructure gaps, operational risks, priority improvements, a recommended roadmap and an estimated investment.',
+      who:'The owner plus senior managers, interviewed directly — not just a document review.',
+      when:'Always first, before any Foundation work begins. Priced and delivered separately (GH₵5,000–25,000).',
+      tip:'Insist on seeing the audit in writing before agreeing to any Level 1 build — a real audit is a deliverable in its own right.'},
+    {ic:'🎯',t:'Vision, Mission & Core Values',d:'Written statements of why the business exists and where it is going.',
+      why:'Without this, every manager improvises a different answer to "what are we actually trying to do here."',
+      how:'Built through structured interviews with ownership, then written, tested against real staff and customers, and finalised.',
+      who:'Written for the owner, but written to be understood by the newest staff member on day one.',
+      when:'The very first deliverable produced in the engagement.',
+      tip:'Keep it to one page. If staff cannot recite it, it is too long.'},
+    {ic:'📜',t:'Company Philosophy & Customer Promise',d:'Who the business serves, what problems it solves, and what customers can always expect.',
+      why:'Sets the standard customers are held to expect, and staff are held to deliver, consistently.',
+      how:'Defined from the vision/mission work, then converted into a plain-language promise your team can repeat verbatim.',
+      who:'Every customer-facing staff member should know this by heart.',
+      when:'Runs alongside the Vision/Mission work in week one of Foundation.',
+      tip:'Print it and put it where staff clock in — repetition is what makes it real, not the document itself.'},
+    {ic:'📘',t:'Company Documents',d:'Employee handbook, staff code of conduct, policies, health & safety, recruitment and training standards.',
+      why:'This is the single biggest fix for "staff problems" — most staff issues are actually undocumented-standard problems.',
+      how:'Drafted from your existing (often informal) rules, formalised, and reviewed with you before rollout.',
+      who:'HR/management team and every current and future employee.',
+      when:'Delivered mid-Foundation, once vision and values are locked.',
+      tip:'Have every current staff member sign an acknowledgement — it converts a document into an enforceable standard.'},
+    {ic:'🏢',t:'Organisational Structure',d:'Who does what, and who reports to whom, documented rather than assumed.',
+      why:'Removes the daily bottleneck of everything routing through the owner because no one else has clear authority.',
+      how:'Mapped from current roles, then rebuilt around what the business actually needs at its next stage of growth.',
+      who:'Owner, managers, and any supervisory staff.',
+      when:'Produced once the audit has identified the real reporting gaps.',
+      tip:'Even a 3-person business benefits from writing down who decides what — it prevents decisions defaulting to whoever is loudest.'},
+    {ic:'🗺️',t:'Business Roadmap & Positioning',d:'SWOT, market research, competitor review, customer personas, and a documentation framework.',
+      why:'Tells you where to compete and where not to — most Ghanaian SMEs try to serve "anyone who comes."',
+      how:'Combines desk research on your specific niche and region with the audit findings into one working document.',
+      who:'Owner and anyone involved in pricing or marketing decisions.',
+      when:'Final Foundation deliverable, feeding directly into Level 2 planning.',
+      tip:'Revisit this every 12 months — positioning that was right at launch drifts as the market moves.'}
+  ]
+},
+{
+  n:2, label:'2', name:'Infrastructure', tagline:'Build systems, not chaos.',
+  price:'GH₵20,000 – GH₵60,000', priceNote:'',
+  purpose:'Turn the Level 1 identity into repeatable operating systems. Technology becomes the tool, not the goal.',
+  reality:'Once the foundation exists, most corporate operations still run on WhatsApp chats, memory, and paper. Stock counts don\'t match sales, nobody can find the business on Google, and every customer touchpoint looks different. This is the phase where BYINFORGH built the Command Centre-style digital presence, dashboards and operational workflows for The White House GH.',
+  outcome:'The business moves from disconnected tasks to integrated systems everyone can rely on.',
+  deliverables:[
+    {ic:'🌐',t:'Digital Presence',d:'Website, SEO, social media systems, CRM.',
+      why:'If customers can\'t find you or verify you online, you lose them to a competitor who is easier to trust in five seconds.',
+      how:'Custom-built site, Google Business optimisation, consistent social presence, and a CRM to capture every enquiry.',
+      who:'Anyone-facing team members plus whoever currently "does the Facebook page."',
+      when:'First build inside Level 2, once Level 1 identity exists to build the brand around.',
+      tip:'Get on Google Maps correctly before spending on ads — it is free and most local searches start there.'},
+    {ic:'📦',t:'Operations Systems',d:'Inventory, stock, finance, payroll, procurement.',
+      why:'This is where revenue quietly leaks — stock that doesn\'t match sales, payroll that depends on memory.',
+      how:'Digitised tracking replacing paper/WhatsApp records, built around your actual daily workflow.',
+      who:'Whoever currently handles stock, cash and payroll — usually the owner or one trusted staff member.',
+      when:'Runs in parallel with digital presence work.',
+      tip:'Start tracking one category (stock or cash) properly before trying to digitise everything at once.'},
+    {ic:'📱',t:'Customer Experience',d:'QR ordering, membership, digital menu.',
+      why:'Removes order-taking errors and speeds up service without adding staff.',
+      how:'QR-based ordering and digital menus built to match your actual floor layout and menu structure.',
+      who:'Front-of-house staff and customers directly.',
+      when:'Built once operations systems are stable enough to feed it accurate data.',
+      tip:'Pilot on your quietest day first — see Level 3 before rolling out on a Friday night.'},
+    {ic:'📊',t:'Management Layer',d:'Executive dashboard, reporting, analytics.',
+      why:'This is what turns daily activity into something the owner can actually see and act on.',
+      how:'Same architecture as the BYINFORGH Command Centre — CRM, sales pipeline, revenue tracking, a WhatsApp workflow engine, call management and a field operations router, all reporting into one live dashboard.',
+      who:'Owner and management team, viewed daily.',
+      when:'Delivered once the underlying operations and customer systems are feeding it real data.',
+      tip:'Check the dashboard at the same time every day — consistency of habit matters more than the tool itself.'},
+    {ic:'📋',t:'Training & Documentation',d:'SOPs, manuals, documentation so tasks don\'t live only in someone\'s head.',
+      why:'Without this, every system you just built quietly reverts to the old manual way within weeks.',
+      how:'Step-by-step SOPs written for each new system, delivered as manuals staff can reference without asking.',
+      who:'Every staff member who touches any of the new systems.',
+      when:'Final Level 2 deliverable, feeding directly into Level 3 testing.',
+      tip:'Keep SOPs one page per task — long manuals don\'t get read on a busy shift.'}
+  ]
+},
+{
+  n:3, label:'3', name:'Validation', tagline:'Test before trust.',
+  price:'GH₵10,000 – GH₵30,000', priceNote:'',
+  purpose:'Stress-test everything before relying on it, with real staff, in real conditions.',
+  reality:'Nothing should go live immediately. A new process, a new order form, a new price list — none of it should be trusted until it survives contact with real customers and a busy Saturday.',
+  outcome:'Weaknesses are discovered while they are still inexpensive to fix, not after they\'ve cost the business customers.',
+  deliverables:[
+    {ic:'🧪',t:'Pilot Deployment',d:'A small, controlled run before full rollout.',
+      why:'Finding a problem with 5 customers on a Tuesday is cheap. Finding it with 200 customers on a Friday is expensive.',
+      how:'The new systems run for a limited period, with a small group of staff and customers, closely observed.',
+      who:'A small, trusted subset of staff — not the whole team on day one.',
+      when:'Immediately after Level 2 systems are built, before any public rollout.',
+      tip:'Pick your most honest staff member for the pilot, not your most agreeable one — you need real feedback.'},
+    {ic:'🎓',t:'Staff & Customer Testing',d:'Real people using the real system, observed and coached.',
+      why:'A system that works on paper often breaks the moment a real customer asks an unexpected question.',
+      how:'Staff are observed handling live orders/enquiries end-to-end; customers are asked for direct feedback.',
+      who:'Frontline staff and a sample of real customers.',
+      when:'Runs throughout the pilot period.',
+      tip:'Watch, don\'t help — if you jump in to fix things, you won\'t see the real gaps.'},
+    {ic:'🐞',t:'Error & Bug Tracking',d:'Every failure logged and fed back into the build.',
+      why:'Untracked problems repeat. Tracked problems get fixed once, permanently.',
+      how:'A simple log of every issue — a wrong price, a missed order, a confused staff member — reviewed daily.',
+      who:'Whoever runs the pilot day-to-day, reporting back to BYINFORGH.',
+      when:'Continuous throughout Level 3.',
+      tip:'Log the small annoyances too, not just the big failures — small friction adds up to lost customers.'},
+    {ic:'📝',t:'Workflow Reviews',d:'Documentation updates and training session refinements.',
+      why:'The SOPs written in Level 2 are a first draft — this is where they get corrected against reality.',
+      how:'Every logged issue is reviewed and the relevant SOP or workflow is updated before full deployment.',
+      who:'BYINFORGH and the management team jointly.',
+      when:'Final step of Level 3, gating entry into Level 4.',
+      tip:'Don\'t skip this step under pressure to "just go live" — it is the cheapest insurance in the whole engagement.'}
+  ]
+},
+{
+  n:4, label:'4', name:'Deployment', tagline:'Launch. Learn. Improve.',
+  price:'GH₵15,000 – GH₵50,000', priceNote:'Monthly Growth Partnership begins from this level',
+  purpose:'Move from testing into real operation — not perfectly, but improving daily.',
+  reality:'Many businesses launch once and never touch the system again. Staff quietly revert to old habits. Nobody reviews what\'s working. From Level 4 onward, BYINFORGH moves the client onto a monthly retainer rather than repeat one-off projects.',
+  outcome:'The business begins improving every day rather than only reacting when something breaks.',
+  deliverables:[
+    {ic:'🚀',t:'Live Rollout',d:'The system goes fully live, everyone using it, not just some.',
+      why:'A pilot proves the system works. Rollout proves it works at full volume, with every staff member, every day.',
+      how:'Full public launch — every location, every staff member, every customer touchpoint switched over together.',
+      who:'The entire team, plus customers from day one.',
+      when:'Once Level 3 testing has closed out its major issues.',
+      tip:'Announce the launch to customers — a visible relaunch builds goodwill even if small issues surface in week one.'},
+    {ic:'🧑‍🏫',t:'Team Training & Coaching',d:'Customer launch support with staff coaching to keep adoption real.',
+      why:'Staff revert to old habits under pressure unless someone is actively coaching them through the new way.',
+      how:'On-the-floor coaching during the first weeks of live operation, not a one-off training session.',
+      who:'Every staff member, with extra attention to the slowest adopters.',
+      when:'Concentrated in the first 2–4 weeks after go-live.',
+      tip:'Identify one internal "champion" per shift who can answer questions when BYINFORGH isn\'t on site.'},
+    {ic:'📈',t:'Daily Monitoring',d:'Regular, scheduled review of how things are actually going.',
+      why:'Problems caught on day 2 are a quick fix. Problems caught in month 3 are a habit to break.',
+      how:'Scheduled daily or weekly check-ins against the new dashboards, with issues raised immediately.',
+      who:'Owner/manager plus BYINFORGH during the retainer period.',
+      when:'Ongoing from launch through the Growth Partnership retainer.',
+      tip:'Put the check-in on the calendar as a recurring event — "when we get time" never happens.'},
+    {ic:'🔁',t:'Continuous Improvement',d:'Dashboard optimisation and reporting based on real feedback, not guesswork.',
+      why:'The business, the market and your customers keep changing — a system frozen at launch slowly goes stale.',
+      how:'Monthly review of what the data shows, with small adjustments made continuously rather than in one big overhaul.',
+      who:'Owner and BYINFORGH, as part of the Corporate Growth Partnership retainer.',
+      when:'Ongoing, monthly, for as long as the retainer runs.',
+      tip:'Ask "what changed this month" at every review — improvement compounds, it doesn\'t happen in one sitting.'}
+  ]
+},
+{
+  n:5, label:'5', name:'Performance', tagline:'What gets measured gets improved.',
+  price:'GH₵20,000 – GH₵80,000', priceNote:'',
+  purpose:'Understand exactly how money flows through the business.',
+  reality:'Many corporate operations are busy — very few understand their own numbers. Sales happen, but nobody can say what the actual profit was last month, or which line is quietly losing money. Average luxury hospitality venues alone lose 10–15% of monthly revenue to manual tracking gaps.',
+  outcome:'Owners stop guessing and start managing through data.',
+  deliverables:[
+    {ic:'💰',t:'Financial Systems',d:'Revenue, expenses, profitability, KPIs, forecasting, cash flow.',
+      why:'Revenue tells you the business is busy. Only margin tells you if it is actually profitable.',
+      how:'Cost-per-item mapped against selling price, cash and MoMo income reconciled separately, and monthly forecasting set up.',
+      who:'Owner and whoever handles bookkeeping/accounts.',
+      when:'First build inside Level 5, once operations data from Level 2–4 is reliable enough to trust.',
+      tip:'Start with one number — true monthly profit — before trying to track everything at once.'},
+    {ic:'📦',t:'Inventory & Customer Analytics',d:'Stock value tracked separately from cost, plus customer behaviour data.',
+      why:'Stock tied up in slow-moving items is cash you can\'t use elsewhere — most owners never see this clearly.',
+      how:'Stock value reporting linked to sales velocity, plus repeat-customer and spend-pattern tracking.',
+      who:'Operations manager and owner.',
+      when:'Runs alongside financial systems build.',
+      tip:'Identify your slowest-moving 10% of stock first — that\'s usually where the trapped cash is.'},
+    {ic:'👥',t:'Staff Performance',d:'Business intelligence on team output, not just attendance.',
+      why:'Two staff can both "be present" while one closes twice the sales — attendance alone hides this.',
+      how:'Output-based tracking (sales per staff, tasks completed, service speed) rather than clock-in records alone.',
+      who:'Managers, used for coaching, not punishment.',
+      when:'Built once daily monitoring habits from Level 4 are established.',
+      tip:'Share performance data with staff, not just management — visibility motivates more than surveillance.'},
+    {ic:'📊',t:'Executive Dashboards',d:'Sales, margin, and KPIs visible at a glance, updating in real time.',
+      why:'This is the payoff of everything before it — one screen that replaces asking five people for numbers.',
+      how:'All financial, inventory and staff data consolidated into a single live view, mirroring the Command Centre pattern.',
+      who:'Owner, primarily, shared selectively with senior managers.',
+      when:'Final Level 5 deliverable.',
+      tip:'Set one target number on the dashboard (e.g. monthly margin %) and check it first every time you open it.'}
+  ]
+},
+{
+  n:6, label:'6', name:'Predictability', tagline:'The business should function without depending on the owner.',
+  price:'GH₵30,000 – GH₵120,000', priceNote:'',
+  purpose:'Create a business that operates consistently even when the owner is not in the building.',
+  reality:'The BYINFORGH Test: if the owner disappeared for two weeks, would the business keep running successfully? For most businesses at this point, the honest answer is still no.',
+  outcome:'The business becomes self-sustaining and less dependent on the founder.',
+  deliverables:[
+    {ic:'📡',t:'Automated Reporting',d:'Executive dashboards and management reports delivered without chasing anyone.',
+      why:'If the owner has to ask for the numbers, the business is still dependent on the owner asking.',
+      how:'Reports generate and deliver automatically on a schedule — daily, weekly, monthly — with no manual compilation.',
+      who:'Owner and any board/investor-facing stakeholders.',
+      when:'Built once Level 5 dashboards have run reliably for a full reporting cycle.',
+      tip:'Set reports to arrive before you\'d think to ask for them — that\'s the actual test of automation.'},
+    {ic:'⚙️',t:'Automation & Accountability',d:'Department KPIs and staff accountability built into the system, not memory.',
+      why:'Accountability that depends on the owner noticing collapses the moment the owner isn\'t watching.',
+      how:'Each department gets measurable KPIs tracked automatically, with clear ownership of each number.',
+      who:'Department heads/managers.',
+      when:'Runs alongside automated reporting.',
+      tip:'Tie one KPI per role directly to a consequence or reward — an unmeasured KPI is just a suggestion.'},
+    {ic:'📚',t:'Complete Documentation',d:'Every role, process and protocol written down.',
+      why:'This is the direct answer to the BYINFORGH Test — could the business run for two weeks without the owner?',
+      how:'Every Level 1–5 document is consolidated, updated and expanded into a single operating manual per role.',
+      who:'Every role in the business, from frontline to management.',
+      when:'A major Level 6 deliverable, drawing on everything built in earlier levels.',
+      tip:'Test it properly: have someone follow only the documentation for a full shift with no verbal help.'},
+    {ic:'🧭',t:'Leadership Systems',d:'Investor documentation begins here, in preparation for Level 7.',
+      why:'Predictability is what makes a business investable — this is where that story starts being told on paper.',
+      how:'Leadership roles, decision rights, and a preliminary financial/operational record start being organised for outside review.',
+      who:'Owner and any co-founders/senior leadership.',
+      when:'Final Level 6 deliverable, bridging directly into Level 7.',
+      tip:'Start this even if you have no immediate plan to raise capital or sell — it is cheaper to build gradually than all at once.'}
+  ]
+},
+{
+  n:7, label:'7', name:'Expansion', tagline:'Build a business that outlives its founder.',
+  price:'GH₵50,000 – GH₵250,000+', priceNote:'Enterprise / multi-location builds are quoted individually, e.g. the Command Centre Enterprise system at GH₵250,000 one-time + GH₵15,000/month care',
+  purpose:'Transform the business into an asset capable of long-term growth.',
+  reality:'Once a business is predictable, it becomes investable — but most businesses never organise their records or their story well enough for an investor, bank, or partner to say yes quickly.',
+  outcome:'The business is no longer simply providing an income — it creates long-term wealth and can outlive its founder.',
+  deliverables:[
+    {ic:'📁',t:'Investor Data Room',d:'Clean, organised financial history ready to show.',
+      why:'An investor or bank that asks for records and gets silence has already made their decision.',
+      how:'Financial history, contracts, SOPs and system architecture organised into one reviewable package.',
+      who:'Owner, prepared for external eyes — investors, banks, or acquisition partners.',
+      when:'Built once Level 6 documentation and reporting are stable.',
+      tip:'Build this before you need it — scrambling to produce records under investor deadline pressure is a bad negotiating position.'},
+    {ic:'🗺️',t:'Multi-Location Playbook',d:'Franchise and expansion readiness, board reporting, governance.',
+      why:'What makes the business work has to be repeatable, or growth just multiplies the same problems in a new location.',
+      how:'Every Level 1–6 system packaged as a step-by-step playbook a new manager could follow to replicate the business.',
+      who:'Owner and any future location managers or franchise partners.',
+      when:'Runs alongside investor data room preparation.',
+      tip:'Pilot the playbook internally — promote from within or open a second till/section before opening a full second site.'},
+    {ic:'🤝',t:'Succession Planning',d:'A plan for what happens to the business if something happens to the founder.',
+      why:'Every business built entirely around one person is one accident away from collapsing overnight.',
+      how:'A documented plan covering who takes over, how, and what authority transfers, agreed with family/partners as relevant.',
+      who:'Owner, family, and senior leadership.',
+      when:'Addressed directly in Level 7, though the groundwork starts in Level 6 documentation.',
+      tip:'This conversation is uncomfortable — have it anyway, while there is no pressure to rush it.'},
+    {ic:'📈',t:'Valuation & Long-Term Roadmap',d:'Knowing what the business is actually worth, and where it is going.',
+      why:'You can\'t negotiate an investment, a sale, or a partnership from a position of strength without knowing your real number.',
+      how:'Valuation built from the financial history in the data room, plus a long-term growth roadmap beyond the current operation.',
+      who:'Owner, and any board or investment stakeholders.',
+      when:'Final Level 7 deliverable — the natural endpoint of the full seven-level engagement.',
+      tip:'Revisit valuation annually — a business that has done Levels 1–7 properly should see this number move.'}
+  ]
+}
+];
+
+// Corporate packages shown per level. Distinct from the SME Ecosystem/SME Systems tier.
+const CORP_PACKAGES = {
+  0:[{name:'The Signal Guide', tier:'Free Guide', desc:'10-chapter self-serve growth guide plus Business Health Checklist.', price:'Free'}],
+  1:[{name:'Business Infrastructure Audit (Corporate)', tier:'Entry Diagnostic', desc:'Full maturity assessment, gap analysis, and roadmap.', price:'GH₵5,000 – 25,000'},
+     {name:'Foundation Build', tier:'Level 1 Package', desc:'Vision, mission, values, brand standards, staff expectations, org structure.', price:'GH₵8,500 – 20,000'}],
+  2:[{name:'Infrastructure Build', tier:'Level 2 Package', desc:'Digital presence, CRM, operations systems, dashboards, SOPs.', price:'GH₵20,000 – 60,000'},
+     {name:'Command Centre — Foundation', tier:'Enterprise Build', desc:'Digital presence plus one operational pipeline, live.', price:'GH₵45,000 + GH₵4,500/mo'}],
+  3:[{name:'Validation Sprint', tier:'Level 3 Package', desc:'Pilot deployment, staff/customer testing, bug tracking.', price:'GH₵10,000 – 30,000'}],
+  4:[{name:'Deployment & Go-Live', tier:'Level 4 Package', desc:'Live rollout, staff coaching, daily monitoring.', price:'GH₵15,000 – 50,000'},
+     {name:'Corporate Growth Partnership', tier:'Monthly Retainer', desc:'Continuous improvement, dashboard maintenance, monthly strategy.', price:'GH₵15,000 – 50,000+/mo'}],
+  5:[{name:'Performance Systems', tier:'Level 5 Package', desc:'Financial systems, KPIs, forecasting, inventory & staff analytics.', price:'GH₵20,000 – 80,000'},
+     {name:'Command Centre — Growth', tier:'Enterprise Build', desc:'Multi-module operations plus executive dashboard.', price:'GH₵95,000 + GH₵8,500/mo'}],
+  6:[{name:'Predictability Build', tier:'Level 6 Package', desc:'Executive dashboards, automation, leadership systems, investor documentation.', price:'GH₵30,000 – 120,000'},
+     {name:'Command Centre — Enterprise', tier:'Enterprise Build', desc:'Full seven-pillar deployment across all locations.', price:'GH₵175,000 + GH₵12,500/mo'}],
+  7:[{name:'Expansion & Legacy Build', tier:'Level 7 Package', desc:'Investor data room, multi-location playbook, succession, valuation.', price:'GH₵50,000 – 250,000+'},
+     {name:'Command Centre — Flagship', tier:'Enterprise Build', desc:'White-glove build, dedicated team, 24/7 priority care.', price:'GH₵250,000 + GH₵15,000/mo'}]
+};
+
+// Offer-architecture data: bonuses, guarantees, payment plan.
+const BONUSES = [
+  {t:'The "2-Week Owner Absence" Playbook', val:'GH₵25,000', d:'Complete management SOPs, emergency escalation protocols, and automated daily WhatsApp/SMS summaries so the owner can step away for 14 days without operations slipping.'},
+  {t:'Staff Certification & "Live Fire" Onboarding', val:'GH₵15,000', d:'We don\'t just build the system — we personally train your floor staff, run 100 simulated stress-test orders, and certify each employee before go-live.'},
+  {t:'Custom Hardware & QR Stand Setup', val:'GH₵8,000', d:'Physical branded acrylic QR table stands, staff tablet optimisation, and a localised offline/online network fallback so the system never goes dark.'},
+  {t:'Investor Data Room Vault', val:'GH₵20,000', d:'Automated 12-month financial ledger structuring, COGS analytics, and balance sheets ready to present to a bank, partner, or investor.'}
+];
+const BONUS_LEVELS = [6,7]; // shown on Predictability and Expansion — the Enterprise Tier 2/3 contracts
+
+const GUARANTEES = [
+  {t:'The Leak Identification Guarantee', d:'If the Business Infrastructure Audit and Level 5 Financial Control setup don\'t uncover operational, stock or revenue leakage worth at least the audit fee, the audit fee is refunded 100%.'},
+  {t:'The 100-Order Zero-Defect Guarantee', d:'Your final milestone payment is held back and only released after your team completes 7 consecutive days of error-free live operation on the new system — not on our word that it\'s "done."'}
+];
+
+const PAYMENT_PLAN = [
+  {pct:'40%', label:'Mobilization Deposit', d:'Kicks off system architecture, cloud/database provisioning, and the custom buildout for this level.'},
+  {pct:'40%', label:'Validation Milestone', d:'Released only after staff training and live stress-testing are complete — not on delivery of code alone.'},
+  {pct:'20%', label:'Live Handover', d:'Paid strictly after 7 consecutive days of verified, error-free live operation.'}
+];
+
+let currentLevelN=0;
+
+function buildStageNav(){
+  const nav=document.getElementById('stageNav');
+  let html=`<button onclick="goHome()" id="navHome">HOME</button>`;
+  LEVEL_CONTENT.forEach(s=>{
+    html+=`<button onclick="openStage(${s.n})" id="navStage${s.n}">L${s.label} · ${s.name.toUpperCase()}</button>`;
+  });
+  nav.innerHTML=html;
+}
+function setActiveNav(id){
+  document.querySelectorAll('.stagenav button').forEach(b=>b.classList.remove('active'));
+  const el=document.getElementById(id); if(el) el.classList.add('active');
+}
+function goHome(){
+  ['stage','intake','diagnostic','results','selection','staffgate','staffhome','staffintake','staffdiag','deepaudit','staffresults']
+    .forEach(s=>{const el=document.getElementById('screen-'+s); if(el) el.classList.add('hidden');});
+  document.getElementById('screen-home').classList.remove('hidden');
+  setActiveNav('navHome');
+  window.scrollTo({top:0,behavior:'smooth'});
+  renderHomeLadder();
+  renderSelBar();
+}
+function scrollToLadder(){ document.getElementById('ladderAnchor').scrollIntoView({behavior:'smooth'}); }
+
+function renderHomeLadder(){
+  document.getElementById('homeLadderGrid').innerHTML = LEVEL_CONTENT.map(s=>`
+    <div class="ladder-card ${s.n===0?'free':''}" onclick="openStage(${s.n})">
+      <div class="sn">LEVEL ${s.label}</div>
+      <h3>${s.name}</h3>
+      <p>${s.tagline}</p>
+      <div class="price">${s.price}</div>
+      <div class="arrow">Read the full level →</div>
+      ${s.n>0?`<label class="ladder-select" onclick="event.stopPropagation()">
+        <input type="checkbox" id="ladderChk-${s.n}" onchange="toggleLevelSelection(${s.n}, this.checked)" ${selection.levels.includes(s.n)?'checked':''}>
+        Add Level ${s.label} to My Selection
+      </label>`:''}
+    </div>`).join('');
+}
+
+function openStage(n){
+  currentLevelN=n;
+  const s=LEVEL_CONTENT.find(x=>x.n===n);
+  ['home','intake','diagnostic','results','selection','staffgate','staffhome','staffintake','staffdiag','deepaudit','staffresults']
+    .forEach(sc=>{const el=document.getElementById('screen-'+sc); if(el) el.classList.add('hidden');});
+  document.getElementById('screen-stage').classList.remove('hidden');
+  setActiveNav('navStage'+n);
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  document.getElementById('stageHeroWrap').innerHTML=`
+    <div class="stage-hero">
+      <div class="sn">BUSINESS MATURITY LEVEL ${s.label} OF 7</div>
+      <h1>${s.name}</h1>
+      <div class="tagline">"${s.tagline}"</div>
+      <div class="pricebox"><div class="lbl">Corporate Investment</div><div class="val">${s.price}</div></div>
+      ${s.priceNote?`<div style="margin-top:8px;font-size:12px;color:#dff2ef;">${s.priceNote}</div>`:''}
+      ${n>0?`<label class="select-toggle">
+        <input type="checkbox" id="heroChk-${n}" onchange="toggleLevelSelection(${n}, this.checked)" ${selection.levels.includes(n)?'checked':''}>
+        <span>Add Level ${s.label} to My Selection</span>
+      </label>`:''}
+    </div>`;
+
+  document.getElementById('stageTwoCol').innerHTML=`
+    <div class="info-panel"><h4>Purpose</h4><p>${s.purpose}</p></div>
+    <div class="info-panel reality"><h4>What's usually missing here</h4><p>${s.reality}</p></div>
+    <div class="info-panel outcome" style="grid-column:1/-1"><h4>Outcome once this level is solid</h4><p>${s.outcome}</p></div>`;
+
+  document.getElementById('stageDelivGrid').innerHTML = s.deliverables.map((d,i)=>`
+    <div class="deliv-card" onclick="toggleDetail(${n},${i})">
+      <div class="dic"><span>${d.ic}</span><span class="toggle" id="tgl-${n}-${i}">+ why / how / who</span></div>
+      <h5>${d.t}</h5><p>${d.d}</p>
+      <div class="detail hidden" id="det-${n}-${i}">
+        ${d.why?`<div class="detail-row"><b>Why it matters</b>${d.why}</div>`:''}
+        ${d.how?`<div class="detail-row"><b>How it's delivered</b>${d.how}</div>`:''}
+        ${d.who?`<div class="detail-row"><b>Who it's for</b>${d.who}</div>`:''}
+        ${d.when?`<div class="detail-row"><b>When it happens</b>${d.when}</div>`:''}
+        ${d.tip?`<div class="detail-row tip"><b>💡 Tip</b>${d.tip}</div>`:''}
+      </div>
+    </div>`).join('');
+
+  const pkgs = CORP_PACKAGES[n] || [];
+  document.getElementById('stagePkgGrid').innerHTML = pkgs.map((p,pi)=>{
+    const key=n+'::'+p.name;
+    const isSel=selection.custom.includes(key);
+    return `<div class="pkg-card">
+      <div class="pn">${p.name}</div><div class="pt">${p.tier}</div>
+      <div class="pd">${p.desc}</div>
+      <div class="pp">${p.price}</div>
+      <button class="btn ${isSel?'btn-primary':'btn-ghost'} btn-full" style="margin-top:10px;font-size:12px;padding:9px 14px;" onclick="toggleCustomItem('${key.replace(/'/g,"\\'")}', '${p.name.replace(/'/g,"\\'")}', '${p.price.replace(/'/g,"\\'")}', ${n})">${isSel?'✓ Added':'+ Add this package'}</button>
+    </div>`;
+  }).join('');
+
+  document.getElementById('stagePrevBtn').disabled = n===0;
+  document.getElementById('stageNextBtn').textContent = n===7 ? 'Back to overview →' : 'Next level →';
+
+  // Bonus stack — only on the Enterprise Tier 2/3 levels
+  const bonusWrap=document.getElementById('stageBonusWrap');
+  if(BONUS_LEVELS.includes(n)){
+    const totalVal=BONUSES.reduce((sum,b)=>sum+parseInt(b.val.replace(/[^\d]/g,'')),0);
+    bonusWrap.innerHTML=`
+      <div class="section-label" style="margin-top:34px">INCLUDED FREE — THE ENTERPRISE BONUS STACK</div>
+      <p class="lead" style="font-size:13px;margin-bottom:0;">We don't discount enterprise builds. We stack value instead. Every Level ${s.label} Command Centre-grade contract includes all four of these at no extra cost:</p>
+      <div class="bonus-grid">
+        ${BONUSES.map((b,i)=>`<div class="bonus-card"><div class="bnum">BONUS #${i+1}</div><h5>${b.t}</h5><p>${b.d}</p><div class="bval">Valued at ${b.val}</div></div>`).join('')}
+      </div>
+      <div class="bonus-total">Total bonus value included free<span class="amt">GH₵${totalVal.toLocaleString()}</span></div>`;
+  } else {
+    bonusWrap.innerHTML='';
+  }
+
+  document.getElementById('stageGuaranteeGrid').innerHTML = GUARANTEES.map(g=>
+    `<div class="guarantee-card"><h5>🛡️ ${g.t}</h5><p>${g.d}</p></div>`).join('');
+
+  document.getElementById('stagePaymentRow').innerHTML = PAYMENT_PLAN.map(p=>
+    `<div class="payment-step"><div class="pct">${p.pct}</div><div class="plabel">${p.label}</div><p>${p.d}</p></div>`).join('');
+
+  renderSelBar();
+}
+function jumpStage(dir){
+  if(currentLevelN===7 && dir===1){ goHome(); return; }
+  const next=currentLevelN+dir;
+  if(next>=0 && next<=7) openStage(next);
+}
+function toggleDetail(n,i){
+  const det=document.getElementById(`det-${n}-${i}`);
+  const tgl=document.getElementById(`tgl-${n}-${i}`);
+  if(!det) return;
+  det.classList.toggle('hidden');
+  tgl.textContent = det.classList.contains('hidden') ? '+ why / how / who' : '− close';
+}
+
+// ============================================================
+// MY SELECTION — multi-level, custom package, checkout
+// ============================================================
+let selection = { levels: [], custom: [] }; // levels: [1,2,...]; custom: ['n::PackageName', ...]
+
+function toggleLevelSelection(n, checked){
+  const idx=selection.levels.indexOf(n);
+  if(checked && idx===-1){ selection.levels.push(n); showToast('Level '+n+' added to My Selection'); }
+  else if(!checked && idx!==-1){ selection.levels.splice(idx,1); showToast('Level '+n+' removed'); }
+  // keep checkboxes in sync wherever they appear
+  const a=document.getElementById('ladderChk-'+n); if(a) a.checked=checked;
+  const b=document.getElementById('heroChk-'+n); if(b) b.checked=checked;
+  renderSelBar();
+}
+function toggleCustomItem(key, name, price, levelN){
+  const idx=selection.custom.indexOf(key);
+  if(idx===-1){ selection.custom.push(key); showToast(name+' added to My Selection'); }
+  else{ selection.custom.splice(idx,1); showToast(name+' removed'); }
+  if(currentLevelN===levelN) openStage(levelN); // re-render package buttons state
+  renderSelBar();
+}
+function selectionCount(){ return selection.levels.length + selection.custom.length; }
+function renderSelBar(){
+  const count=selectionCount();
+  document.getElementById('selCountTop').textContent='('+count+')';
+  const bar=document.getElementById('selBar');
+  const barCount=document.getElementById('selBarCount');
+  if(!bar) return;
+  barCount.textContent=count;
+  bar.classList.toggle('hidden', count===0);
+}
+function toggleCustomBuilder(){
+  const list=document.getElementById('customBuilderList');
+  const btn=document.getElementById('customToggleBtn');
+  list.classList.toggle('hidden');
+  if(!list.classList.contains('hidden')) renderCustomBuilder();
+  btn.textContent = list.classList.contains('hidden') ? '+ Show every deliverable, by level' : '− Hide deliverable list';
+}
+function renderCustomBuilder(){
+  document.getElementById('customBuilderList').innerHTML = LEVEL_CONTENT.filter(s=>s.n>0).map(s=>`
+    <div class="custom-group">
+      <div class="glabel">LEVEL ${s.label} — ${s.name} (${s.price})</div>
+      ${s.deliverables.map((d,i)=>{
+        const key=s.n+'::deliv::'+i;
+        const checked=selection.custom.includes(key);
+        return `<label class="custom-item">
+          <input type="checkbox" ${checked?'checked':''} onchange="toggleCustomItem('${key}', '${d.t.replace(/'/g,"\\'")}', '', ${s.n})">
+          <span><b>${d.t}</b> — ${d.d}</span>
+        </label>`;
+      }).join('')}
+    </div>`).join('');
+}
+function renderSelectionScreen(){
+  document.getElementById('selLevelsList').innerHTML = selection.levels.length
+    ? selection.levels.sort((a,b)=>a-b).map(n=>{
+        const s=LEVEL_CONTENT.find(x=>x.n===n);
+        return `<div class="sel-item"><span><b>Level ${s.label} — ${s.name}</b><br><span style="color:var(--ink-dim);font-size:11px">${s.price}</span></span>
+          <button class="rm" onclick="toggleLevelSelection(${n}, false); renderSelectionScreen();">Remove</button></div>`;
+      }).join('')
+    : '<div style="font-size:12px;color:var(--ink-dim)">No full levels selected yet — tick a level from any page, or build a custom package below.</div>';
+
+  const customLines = selection.custom.map(key=>{
+    const parts=key.split('::');
+    const n=parseInt(parts[0]);
+    const s=LEVEL_CONTENT.find(x=>x.n===n);
+    let label;
+    if(parts[1]==='deliv'){ const d=s.deliverables[parseInt(parts[2])]; label=d.t+' (Level '+n+')'; }
+    else{ label=parts[1]+' (Level '+n+')'; }
+    return `<div class="sel-item"><span>${label}</span><button class="rm" onclick="toggleCustomItem('${key}','','',${n}); renderSelectionScreen();">Remove</button></div>`;
+  }).join('');
+  if(customLines) document.getElementById('selLevelsList').innerHTML += customLines;
+
+  const count=selectionCount();
+  document.getElementById('selTotalBox').textContent = count===0
+    ? 'Nothing selected yet.'
+    : count+' item(s) selected — this is a custom, multi-level engagement. BYINFORGH will send one combined quote covering everything on this list, scoped after a short confirmation call.';
+  renderSelBar();
+}
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2200);
+}
+function buildSelectionSummary(){
+  let lines=[];
+  selection.levels.sort((a,b)=>a-b).forEach(n=>{ const s=LEVEL_CONTENT.find(x=>x.n===n); lines.push('Level '+s.label+' — '+s.name+' ('+s.price+')'); });
+  selection.custom.forEach(key=>{
+    const parts=key.split('::'); const n=parseInt(parts[0]); const s=LEVEL_CONTENT.find(x=>x.n===n);
+    if(parts[1]==='deliv'){ lines.push(s.deliverables[parseInt(parts[2])].t+' (Level '+n+' item)'); }
+    else{ lines.push(parts[1]+' (Level '+n+' package)'); }
+  });
+  return lines;
+}
+// Rough estimate only — extracts GH₵ figures from the price/package
+// strings so the backend Orders sheet has a starting number to work from.
+// The UI is explicit throughout that this is not a final quote.
+function extractGHSNumbers(str){
+  const nums=[]; const re=/GH₵\s?([\d,]+)/g; let m;
+  while(m=re.exec(str||'')) nums.push(parseInt(m[1].replace(/,/g,''),10));
+  return nums;
+}
+function estimateSelectionTotals(){
+  let oneTime=0, monthly=0;
+  selection.levels.forEach(n=>{
+    const s=LEVEL_CONTENT.find(x=>x.n===n);
+    const nums=extractGHSNumbers(s.price);
+    if(nums.length) oneTime+=nums[0];
+  });
+  selection.custom.forEach(key=>{
+    const parts=key.split('::'); const n=parseInt(parts[0]);
+    if(parts[1]==='deliv') return; // individual deliverables have no standalone price
+    const pkgName=parts.slice(1).join('::');
+    const pkg=(CORP_PACKAGES[n]||[]).find(p=>p.name===pkgName);
+    if(!pkg) return;
+    const nums=extractGHSNumbers(pkg.price);
+    if(!nums.length) return;
+    if(/\/mo/i.test(pkg.price)){
+      monthly+=nums[nums.length-1];
+      oneTime+=nums.slice(0,-1).reduce((a,b)=>a+b,0);
+    } else {
+      oneTime+=nums[0];
+    }
+  });
+  return {oneTime,monthly};
+}
+function submitOrderToBackend(){
+  const lines=buildSelectionSummary();
+  const totals=estimateSelectionTotals();
+  return backendCall({
+    action:'submitOrder',
+    business:document.getElementById('sel_business').value.trim(),
+    contactName:document.getElementById('sel_contact').value.trim(),
+    number:document.getElementById('sel_number').value.trim(),
+    region:'',
+    selectedPackages:lines.join(', '),
+    totalOneTime:totals.oneTime,
+    totalMonthly:totals.monthly,
+    paymentMethod:'To be confirmed at consultation',
+    notes:document.getElementById('sel_notes').value.trim()
+  });
+}
+function emailSelection(){
+  const business=document.getElementById('sel_business').value.trim();
+  const contact=document.getElementById('sel_contact').value.trim();
+  const number=document.getElementById('sel_number').value.trim();
+  const notes=document.getElementById('sel_notes').value.trim();
+  if(selectionCount()===0){ document.getElementById('selErr').textContent='Add at least one level or custom item first.'; return; }
+  const lines=buildSelectionSummary();
+  submitOrderToBackend();
+  const subject='Business Solutions Selection — '+(business||'New enquiry');
+  const body='Business: '+business+'\nContact: '+contact+'\nWhatsApp: '+number+'\n\nSelection:\n- '+lines.join('\n- ')+(notes?'\n\nNotes: '+notes:'');
+  window.location.href='mailto:solutions@byinforgh.com?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+function checkoutSelection(){
+  const err=document.getElementById('selErr');
+  const business=document.getElementById('sel_business').value.trim();
+  const contact=document.getElementById('sel_contact').value.trim();
+  const number=document.getElementById('sel_number').value.trim();
+  const notes=document.getElementById('sel_notes').value.trim();
+  if(selectionCount()===0){ err.textContent='Add at least one level or custom item first.'; return; }
+  if(!business||!contact||!number){ err.textContent='Business name, your name and WhatsApp number are required.'; return; }
+  err.textContent='';
+  const lines=buildSelectionSummary();
+  submitOrderToBackend();
+  const msg='Hi BYINFORGH, I would like to check out this selection for '+business+' (contact: '+contact+', '+number+'):\n- '+lines.join('\n- ')+
+    (notes?'\nNotes: '+notes:'')+'\nPlease send a combined quote and next steps.';
+  window.open('https://wa.me/233509960980?text='+encodeURIComponent(msg),'_blank');
+  showToast('Selection sent — BYINFORGH will follow up on WhatsApp');
+}
+
+// ============================================================
+// BYINFORGH STAFF CONSOLE — Full-Day Audit & Consulting Session
+// Runs entirely client-side, reuses the same LEVEL_CONTENT /
+// CORP_PACKAGES / backendCall() as the public audit above.
+// ============================================================
+
+// ---- Light PIN gate. NOT real security — see the note above the
+// staffgate screen markup. Change this PIN whenever you like.
+const STAFF_PIN = '2580';
+
+function goStaffScreen(id){
+  const ids=['home','stage','intake','diagnostic','results','selection',
+             'staffgate','staffhome','staffintake','staffdiag','deepaudit','staffresults'];
+  ids.forEach(s=>{const el=document.getElementById('screen-'+s); if(el) el.classList.add('hidden');});
+  document.getElementById('screen-'+id).classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function checkStaffPin(){
+  const val=document.getElementById('staffPinInput').value.trim();
+  if(val===STAFF_PIN){
+    document.getElementById('staffPinErr').textContent='';
+    document.getElementById('staffPinInput').value='';
+    document.getElementById('staffBadge').classList.remove('hidden');
+    sessionStorage.setItem('byinforgh_staff','1');
+    goStaffScreen('staffhome');
+  } else {
+    document.getElementById('staffPinErr').textContent='Incorrect PIN.';
+  }
+}
+function lockStaffConsole(){
+  sessionStorage.removeItem('byinforgh_staff');
+  document.getElementById('staffBadge').classList.add('hidden');
+  goHome();
+}
+// Stay unlocked for the rest of this browser tab/session only
+if(sessionStorage.getItem('byinforgh_staff')==='1'){
+  document.addEventListener('DOMContentLoaded',()=>{ const b=document.getElementById('staffBadge'); if(b) b.classList.remove('hidden'); });
+}
+
+// Pull 2 highest-signal questions per level from QUESTIONS for the
+// shorter Consulting Session flow.
+const CONSULT_QUESTIONS = (function(){
+  const out=[];
+  for(let n=1;n<=7;n++){
+    const qs=QUESTIONS.filter(q=>q.level===n);
+    out.push(qs[0]);
+    if(qs[1]) out.push(qs[1]);
+  }
+  return out;
+})();
+
+// Deep Full-Day Audit — 7 operational departments, mapped to the
+// same 1–7 maturity levels used everywhere else so results plug
+// straight into the existing LEVEL_CONTENT / CORP_PACKAGES engine.
+const DEEP_AUDIT_SECTIONS = [
+  {level:1, name:'Digital Presence', icon:'🌐', items:[
+    {t:'Website — live, mobile-friendly, correct info', prompt:'Open it on your phone right now. Does it load properly? Is the info current?'},
+    {t:'Google Business listing — claimed, accurate hours/location', prompt:'Search the business on Google Maps. Check hours, photos, reviews.'},
+    {t:'Social media — active, consistent branding', prompt:'Check the last 3 posts. Same logo/colours/voice everywhere?'},
+    {t:'Content & photography quality', prompt:'Are product/service photos clear and current, or old phone snaps?'},
+    {t:'Findability / SEO', prompt:'Search the business name plus town. Do they show up on page 1?'}
+  ]},
+  {level:2, name:'Operations', icon:'📦', items:[
+    {t:'Stock / inventory tracking', prompt:'Ask to see how they track stock. Spreadsheet, notebook, or nothing?'},
+    {t:'Payroll process', prompt:'Ask how payroll is calculated and paid each month.'},
+    {t:'Finance tracking (income/expense)', prompt:"Ask to see this week's income record. Does one exist?"},
+    {t:'Procurement / supplier process', prompt:'Ask how they reorder from suppliers — planned or reactive?'}
+  ]},
+  {level:3, name:'Customer Experience', icon:'🧾', items:[
+    {t:'Ordering / booking system (QR, digital menu, booking form)', prompt:'Walk through placing an order or booking exactly as a customer would.'},
+    {t:'Guest/customer journey mapped', prompt:'Ask two staff to describe the journey start to finish — one story or two different ones?'},
+    {t:'Membership / loyalty structure', prompt:'Is there any way repeat customers are recognised or rewarded?'},
+    {t:'Feedback loop', prompt:'Where do complaints actually go? Is anything ever done with them?'}
+  ]},
+  {level:4, name:'Facilities', icon:'🧹', items:[
+    {t:'Maintenance schedule', prompt:'Ask what breaks most often and how it gets fixed — planned or emergency?'},
+    {t:'Staff requests process', prompt:'How does staff report an issue — verbally, a book, an app?'},
+    {t:'Cleaning standards', prompt:'Walk the floor / kitchen / back-of-house. Is there a written cleaning schedule?'},
+    {t:'Asset tracking', prompt:'Ask if they know what equipment they own and its condition.'}
+  ]},
+  {level:5, name:'Management', icon:'📊', items:[
+    {t:'Executive dashboard / daily reporting', prompt:'Ask what single number they personally check every morning.'},
+    {t:'KPIs defined and tracked', prompt:'Ask for their top 3 numbers. Can they say them without checking anything?'},
+    {t:'Analytics used for decisions', prompt:'Ask for one decision made because of data in the last month.'},
+    {t:'Weekly/monthly review rhythm', prompt:'Is there a standing review — even an informal one?'}
+  ]},
+  {level:6, name:'Training', icon:'🎓', items:[
+    {t:'SOPs documented', prompt:'Ask to see a written SOP for one core task, right now.'},
+    {t:'Staff guides / onboarding material', prompt:'How does a new hire learn the job — shadowing only, or a document?'},
+    {t:'Documentation kept current', prompt:'Ask when SOPs/guides were last updated.'}
+  ]},
+  {level:7, name:'Support', icon:'🛟', items:[
+    {t:'Update/maintenance plan for existing systems', prompt:'If a system breaks, who fixes it and how fast?'},
+    {t:'Continuous improvement habit', prompt:'Ask for one thing they changed or improved in the last quarter.'},
+    {t:'External support relationships', prompt:'Do they have any ongoing consultant/vendor relationship, or is everything reactive?'}
+  ]}
+];
+
+// Industry-specific "what to look for" prompts — pulled directly from the
+// BYINFORGH field strategy notes (top target categories, proven visibility
+// gaps per trade). Shown as extra consultant-only checks once the intake
+// industry is known, on top of the core questions — this is what "learns"
+// from the business as you go: the flow adapts to what kind of business
+// it is instead of asking generic questions only.
+const INDUSTRY_FOCUS = {
+  'Salon & Beauty':{icon:'💇‍♀️', label:'Barbershop / Salon & Beauty Focus', items:[
+    'Is the work genuinely good but the online content inconsistent or absent?',
+    'Is there a consistent before/after or transformation content habit?',
+    'Would customers describe the shop as looking "premium," or just "fine"?',
+    'Is there a booking system, or is it all walk-in/WhatsApp chaos?'
+  ]},
+  'Food & Beverage / Restaurant':{icon:'🍽️', label:'Restaurant / Lounge Focus', items:[
+    'Does the online presence match the actual in-person experience?',
+    'Are there visibly slow/empty hours that better visibility could fill?',
+    'Is there any video content showing the food, space, or atmosphere?',
+    'Is the Google Business listing accurate (hours, menu, photos)?'
+  ]},
+  'Hospitality / Guest House / Hotel':{icon:'🏨', label:'Hospitality Focus', items:[
+    'Is there a working booking system, or is everything manual/WhatsApp?',
+    'Does the online presence (photos, listings) match the real property standard?',
+    'Is there a guest journey — arrival to checkout — that is consistent across staff?',
+    'Are reviews being actively managed and responded to?'
+  ]},
+  'Automotive':{icon:'🚗', label:'Auto Care / Detailing Focus', items:[
+    'Is the actual work high quality but not documented (no before/after videos)?',
+    'Is there a booking structure, or is it first-come chaos?',
+    'Is there a loyalty/repeat customer system for a high-margin service?'
+  ]},
+  'Real Estate':{icon:'🏠', label:'Real Estate Focus', items:[
+    'Is content limited to plain listing photos with no storytelling or personal brand?',
+    'Is there a clear trust-building presence (video walkthroughs, testimonials)?',
+    'Given deal sizes, is the visibility investment proportionate to the upside?'
+  ]},
+  'Health & Wellness Clinic':{icon:'🏥', label:'Clinic / Aesthetics Focus', items:[
+    'Is the branding outdated relative to the trust this industry requires?',
+    'Is there a visible human face to the practice, or does it feel anonymous?',
+    'Is there any educational content building authority and trust?'
+  ]},
+  'Education / Training':{icon:'🏫', label:'School / Training Institute Focus', items:[
+    'Is there a digital structure parents can actually trust before enrolling?',
+    'Is enrolment/registration digitised, or fully manual/paper-based?',
+    'Is there any storytelling (results, testimonials) beyond bare facts?'
+  ]},
+  'Events':{icon:'🎉', label:'Events / Decor Focus', items:[
+    'Is the portfolio presented with process/storytelling, or just finished photos?',
+    'Is there a booking/deposit system, or is everything negotiated ad hoc?'
+  ]},
+  'Retail & Fashion':{icon:'👗', label:'Boutique / Retail Focus', items:[
+    'Is the product quality strong but the marketing/content weak?',
+    'Is there a consistent brand identity across the shop and online presence?',
+    'Is stock tracked in any real system, or only in the owner\'s head?'
+  ]}
+};
+function getIndustryFocus(industry){ return INDUSTRY_FOCUS[industry] || null; }
+
+let pendingStaffMode='', pendingStaffDepth='';
+const SESSION_FEES = {consultant_consulting_session:600, consultant_quick_audit:1800, consultant_deep_audit:3200};
+let implementationChoice='done_for_you'; // default; consultant can switch to 'diy'
+function setImplementationChoice(val){
+  implementationChoice=val;
+  const diyBtn=document.getElementById('implDiyBtn'), doneBtn=document.getElementById('implDoneBtn');
+  diyBtn.classList.toggle('btn-primary', val==='diy'); diyBtn.classList.toggle('btn-ghost', val!=='diy');
+  doneBtn.classList.toggle('btn-primary', val==='done_for_you'); doneBtn.classList.toggle('btn-ghost', val!=='done_for_you');
+  renderStaffResults();
+}
+
+let staffIntake={}, staffQIndex=0, staffAnswers=[], staffNotes=[], staffQuestionSet=[], staffResult=null, staffSessionType='';
+let deepSectionIdx=0, deepAnswers={}, deepNotesState={}, sessionDeepSections=DEEP_AUDIT_SECTIONS.slice();
+
+function startStaffSession(){
+  const consultant=document.getElementById('st_consultant').value.trim();
+  const business=document.getElementById('st_business').value.trim();
+  const contact=document.getElementById('st_contact').value.trim();
+  const number=document.getElementById('st_number').value.trim();
+  const region=document.getElementById('st_region').value;
+  const industry=document.getElementById('st_industry').value;
+  const years=document.getElementById('st_years').value;
+  const staff=document.getElementById('st_staff').value;
+  const revenue=document.getElementById('st_revenue').value;
+  const headache=document.getElementById('st_headache').value.trim();
+  const err=document.getElementById('staffIntakeErr');
+  if(!consultant||!business||!contact||!number||!region||!industry||!years||!staff){
+    err.textContent='Please fill in every field marked *.'; return;
+  }
+  err.textContent='';
+  const email=document.getElementById('st_email').value.trim();
+  staffIntake={consultant,business,contact,number,email,region,industry,years,staff,revenue,headache};
+
+  if(pendingStaffMode==='audit' && pendingStaffDepth==='deep'){
+    staffSessionType='consultant_deep_audit';
+    deepSectionIdx=0; deepAnswers={}; deepNotesState={};
+    const focus=getIndustryFocus(industry);
+    sessionDeepSections = focus
+      ? DEEP_AUDIT_SECTIONS.concat([{level:'industry', name:focus.label, icon:focus.icon, items:focus.items.map(t=>({t, prompt:'Assess based on what you have seen and heard today.'}))}])
+      : DEEP_AUDIT_SECTIONS.slice();
+    goStaffScreen('deepaudit'); renderDeepSection();
+  } else {
+    staffSessionType = pendingStaffMode==='consulting' ? 'consultant_consulting_session' : 'consultant_quick_audit';
+    const core = pendingStaffMode==='consulting' ? CONSULT_QUESTIONS : QUESTIONS;
+    const focus=getIndustryFocus(industry);
+    const industryQs = focus ? focus.items.map(t=>({level:'industry', text:t, industryLabel:focus.label})) : [];
+    staffQuestionSet = core.concat(industryQs);
+    staffQIndex=0;
+    staffAnswers=new Array(staffQuestionSet.length).fill(null);
+    staffNotes=new Array(staffQuestionSet.length).fill('');
+    goStaffScreen('staffdiag'); renderStaffQuestion();
+  }
+}
+
+function renderStaffQuestion(){
+  const q=staffQuestionSet[staffQIndex];
+  const isIndustry = q.level==='industry';
+  const lvl = isIndustry ? null : LEVEL_CONTENT.find(s=>s.n===q.level);
+  document.getElementById('staffDiagMeta').innerHTML=
+    `<b>${staffIntake.business}</b> · ${staffSessionType==='consultant_consulting_session'?'Consulting Session':'Half-Day Audit — Quick'} · consultant: ${staffIntake.consultant} · question ${staffQIndex+1} of ${staffQuestionSet.length}`;
+  document.getElementById('staffQStageTag').textContent = isIndustry
+    ? '🎯 '+(q.industryLabel||'INDUSTRY FOCUS').toUpperCase()
+    : 'LEVEL '+q.level+' — '+lvl.name.toUpperCase();
+  document.getElementById('staffQText').textContent=q.text;
+  document.getElementById('staffDiagProgressFill').style.width=Math.round((staffQIndex/staffQuestionSet.length)*100)+'%';
+  document.querySelectorAll('#screen-staffdiag .ans-btn').forEach(b=>b.classList.remove('sel'));
+  if(staffAnswers[staffQIndex]!==null){
+    const val=staffAnswers[staffQIndex]; const cls=val===2?'yes':val===1?'partial':'no';
+    document.querySelector('#screen-staffdiag .ans-btn.'+cls).classList.add('sel');
+  }
+  document.getElementById('staffQNotes').value=staffNotes[staffQIndex]||'';
+}
+function saveStaffNote(val){ staffNotes[staffQIndex]=val; }
+function staffAnswer(points){
+  staffAnswers[staffQIndex]=points;
+  if(staffQIndex<staffQuestionSet.length-1){ staffQIndex++; renderStaffQuestion(); }
+  else{ computeStaffResults(); goStaffScreen('staffresults'); renderStaffResults(); }
+}
+function staffPrevQuestion(){ if(staffQIndex>0){ staffQIndex--; renderStaffQuestion(); } else goStaffScreen('staffintake'); }
+
+function computeStaffResults(){
+  const levelScores={};
+  for(let n=1;n<=7;n++){
+    const qs=staffQuestionSet.map((q,i)=>({q,i})).filter(x=>x.q.level===n);
+    if(!qs.length){ levelScores[n]=null; continue; }
+    const earned=qs.reduce((sum,x)=>sum+(staffAnswers[x.i]||0),0);
+    levelScores[n]=Math.round((earned/(qs.length*2))*100);
+  }
+  const scored=Object.keys(levelScores).filter(n=>levelScores[n]!==null).map(Number).sort((a,b)=>a-b);
+  let overallLevel=scored.length?scored[scored.length-1]:1;
+  for(const n of scored){ if(levelScores[n]<60){ overallLevel=n; break; } }
+  const validScores=scored.map(n=>levelScores[n]);
+  const overallScore=validScores.length?Math.round(validScores.reduce((a,b)=>a+b,0)/validScores.length):0;
+  const gapCandidates=staffQuestionSet.map((q,i)=>({q,i,val:staffAnswers[i],note:staffNotes[i]})).filter(x=>x.q.level!=='industry' && x.val<2);
+  gapCandidates.sort((a,b)=>a.val-b.val || a.q.level-b.q.level);
+  const topGaps=gapCandidates.slice(0,5).map(x=>({text:x.q.text, note:x.note}));
+  // Industry-specific findings, kept separate from the 1–7 ladder score but
+  // surfaced in the report as targeted, business-type-specific insight.
+  const industryGaps=staffQuestionSet.map((q,i)=>({q,i,val:staffAnswers[i],note:staffNotes[i]}))
+    .filter(x=>x.q.level==='industry' && x.val<2)
+    .map(x=>({text:x.q.text, note:x.note}));
+  staffResult={levelScores,overallLevel,overallScore,topGaps,industryGaps,intake:staffIntake};
+}
+
+// ---- Deep Audit section flow ----
+function renderDeepSection(){
+  const sec=sessionDeepSections[deepSectionIdx];
+  document.getElementById('deepAuditMeta').innerHTML=
+    `<b>${staffIntake.business}</b> · Full-Day Audit — Deep · consultant: ${staffIntake.consultant} · section ${deepSectionIdx+1} of ${sessionDeepSections.length}`;
+  document.getElementById('deepStepper').innerHTML=sessionDeepSections.map((s,i)=>
+    `<div class="sstep ${i<deepSectionIdx?'done':''} ${i===deepSectionIdx?'current':''}"></div>`).join('');
+  document.getElementById('deepSectionTag').textContent = sec.level==='industry'
+    ? '🎯 INDUSTRY-SPECIFIC FOCUS'
+    : 'MAPS TO LEVEL '+sec.level+' — '+(LEVEL_CONTENT.find(x=>x.n===sec.level)||{}).name;
+  document.getElementById('deepSectionName').textContent=sec.icon+' '+sec.name;
+  document.getElementById('deepItemsList').innerHTML=sec.items.map((it,i)=>{
+    const key=deepSectionIdx+'-'+i;
+    const val=deepAnswers[key];
+    const note=deepNotesState[key]||'';
+    return `<div class="deep-item">
+      <div class="dq">${it.t}</div>
+      <div class="dprompt">${it.prompt}</div>
+      <div class="status-row">
+        <button class="${val===2?'sel-good':''}" onclick="setDeepAnswer(${deepSectionIdx},${i},2)">✓ Good</button>
+        <button class="${val===1?'sel-partial':''}" onclick="setDeepAnswer(${deepSectionIdx},${i},1)">◐ Partial</button>
+        <button class="${val===0?'sel-missing':''}" onclick="setDeepAnswer(${deepSectionIdx},${i},0)">✕ Missing</button>
+      </div>
+      <textarea rows="2" placeholder="What you observed..." onblur="setDeepNote(${deepSectionIdx},${i},this.value)">${note}</textarea>
+    </div>`;
+  }).join('');
+  document.getElementById('deepNextBtn').textContent = deepSectionIdx===sessionDeepSections.length-1 ? 'Finish audit →' : 'Next section →';
+}
+function setDeepAnswer(secIdx,itemIdx,val){ deepAnswers[secIdx+'-'+itemIdx]=val; renderDeepSection(); }
+function setDeepNote(secIdx,itemIdx,val){ deepNotesState[secIdx+'-'+itemIdx]=val; }
+function deepNextSection(){
+  if(deepSectionIdx<sessionDeepSections.length-1){ deepSectionIdx++; renderDeepSection(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else{ computeDeepResults(); goStaffScreen('staffresults'); renderStaffResults(); }
+}
+function deepPrevSection(){
+  if(deepSectionIdx>0){ deepSectionIdx--; renderDeepSection(); window.scrollTo({top:0,behavior:'smooth'}); }
+  else goStaffScreen('staffintake');
+}
+function computeDeepResults(){
+  const levelScores={};
+  const gapCandidates=[];
+  const industryGaps=[];
+  sessionDeepSections.forEach((sec,si)=>{
+    let earned=0;
+    sec.items.forEach((it,ii)=>{
+      const val=deepAnswers[si+'-'+ii]; const points=(val===undefined||val===null)?0:val;
+      earned+=points;
+      if(points<2){
+        const entry={text:sec.icon+' '+sec.name+' — '+it.t, note:deepNotesState[si+'-'+ii]||''};
+        if(sec.level==='industry') industryGaps.push(entry);
+        else gapCandidates.push({...entry, level:sec.level, val:points});
+      }
+    });
+    if(sec.level!=='industry') levelScores[sec.level]=Math.round((earned/(sec.items.length*2))*100);
+  });
+  const levels=sessionDeepSections.map(s=>s.level).filter(n=>n!=='industry').sort((a,b)=>a-b);
+  let overallLevel=levels[levels.length-1];
+  for(const n of levels){ if(levelScores[n]<60){ overallLevel=n; break; } }
+  const overallScore=Math.round(levels.reduce((sum,n)=>sum+levelScores[n],0)/levels.length);
+  gapCandidates.sort((a,b)=>a.val-b.val || a.level-b.level);
+  const topGaps=gapCandidates.slice(0,6).map(x=>({text:x.text, note:x.note}));
+  staffResult={levelScores,overallLevel,overallScore,topGaps,industryGaps,intake:staffIntake};
+}
+
+// ---- Shared results / report rendering ----
+function renderStaffResults(){
+  const lvl=LEVEL_CONTENT.find(s=>s.n===staffResult.overallLevel);
+  const modeLabel = staffSessionType==='consultant_deep_audit' ? 'Full-Day Audit (Deep)'
+    : staffSessionType==='consultant_consulting_session' ? 'Consulting Session' : 'Half-Day Audit (Quick)';
+  document.getElementById('staffResHeadline').textContent=
+    (staffIntake.business||'This business')+' — '+modeLabel+' (GH₵'+SESSION_FEES[staffSessionType].toLocaleString()+') — Level '+lvl.label+' ('+lvl.name+')';
+
+  document.getElementById('staffResLadder').innerHTML=Object.keys(staffResult.levelScores)
+    .filter(n=>staffResult.levelScores[n]!==null).map(Number).sort((a,b)=>a-b).map(n=>{
+    const s=LEVEL_CONTENT.find(x=>x.n===n);
+    const score=staffResult.levelScores[n];
+    const color=score>=80?'var(--green)':score>=50?'var(--orange)':'var(--red)';
+    const isCurrent=n===staffResult.overallLevel;
+    return `<div class="rung ${isCurrent?'current':''}">
+      <div class="num">${n}</div><div class="name">${s.name}</div>
+      <div class="barwrap"><div class="barfill" style="width:${score}%;background:${color}"></div></div>
+      <div class="pct" style="color:${color}">${score}%</div></div>`;
+  }).join('');
+
+  document.getElementById('staffResGaps').innerHTML=staffResult.topGaps.length
+    ? staffResult.topGaps.map(g=>`<div class="gap-item"><b>${g.text}</b>${g.note?'<br><span style="color:var(--ink-dim)">Note: '+g.note+'</span>':''}</div>`).join('')
+    : '<div class="gap-item" style="border-color:var(--green)">No major gaps found — strong across the board.</div>';
+
+  const industryBlock=document.getElementById('staffResIndustry');
+  if(staffResult.industryGaps && staffResult.industryGaps.length){
+    industryBlock.classList.remove('hidden');
+    const focus=getIndustryFocus(staffIntake.industry);
+    industryBlock.querySelector('.ind-title').textContent=(focus?focus.icon+' '+focus.label:'Industry-Specific Findings');
+    industryBlock.querySelector('.ind-list').innerHTML=staffResult.industryGaps.map(g=>
+      `<div class="gap-item" style="border-color:var(--blue,#4DA3B8)"><b>${g.text}</b>${g.note?'<br><span style="color:var(--ink-dim)">Note: '+g.note+'</span>':''}</div>`).join('');
+  } else { industryBlock.classList.add('hidden'); }
+
+  const pkgs=CORP_PACKAGES[staffResult.overallLevel]||[];
+  const pkgLine=pkgs.length ? pkgs[0].name+' ('+pkgs[0].price+')' : 'a scoped consultation';
+  const diyBtn=document.getElementById('implDiyBtn'), doneBtn=document.getElementById('implDoneBtn');
+  diyBtn.classList.toggle('btn-primary', implementationChoice==='diy'); diyBtn.classList.toggle('btn-ghost', implementationChoice!=='diy');
+  doneBtn.classList.toggle('btn-primary', implementationChoice==='done_for_you'); doneBtn.classList.toggle('btn-ghost', implementationChoice!=='done_for_you');
+  const nextStepLine = implementationChoice==='diy'
+    ? `You now have the full findings to act on yourselves. If you'd like a second pass or get stuck implementing, BYINFORGH can step in for the specific pieces you need.`
+    : `I'd recommend starting with ${pkgLine} — BYINFORGH scopes, builds and trains your team on it. This isn't a final quote — I'll follow up with a full written proposal after today.`;
+  document.getElementById('staffScriptBox').innerHTML=
+    `<b>SAY THIS TO ${(staffIntake.business||'THE OWNER').toUpperCase()}:</b>\n\n`+
+    `"Based on what I've seen today, ${staffIntake.business||'your business'} is currently operating at Level ${lvl.label} — ${lvl.name}. `+
+    `${lvl.tagline}\n\n`+
+    `The clearest gaps right now are:\n`+
+    staffResult.topGaps.slice(0,3).map((g,i)=>`  ${i+1}. ${g.text}`).join('\n')+`\n\n`+
+    nextStepLine+`"`;
+
+  window.__staffPkgLine = pkgLine;
+}
+
+function buildStaffReportText(){
+  const lvl=LEVEL_CONTENT.find(s=>s.n===staffResult.overallLevel);
+  const modeLabel = staffSessionType==='consultant_deep_audit' ? 'Full-Day Audit (Deep)'
+    : staffSessionType==='consultant_consulting_session' ? 'Consulting Session' : 'Half-Day Audit (Quick)';
+  const finalNotes=document.getElementById('staffFinalNotes').value.trim();
+  let lines=[];
+  lines.push('BYINFORGH BUSINESS SOLUTIONS — CONSULTANT REPORT');
+  lines.push(modeLabel);
+  lines.push('Business: '+staffIntake.business);
+  lines.push('Contact: '+staffIntake.contact+' — '+staffIntake.number);
+  lines.push('Region: '+staffIntake.region+' | Industry: '+staffIntake.industry);
+  lines.push('Consultant: '+staffIntake.consultant+' | Date: '+new Date().toLocaleDateString());
+  lines.push('Session Fee: GH₵'+SESSION_FEES[staffSessionType].toLocaleString());
+  lines.push('Implementation preference: '+(implementationChoice==='diy'?'Business will implement themselves':'BYINFORGH to implement'));
+  lines.push('');
+  lines.push('RESULT: Level '+lvl.label+' — '+lvl.name+' (overall score '+staffResult.overallScore+'%)');
+  lines.push('');
+  lines.push('TOP GAPS:');
+  staffResult.topGaps.forEach((g,i)=>{ lines.push((i+1)+'. '+g.text+(g.note?' — Note: '+g.note:'')); });
+  if(staffResult.industryGaps && staffResult.industryGaps.length){
+    const focus=getIndustryFocus(staffIntake.industry);
+    lines.push('');
+    lines.push((focus?focus.label:'INDUSTRY-SPECIFIC FINDINGS').toUpperCase()+':');
+    staffResult.industryGaps.forEach((g,i)=>{ lines.push((i+1)+'. '+g.text+(g.note?' — Note: '+g.note:'')); });
+  }
+  lines.push('');
+  lines.push('RECOMMENDATION: '+(window.__staffPkgLine||''));
+  if(finalNotes){ lines.push(''); lines.push('CONSULTANT SUMMARY:'); lines.push(finalNotes); }
+  return lines.join('\n');
+}
+
+// Shorter, owner-facing version of the report (used for WhatsApp/email —
+// keeps the consultant's raw notes out of what the client actually reads).
+function buildOwnerFacingSummary(){
+  const lvl=LEVEL_CONTENT.find(s=>s.n===staffResult.overallLevel);
+  const focus=getIndustryFocus(staffIntake.industry);
+  let lines=[];
+  lines.push(`Hi ${staffIntake.contact||''}, thank you for today.`);
+  lines.push('');
+  lines.push(`${staffIntake.business||'Your business'} is currently at Level ${lvl.label} — ${lvl.name}. ${lvl.tagline}`);
+  lines.push('');
+  lines.push(`Session: ${staffSessionType==='consultant_consulting_session'?'Consulting Session (GH₵600)':(staffSessionType==='consultant_deep_audit'?'Full-Day Audit (GH₵3,200)':'Half-Day Audit (GH₵1,800)')}`);
+  lines.push('');
+  lines.push('The clearest gaps found today:');
+  staffResult.topGaps.slice(0,3).forEach((g,i)=>lines.push(`${i+1}. ${g.text}`));
+  if(focus && staffResult.industryGaps && staffResult.industryGaps.length){
+    lines.push('');
+    lines.push(`${focus.icon} Specific to ${staffIntake.industry}:`);
+    staffResult.industryGaps.slice(0,2).forEach((g,i)=>lines.push(`${i+1}. ${g.text}`));
+  }
+  lines.push('');
+  lines.push(`Recommended next step: ${window.__staffPkgLine||'a scoped package'}.`);
+  lines.push(implementationChoice==='diy'
+    ? "You'll be implementing this yourselves — reach out any time if you want BYINFORGH to step in on a specific piece."
+    : 'BYINFORGH will scope, build and train your team on this.');
+  lines.push('');
+  lines.push(`I'll follow up with a full written proposal shortly. — ${staffIntake.consultant||'BYINFORGH'}`);
+  return lines.join('\n');
+}
+
+function copyStaffReport(){
+  const text=buildStaffReportText();
+  navigator.clipboard.writeText(text).then(()=>showToast('Report copied to clipboard')).catch(()=>{
+    const ta=document.createElement('textarea'); ta.value=text; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta); showToast('Report copied to clipboard');
+  });
+}
+function sendRecommendationWhatsApp(){
+  const msg=buildOwnerFacingSummary();
+  const number=(staffIntake.number||'').replace(/[^\d]/g,'');
+  window.open('https://wa.me/'+(number?('233'+number.replace(/^0/,'')):'')+'?text='+encodeURIComponent(msg),'_blank');
+}
+function sendRecommendationEmail(){
+  const to=(staffIntake.email||'').trim();
+  if(!to){ showToast('No email on file for this business — add one on the intake screen, or use WhatsApp/Copy instead.'); return; }
+  const lvl=LEVEL_CONTENT.find(s=>s.n===staffResult.overallLevel);
+  const subject=`${staffIntake.business||'Your business'} — BYINFORGH Business Solutions recommendation`;
+  const body=buildOwnerFacingSummary();
+  window.location.href='mailto:'+encodeURIComponent(to)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+function saveSessionToCommandCentre(){
+  const err=document.getElementById('staffSaveErr'); err.textContent='';
+  const lvl=LEVEL_CONTENT.find(s=>s.n===staffResult.overallLevel);
+  const finalNotes=document.getElementById('staffFinalNotes').value.trim();
+  const gapsPayload=staffResult.topGaps.map(g=>g.text+(g.note?' ['+g.note+']':'')).join(' | ');
+  const industryGapsPayload=(staffResult.industryGaps||[]).map(g=>g.text+(g.note?' ['+g.note+']':'')).join(' | ');
+  const scores={};
+  for(let n=1;n<=7;n++) scores['stage'+n]=staffResult.levelScores[n]!=null?staffResult.levelScores[n]:'';
+  backendCall({
+    action:'submitDiagnostic',
+    source:staffSessionType,                 // consultant_quick_audit | consultant_deep_audit | consultant_consulting_session
+    consultantName:staffIntake.consultant||'',
+    business:staffIntake.business||'', contactName:staffIntake.contact||'', number:staffIntake.number||'', email:staffIntake.email||'',
+    region:staffIntake.region||'', industry:staffIntake.industry||'', years:staffIntake.years||'', staff:staffIntake.staff||'',
+    revenueBand:staffIntake.revenue||'', headache:staffIntake.headache||'',
+    scores:JSON.stringify(scores),
+    overallStage:staffResult.overallLevel, overallScore:staffResult.overallScore,
+    topGaps:gapsPayload,
+    industryGaps:industryGapsPayload,
+    recommendedPackage:(window.__staffPkgLine||''),
+    implementationChoice:implementationChoice,
+    sessionFee:SESSION_FEES[staffSessionType],
+    consultantSummary:finalNotes,
+    ctaChosen:'staff_console'
+  }).then(res=>{
+    if(res===null){
+      err.textContent='Could not reach the backend (offline, or APPS_SCRIPT_URL not set) — nothing is lost, use Copy Report as a backup and save manually later.';
+    } else if(res && res.success===false){
+      err.textContent='Backend responded with an error: '+(res.error||'unknown')+'. Use Copy Report as a backup.';
+    } else {
+      showToast('Saved — will appear in the Command Centre Biz Solutions tab');
+    }
+  });
+  showToast('Saving to Command Centre...');
+}
+
+buildStageNav();
+goHome();
+</script>
+</body>
+</html>
