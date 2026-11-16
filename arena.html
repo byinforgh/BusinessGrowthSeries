@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Business Arena | BYINFORGH Business Growth Series</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{--bg:#FAF6EC;--surface:#fff;--sand:#F1E8D2;--line:rgba(15,76,92,.15);--ink:#1C1C1C;--dim:rgba(28,28,28,.62);--teal:#0F4C5C;--deep:#0A363F;--gold:#B08D3F;--gold2:#E4C77E;--blue:#3F93A8;--red:#A6453B;--green:#2e7d5b;}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;}
+.wrap{max-width:1200px;margin:0 auto;padding:0 24px;}
+.stripe{height:6px;display:flex;}.stripe span{flex:1;}
+.stripe span:nth-child(4n+1){background:var(--teal);}.stripe span:nth-child(4n+2){background:var(--gold);}.stripe span:nth-child(4n+3){background:var(--blue);}.stripe span:nth-child(4n+4){background:var(--sand);}
+.top{position:sticky;top:0;z-index:50;background:rgba(250,246,236,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);}
+.row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1200px;margin:0 auto;}
+.brand{display:flex;align-items:center;gap:10px;font:800 16px Inter,sans-serif;text-decoration:none;}
+.brand i{width:32px;height:32px;border-radius:50%;border:2px solid var(--gold);display:grid;place-items:center;color:var(--gold);font-style:normal;font-size:14px;}
+.jump{display:flex;gap:8px;overflow-x:auto;white-space:nowrap;padding:10px 20px;max-width:1200px;margin:0 auto;border-top:1px solid var(--line);scrollbar-width:none;}
+.jump::-webkit-scrollbar{display:none;}
+.chip{flex-shrink:0;border:1px solid var(--line);padding:9px 14px;font:700 11px Inter,sans-serif;text-transform:uppercase;letter-spacing:.04em;text-decoration:none;color:var(--dim);border-radius:2px;background:transparent;cursor:pointer;}
+.chip.on{background:var(--teal);color:var(--bg);border-color:var(--teal);}
+.gate{min-height:70vh;display:grid;place-items:center;text-align:center;font:600 12px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);}
+.hero{background:var(--deep);color:#fff;padding:44px 0;}
+.hero .wrap{display:grid;grid-template-columns:1.3fr 1fr;gap:36px;align-items:center;}
+.eyebrow{font:700 11.5px Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--gold2);}
+.hero h1{font:800 clamp(28px,4.4vw,46px)/1.08 Inter,sans-serif;letter-spacing:-.02em;margin:12px 0 12px;}
+.hero p{color:#cfe3e8;font-size:15px;line-height:1.7;margin:0;max-width:34em;}
+.me{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.me div{background:rgba(255,255,255,.07);border:1px solid rgba(228,199,126,.3);padding:16px 10px;text-align:center;}
+.me b{display:block;font:800 28px Inter,sans-serif;color:var(--gold2);}
+.me span{font-size:11px;color:#9fc1c9;letter-spacing:.06em;text-transform:uppercase;}
+.lvl{margin-top:12px;}
+.lvl .t{display:flex;justify-content:space-between;font:600 12px Inter,sans-serif;color:#cfe3e8;margin-bottom:6px;}
+.bar{height:8px;background:rgba(255,255,255,.12);border-radius:4px;overflow:hidden;}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold2),var(--gold));width:0;transition:width .6s;}
+main{padding:34px 0 60px;}
+.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:24px;align-items:start;}
+.card{background:var(--surface);border:1px solid var(--line);padding:28px 30px;margin-bottom:24px;}
+.card h2{font:800 20px Inter,sans-serif;margin:0 0 6px;color:var(--deep);}
+.sub{font-size:13px;color:var(--dim);margin:0 0 18px;line-height:1.6;}
+.case{border-left:5px solid var(--gold);}
+.case h3{font:800 24px Inter,sans-serif;margin:6px 0 10px;color:var(--deep);}
+.case .sit{font-size:15.5px;line-height:1.75;margin:0 0 20px;}
+.opt{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;width:100%;text-align:left;background:#fff;border:1px solid var(--line);padding:15px 16px;margin-bottom:10px;font:500 14.5px/1.5 Poppins,sans-serif;cursor:pointer;color:var(--ink);transition:.15s;}
+.opt:hover:not(:disabled){border-color:var(--teal);background:#f4faf9;}
+.opt b{width:30px;height:30px;border-radius:50%;background:var(--sand);display:grid;place-items:center;font:800 13px Inter,sans-serif;color:var(--teal);}
+.opt:disabled{cursor:default;}
+.opt.best{border-color:var(--green);background:#eef8f2;}
+.opt.best b{background:var(--green);color:#fff;}
+.opt.wrong{border-color:var(--red);background:#fbf3f1;}
+.opt.wrong b{background:var(--red);color:#fff;}
+.result{margin-top:18px;padding:20px 22px;background:var(--deep);color:#fff;}
+.result h4{margin:0 0 8px;font:800 18px Inter,sans-serif;color:var(--gold2);}
+.result p{margin:0 0 10px;font-size:14px;line-height:1.7;color:#d6e8ec;}
+.result .truth{border-left:3px solid var(--gold2);padding-left:14px;color:#fff;}
+.btn{display:inline-block;border:0;cursor:pointer;background:var(--gold2);color:var(--deep);padding:12px 20px;font:700 12px Inter,sans-serif;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;margin:6px 8px 0 0;}
+.btn.l{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.4);}
+.lb{list-style:none;margin:0;padding:0;}
+.lb li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;align-items:center;padding:11px 0;border-top:1px solid var(--line);font-size:13.5px;}
+.lb li:first-child{border-top:0;}
+.lb .r{font:800 14px Inter,sans-serif;color:var(--gold);}
+.lb small{display:block;color:var(--dim);font-size:11.5px;}
+.lb .x{font:800 13px Inter,sans-serif;color:var(--teal);}
+.lvls{display:grid;gap:8px;}
+.lvls div{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;border:1px solid var(--line);padding:11px 14px;font-size:13px;opacity:.55;}
+.lvls div.got{opacity:1;border-color:var(--gold);background:#fffaf0;}
+.lvls div.now{opacity:1;border-color:var(--teal);box-shadow:inset 3px 0 0 var(--teal);}
+.lvls b{font-size:20px;}
+.lvls span small{display:block;color:var(--dim);font-size:11.5px;margin-top:2px;}
+.lvls em{font:700 11px Inter,sans-serif;color:var(--dim);font-style:normal;}
+.rules{margin:0;padding-left:18px;font-size:13px;line-height:1.8;color:var(--dim);}
+.next{font:600 12.5px Inter,sans-serif;color:var(--dim);margin-top:14px;}
+@media(max-width:860px){.hero .wrap,.grid{grid-template-columns:1fr;}.card{padding:22px 18px;}}
+</style>
+</head>
+<body>
+<div id="gate" class="gate">Checking your session...</div>
+<div id="shell" style="display:none;">
+<header class="top">
+  <div class="stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="row1"><a class="brand" href="app.html"><i>B</i>BYINFORGH</a><a class="chip" href="app.html">Dashboard</a></div>
+  <div class="jump" id="jump">
+    <a class="chip" href="app.html">Dashboard</a><a class="chip" href="curriculum.html">Curriculum</a><a class="chip on" href="arena.html">Arena</a><a class="chip" href="lounge.html">Live Lounge</a><a class="chip" href="community.html">Community</a><a class="chip" href="directory.html">Directory</a><a class="chip" href="connections.html">Connections</a><a class="chip" href="groups.html">Groups</a><a class="chip" href="messages.html">Messages</a><a class="chip" href="qa.html">Q&amp;A</a><a class="chip" href="tecxfra.html">TecXFRA</a><a class="chip" href="corporate.html">Corporate</a>
+  </div>
+</header>
+
+<section class="hero"><div class="wrap">
+  <div>
+    <span class="eyebrow">The Business Arena</span>
+    <h1>One real business decision. Every day.</h1>
+    <p>Each day brings a new situation from a Ghanaian business. Make the call, see what a real owner would do, and earn XP. Play daily to build your streak, climb the weekly board and level up from Hustler to Founder.</p>
+  </div>
+  <div>
+    <div class="me"><div><b id="mStreak">0</b><span>Day streak</span></div><div><b id="mXp">0</b><span>Total XP</span></div><div><b id="mRank">-</b><span>Your rank</span></div></div>
+    <div class="lvl"><div class="t"><span id="lvName">Hustler</span><span id="lvNext"></span></div><div class="bar"><i id="lvBar"></i></div></div>
+  </div>
+</div></section>
+
+<main><div class="wrap grid">
+  <div>
+    <div class="card case" id="caseCard"><p class="sub">Loading today's case...</p></div>
+    <div class="card">
+      <h2>How it works</h2>
+      <ul class="rules">
+        <li>One case a day. A new one arrives at midnight, Ghana time.</li>
+        <li>Right call: 20 XP. Wrong call: 5 XP, because you still learn something.</li>
+        <li>Streak bonus: every consecutive day adds 3 XP, up to 18.</li>
+        <li>The weekly board counts the last 7 days, so everyone can catch up.</li>
+      </ul>
+    </div>
+  </div>
+  <div>
+    <div class="card"><h2>This week's top players</h2><p class="sub">Last 7 days. Play today to get on the board.</p><ol class="lb" id="lb"></ol></div>
+    <div class="card"><h2>Levels</h2><p class="sub">Your title in the community.</p><div class="lvls" id="lvls"></div></div>
+  </div>
+</div></main>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+const SITE = 'https://businessgrowthseries.byinforgh.com/arena.html';
+// Edit titles and perks here any time. Perks are promises BYINFORGH keeps, so only list what you will honour.
+const LEVELS = [
+  {xp:0,   name:'Hustler',    perk:'Welcome to the Arena'},
+  {xp:100, name:'Trader',     perk:'Your questions are answered first at the Business Hour'},
+  {xp:300, name:'Shop Owner', perk:'Top Player badge next to your name in the directory'},
+  {xp:600, name:'Manager',    perk:'Priority feedback on your business profile'},
+  {xp:1000,name:'Director',   perk:'Invited to the monthly founders circle'},
+  {xp:2000,name:'Founder',    perk:'Featured as a Business Spotlight'}
+];
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const $ = id => document.getElementById(id);
+let me = null, today = null;
+
+function profileComplete(p){
+  if (!p) return false;
+  const t = v => (v == null ? '' : String(v)).trim();
+  if (t(p.name).length < 2 || t(p.phone).replace(/\D/g,'').length < 9 || t(p.location).length < 2) return false;
+  const st = p.business_stage || (p.has_business === false ? 'starting' : 'running');
+  if (st === 'education') return t(p.series_goal).length >= 5;
+  if (st === 'starting') return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
+  return t(p.business_name).length >= 2 && t(p.category) !== '' && t(p.sells).length >= 3;
+}
+
+async function init(){
+  if (!sb) { $('gate').textContent = 'Not connected'; return; }
+  const { data: { session } } = await sb.auth.getSession();
+  if (!session) { location.href = 'auth.html'; return; }
+  const { data: prof } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
+  if (!profileComplete(prof)) { try { sessionStorage.setItem('byg_redirect', 'arena.html'); } catch(e){} location.href = 'auth.html'; return; }
+  if (prof.banned) { $('gate').textContent = 'Account suspended'; return; }
+  $('gate').style.display = 'none'; $('shell').style.display = 'block';
+  await refresh();
+}
+
+async function refresh(){
+  const [a, b, c] = await Promise.all([sb.rpc('arena_today'), sb.rpc('arena_me'), sb.rpc('arena_leaderboard')]);
+  today = a.data; me = b.data;
+  drawMe(); drawCase(); drawBoard(c.data || []); drawLevels();
+}
+
+function levelFor(xp){ let i = 0; LEVELS.forEach((l,k) => { if (xp >= l.xp) i = k; }); return i; }
+function drawMe(){
+  const m = me && !me.error ? me : {total_xp:0, streak:0, rank:null};
+  $('mStreak').textContent = m.streak || 0;
+  $('mXp').textContent = m.total_xp || 0;
+  $('mRank').textContent = m.plays ? ('#' + m.rank) : '-';
+  const i = levelFor(m.total_xp || 0), cur = LEVELS[i], nx = LEVELS[i+1];
+  $('lvName').textContent = cur.name;
+  if (nx) { $('lvNext').textContent = (nx.xp - m.total_xp) + ' XP to ' + nx.name; $('lvBar').style.width = Math.min(100, ((m.total_xp - cur.xp) / (nx.xp - cur.xp)) * 100) + '%'; }
+  else { $('lvNext').textContent = 'Top level'; $('lvBar').style.width = '100%'; }
+}
+
+function drawCase(){
+  const el = $('caseCard');
+  if (!today || today.error || today.empty) { el.innerHTML = '<p class="sub">No case is available today. Check back tomorrow.</p>'; return; }
+  const L = ['A','B','C'];
+  const played = today.played;
+  el.innerHTML = `<span class="eyebrow" style="color:var(--gold)">Today's case</span>
+    <h3>${esc(today.title)}</h3>
+    <p class="sit">${esc(today.situation)}</p>
+    ${today.options.map((o,k) => `<button type="button" class="opt ${played ? (k === today.best ? 'best' : (k === today.choice ? 'wrong' : '')) : ''}" data-k="${k}" ${played ? 'disabled' : ''}><b>${L[k]}</b><span>${esc(o)}</span></button>`).join('')}
+    <div id="res"></div>`;
+  if (played) showResult(today.correct, today.lesson, today.xp);
+  else el.querySelectorAll('.opt').forEach(b => b.addEventListener('click', () => play(+b.dataset.k)));
+}
+
+async function play(k){
+  document.querySelectorAll('.opt').forEach(b => b.disabled = true);
+  const { data, error } = await sb.rpc('arena_play', { p_choice: k });
+  if (error || !data || data.error) { await refresh(); return; }
+  await refresh();
+}
+
+function showResult(ok, lesson, xp){
+  const msg = `I made today's call in the BYINFORGH Business Arena and earned ${xp} XP. Can you beat me? ${SITE}`;
+  $('res').innerHTML = `<div class="result"><h4>${ok ? 'Right call. +' + xp + ' XP' : 'Not this time. +' + xp + ' XP for learning'}</h4>
+    <p class="truth">${esc(lesson)}</p>
+    <p>Come back tomorrow for a new case and keep your streak alive.</p>
+    <a class="btn" href="https://wa.me/?text=${encodeURIComponent(msg)}" target="_blank" rel="noopener">Challenge a friend on WhatsApp</a>
+    <a class="btn l" href="curriculum.html">Study the lessons</a></div>`;
+}
+
+function drawBoard(rows){
+  $('lb').innerHTML = rows.length ? rows.map((r,k) => `<li><span class="r">${k+1}</span><span>${esc(r.name || 'A member')}<small>${esc(r.business_name || '')}</small></span><span class="x">${r.xp} XP</span></li>`).join('')
+    : '<li style="display:block;color:var(--dim);">Nobody has played this week yet. Be the first.</li>';
+}
+
+function drawLevels(){
+  const xp = (me && me.total_xp) || 0, cur = levelFor(xp);
+  $('lvls').innerHTML = LEVELS.map((l,k) => `<div class="${k < cur ? 'got' : ''} ${k === cur ? 'now' : ''}"><b>${['🌱','🛒','🏪','📋','🎯','👑'][k]}</b><span>${esc(l.name)}<small>${esc(l.perk)}</small></span><em>${l.xp} XP</em></div>`).join('');
+}
+init();
+</script>
+</body>
+</html>
