@@ -298,6 +298,9 @@ document.getElementById('logoutBtn').addEventListener('click', async () => {
 let activeAdminTab = 'members';
 let memberSearch = '';
 let showIncompleteOnly = false;
+let memberFilter = 'all'; // all | complete | incomplete | starting
+function memberNo(m){ return (m && m.member_no != null) ? ('#' + String(m.member_no).padStart(4,'0')) : '#----'; }
+function isStarting(m){ const st = m.business_stage || (m.has_business === false ? 'starting' : 'running'); return st === 'starting'; }
 let editingEventId = null;
 
 async function loadAdminConsole(){
@@ -518,9 +521,15 @@ function renderAdminPanel(){
     const online = d.members.filter(m => isOnline(m.last_seen)).length;
     const incompleteCount = d.members.filter(m => !isComplete(m)).length;
     const q = memberSearch.trim().toLowerCase();
-    let scoped = !showIncompleteOnly ? d.members : d.members.filter(m => !isComplete(m));
+    if (showIncompleteOnly) memberFilter = 'incomplete';
+    const completeCount = total - incompleteCount;
+    const startingCount = d.members.filter(m => isComplete(m) && isStarting(m)).length;
+    let scoped = d.members;
+    if (memberFilter === 'complete') scoped = d.members.filter(m => isComplete(m));
+    else if (memberFilter === 'incomplete') scoped = d.members.filter(m => !isComplete(m));
+    else if (memberFilter === 'starting') scoped = d.members.filter(m => isComplete(m) && isStarting(m));
     const filtered = !q ? scoped : scoped.filter(m =>
-      [m.name, m.business_name, m.category, m.location, m.phone, m.email].filter(Boolean).join(' ').toLowerCase().includes(q));
+      [memberNo(m), m.member_no, m.name, m.business_name, m.category, m.location, m.phone, m.email].filter(Boolean).join(' ').toLowerCase().includes(q));
     body.innerHTML = `
       <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">
         <div style="flex:1;min-width:160px;border:1px solid var(--line);background:var(--surface-2);padding:16px 18px;">
@@ -536,13 +545,16 @@ function renderAdminPanel(){
           <div style="font-family:'Inter',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-dim);">Incomplete signups — click to filter</div>
         </div>
       </div>
+      <div id="memberFilterPills" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+        ${[['all','All ('+total+')'],['complete','Full profiles only ('+completeCount+')'],['incomplete','Incomplete ('+incompleteCount+')'],['starting','Starting a business ('+startingCount+')']].map(([k,l]) => `<button type="button" class="btn-ghost member-filter-pill" data-filter="${k}" style="${memberFilter===k ? 'background:var(--teal);color:#fff;border-color:var(--teal);' : ''}">${l}</button>`).join('')}
+      </div>
       <input type="text" id="memberSearchInput" placeholder="Search by name, business, category, location, phone, email..." value="${esc(memberSearch)}" style="width:100%;background:var(--surface);border:1px solid var(--line);color:var(--ink);padding:11px 14px;font-family:'Poppins',sans-serif;font-size:13px;outline:none;margin-bottom:16px;">
       ${filtered.map(m => `
       <div class="admin-queue-item admin-member-row" data-user="${esc(m.id)}" style="cursor:pointer;align-items:center;">
         <div class="admin-queue-main">
           <div class="admin-queue-name">
             <span style="display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:7px;background:${isOnline(m.last_seen) ? 'var(--teal)' : 'var(--line)'};"></span>
-            ${esc(m.name || 'Unnamed')}${m.business_name ? ' · ' + esc(m.business_name) : ''}
+            <span style="font-family:'Inter',sans-serif;font-weight:800;font-size:11px;color:var(--gold);margin-right:6px;">${memberNo(m)}</span>${esc(m.name || 'Unnamed')}${m.business_name ? ' · ' + esc(m.business_name) : ''}
             ${m.is_admin ? ' <span style="color:var(--gold);">(admin)</span>' : ''}
             ${m.banned ? ' <span style="color:var(--m7);">(suspended)</span>' : ''}
             ${!isComplete(m) ? ' <span style="color:var(--m7);">(incomplete: ' + esc(missingFor(m).join(', ')) + ')</span>' : ''}
@@ -556,8 +568,14 @@ function renderAdminPanel(){
     const incompleteStatCard = document.getElementById('incompleteStatCard');
     if (incompleteStatCard) incompleteStatCard.addEventListener('click', () => {
       showIncompleteOnly = !showIncompleteOnly;
+      memberFilter = showIncompleteOnly ? 'incomplete' : 'all';
       renderAdminPanel();
     });
+    document.querySelectorAll('.member-filter-pill').forEach(btn => btn.addEventListener('click', () => {
+      memberFilter = btn.dataset.filter;
+      showIncompleteOnly = false;
+      renderAdminPanel();
+    }));
   } else if (activeAdminTab === 'events') {
     const editing = editingEventId ? d.events.find(ev => ev.id === editingEventId) : null;
     function toLocalInputValue(iso){
@@ -1095,6 +1113,7 @@ function openMemberModal(userId){
   // members who joined without a business yet) their idea + goal.
   const complete = isComplete(m);
   const rows = [
+    ['Member number (admin only)', memberNo(m)],
     ['Profile status', complete ? 'Complete' : 'Incomplete. Still missing: ' + (missingFor(m).join(', ') || 'details')],
     ['Name', m.name], ['Business', m.business_name], ['Category', m.category],
     ['Phone / WhatsApp', m.phone], ['Email (private)', m.email],
