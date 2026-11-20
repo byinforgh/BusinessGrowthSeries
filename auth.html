@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Join or Log In: BYINFORGH Business Growth Series</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
 <style>
 :root{
   --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
@@ -247,9 +245,9 @@ form button[type="submit"]{flex-shrink:0;}
                   </select>
                 </div>
                 <div class="field">
-                  <label>WhatsApp / phone number</label>
+                  <label>WhatsApp / phone number (optional)</label>
                   <input type="tel" id="pPhone" placeholder="+233 XX XXX XXXX">
-                  <span class="field-hint">Other members will be able to see this in the directory, so real customers and contacts can reach you.</span>
+                  <span class="field-hint">Optional. If you add it, other members can see it in the directory so customers can reach you. Leave it empty to keep your number private. You can add or remove it any time in My data.</span>
                 </div>
               </div>
               <div class="grid2">
@@ -258,7 +256,7 @@ form button[type="submit"]{flex-shrink:0;}
                   <input type="text" id="pLocation" placeholder="e.g. Kumasi">
                 </div>
                 <div class="field">
-                  <label>Nearest landmark</label>
+                  <label>Nearest landmark (optional)</label>
                   <input type="text" id="pLandmark" placeholder="e.g. Near Adum Market">
                 </div>
               </div>
@@ -272,7 +270,7 @@ form button[type="submit"]{flex-shrink:0;}
                 <span class="field-hint">Starting out is completely fine, this just helps us point you to the right lessons and people.</span>
               </div>
               <div class="field">
-                <label>What are you looking for right now</label>
+                <label>What are you looking for right now (optional)</label>
                 <textarea id="pLookingFor" rows="2" placeholder="e.g. More customers, a supplier, a business partner, or skills to learn"></textarea>
               </div>
               <div class="field" id="fieldSeriesGoal">
@@ -290,15 +288,21 @@ form button[type="submit"]{flex-shrink:0;}
                 </div>
               </div>
               <div class="field">
-                <label>What's your biggest struggle right now</label>
+                <label>What's your biggest struggle right now (optional, private)</label>
                 <textarea id="pStruggle" rows="2" placeholder="e.g. Customers don't reply after I quote a price"></textarea>
                 <span class="field-hint">This helps the AI assistant and the community actually help you, be specific.</span>
               </div>
+            <div class="field" style="border:1px solid var(--line);background:#fff;padding:14px 16px;margin-bottom:16px;">
+              <label style="display:flex;gap:10px;align-items:flex-start;text-transform:none;letter-spacing:0;font-size:12.5px;color:var(--ink);line-height:1.6;font-family:'Poppins',sans-serif;">
+                <input type="checkbox" id="pConsent" style="margin-top:4px;width:auto;flex-shrink:0;">
+                <span>I am 18 or older. I have read the <a href="privacy.html" target="_blank" style="color:var(--teal);font-weight:600;">Privacy Policy and Terms</a> and I agree to BYINFORGH storing the details I enter here. I understand that my name, business name, category, location, what I sell and what I am looking for are visible to other members, and so are my landmark, phone number and logo if I choose to add them. I also consent to my data being stored and processed on servers outside Ghana, as the policy explains. My email and my struggle stay private.</span>
+              </label>
+            </div>
               <button type="submit" class="btn-primary" id="saveProfileBtn">Enter Business Growth Series &rarr;</button>
             </div>
           </form>
           <div class="form-status" id="profileStatus"></div>
-          <p style="font-size:11.5px;color:var(--ink-dim);margin-top:16px;text-align:center;">By joining you agree to our <a href="privacy.html" style="color:var(--teal);">Privacy Policy &amp; Terms</a>. Your struggle and email stay private, only visible to you and BYINFORGH.</p>
+          <p style="font-size:11.5px;color:var(--ink-dim);margin-top:16px;text-align:center;line-height:1.6;">Your email, business idea, goals and struggle are private to you and BYINFORGH. You can download or delete all your data at any time in <b>My data</b> after you join.</p>
         </div>
 
       </div>
@@ -392,17 +396,6 @@ emailForm.addEventListener('submit', async function(e){
   document.getElementById('sendLinkBtn').disabled = true;
   emailStatus.textContent = 'Sending...';
 
-  // Same email, whatever the capitalization, is always the same
-  // member, this only checks (no data returned) so the messaging on
-  // the next screen is accurate: "welcome back" vs "you're in".
-  let alreadyMember = false;
-  try {
-    const { data: exists } = await sb.rpc('email_has_account', { check_email: email });
-    alreadyMember = !!exists;
-  } catch (rpcErr) {
-    console.warn('email_has_account check failed, continuing anyway:', rpcErr);
-  }
-
   const { error } = await sb.auth.signInWithOtp({
     email,
     options: { emailRedirectTo: currentRedirectUrl() }
@@ -412,9 +405,7 @@ emailForm.addEventListener('submit', async function(e){
   pendingEmail = email;
   document.getElementById('emailDisplay').textContent = email;
   emailStatus.textContent = '';
-  document.getElementById('existingAccountNote').textContent = alreadyMember
-    ? "Looks like you already have an account with this email, no new one is being made, this link will just log you straight back in."
-    : '';
+  document.getElementById('existingAccountNote').textContent = "If this email already has an account, this link logs you straight back in. If it is new, the link creates your account.";
   showStep('stepWaiting');
   startResendCooldown();
 });
@@ -484,9 +475,8 @@ function profileRequiredList(){
   const list = [['Where you are right now', !!stage]];
   if (!stage) return list;
   list.push(['Your name', v('pName').length >= 2 && !_junk(v('pName'))]);
-  list.push(['WhatsApp / phone number (at least 9 digits)', v('pPhone').replace(/\D/g, '').length >= 9]);
+  list.push(['A valid phone number, or leave the phone field empty', v('pPhone') === '' || v('pPhone').replace(/\D/g, '').length >= 9]);
   list.push(['Location', v('pLocation').length >= 2 && !_junk(v('pLocation'))]);
-  list.push(['Nearest landmark', v('pLandmark').length >= 3 && !_junk(v('pLandmark'))]);
   if (stage === 'running') {
     list.push(['Business name', v('pBusinessName').length >= 2 && !_junk(v('pBusinessName'))]);
     list.push(['Category', v('pCategory') !== '']);
@@ -495,8 +485,6 @@ function profileRequiredList(){
     list.push(['Your business idea', v('pBusinessIdea').length >= 5 && !_junk(v('pBusinessIdea'))]);
   }
   list.push([stage === 'education' ? 'What you want to learn' : 'What you want from the Series', v('pSeriesGoal').length >= 5 && !_junk(v('pSeriesGoal'))]);
-  list.push(['What you are looking for', v('pLookingFor').length >= 3 && !_junk(v('pLookingFor'))]);
-  list.push(['Your biggest struggle', v('pStruggle').length >= 3 && !_junk(v('pStruggle'))]);
   return list;
 }
 function profileMissingFields(){ return profileRequiredList().filter(x => !x[1]).map(x => x[0]); }
@@ -552,6 +540,7 @@ profileForm.addEventListener('submit', async function(e){
   }
   const { data: { user } } = await sb.auth.getUser();
   if (!user) { profileStatus.textContent = 'Session expired, please log in again.'; return; }
+  if (!document.getElementById('pConsent').checked) { profileStatus.textContent = 'Please tick the box to confirm you are 18 or older and agree to the Privacy Policy.'; return; }
   document.getElementById('saveProfileBtn').disabled = true;
   profileStatus.textContent = 'Saving...';
 
@@ -576,18 +565,20 @@ profileForm.addEventListener('submit', async function(e){
     name: document.getElementById('pName').value.trim(),
     business_name: stage === 'running' ? document.getElementById('pBusinessName').value.trim() : null,
     category: stage === 'running' ? document.getElementById('pCategory').value : null,
-    phone: document.getElementById('pPhone').value.trim(),
+    phone: document.getElementById('pPhone').value.trim() || null,
     location: document.getElementById('pLocation').value.trim(),
-    landmark: document.getElementById('pLandmark').value.trim(),
+    landmark: document.getElementById('pLandmark').value.trim() || null,
     has_business: stage === 'running',
     business_stage: stage,
     sells: stage === 'running' ? document.getElementById('pSells').value.trim() : null,
     business_idea: stage === 'starting' ? document.getElementById('pBusinessIdea').value.trim() : null,
     series_goal: document.getElementById('pSeriesGoal').value.trim(),
     looking_for: document.getElementById('pLookingFor').value.trim() || null,
-    struggle: document.getElementById('pStruggle').value.trim(),
+    struggle: document.getElementById('pStruggle').value.trim() || null,
     ...(logoUrl ? { logo_url: logoUrl } : {}),
     last_seen: new Date().toISOString(),
+    consent_at: new Date().toISOString(),
+    consent_version: 'v2026-11-19',
   }).eq('id', user.id);
   document.getElementById('saveProfileBtn').disabled = false;
   if (error) {
@@ -656,7 +647,7 @@ function isProfileComplete(p){
   const t = v => (v == null ? '' : String(v)).trim();
   const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
   if (t(p.name).length < 2 || junk(p.name)) return false;
-  if (t(p.phone).replace(/\D/g, '').length < 9) return false;
+  if (t(p.phone) !== '' && t(p.phone).replace(/\D/g, '').length < 9) return false;
   if (t(p.location).length < 2 || junk(p.location)) return false;
   const stage = p.business_stage || (p.has_business === false ? 'starting' : 'running');
   if (stage === 'education') return t(p.series_goal).length >= 5;
@@ -813,6 +804,7 @@ setTimeout(() => {
     try {
       var step = document.getElementById('stepProfile');
       if (!step || !step.classList.contains('active')) return;
+      var cb = document.getElementById('pConsent'); if (!cb || !cb.checked) return;
       var sess = (await sb.auth.getSession()).data.session;
       if (!sess) return;
       var d = {};
