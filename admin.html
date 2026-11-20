@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Admin Console: BYINFORGH Business Growth Series</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
 <style>
 :root{
   --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
@@ -381,7 +379,7 @@ async function loadAdminConsole(){
 // keep this window in sync with whatever online_member_count() uses.
 function isComplete(m){
   const t = v => (v == null ? '' : String(v)).trim();
-  if (!m || t(m.name).length < 2 || t(m.phone).replace(/\D/g, '').length < 9 || t(m.location).length < 2) return false;
+  if (!m || t(m.name).length < 2 || (t(m.phone) !== '' && t(m.phone).replace(/\D/g, '').length < 9) || t(m.location).length < 2) return false;
   const stage = m.business_stage || (m.has_business === false ? 'starting' : 'running');
   if (stage === 'education') return t(m.series_goal).length >= 5;
   if (stage === 'starting') return t(m.business_idea).length >= 5 && t(m.series_goal).length >= 5;
@@ -390,7 +388,7 @@ function isComplete(m){
 function missingFor(m){
   const t = v => (v == null ? '' : String(v)).trim(), out = [];
   if (t(m.name).length < 2 || t(m.name) === 'New member') out.push('name');
-  if (t(m.phone).replace(/\D/g, '').length < 9) out.push('phone');
+  if (t(m.phone) !== '' && t(m.phone).replace(/\D/g, '').length < 9) out.push('phone');
   if (t(m.location).length < 2) out.push('location');
   const stage = m.business_stage || (m.has_business === false ? 'starting' : 'running');
   if (!m.business_stage && m.has_business !== false && t(m.sells).length < 3) out.push('has not chosen running / starting / just education');
@@ -420,10 +418,7 @@ function renderAdminPanel(){
           <div class="admin-queue-name">${esc(nameFor(v.user_id))}</div>
           <div class="admin-queue-meta">submitted ${new Date(v.submitted_at).toLocaleDateString('en-GB')}${v.social_handle ? ' · ' + esc(v.social_handle) : ''}</div>
           <div class="admin-queue-body">${esc(v.notes || 'No notes provided.')}</div>
-          <div class="admin-doc-links">
-            <a class="admin-doc-link" data-path="${esc(v.photo_url)}">View business photo →</a>
-            <a class="admin-doc-link" data-path="${esc(v.product_url)}">View product screenshot →</a>
-          </div>
+          ${v.photo_url || v.product_url ? `<div class="admin-doc-links">${v.photo_url ? `<a class="admin-doc-link" data-path="${esc(v.photo_url)}">View business photo →</a>` : ''}${v.product_url ? `<a class="admin-doc-link" data-path="${esc(v.product_url)}">View product screenshot →</a>` : ''}</div>` : ''}
         </div>
         <div class="admin-queue-actions">
           <button class="btn-primary admin-verify-approve" data-id="${esc(v.id)}" data-user="${esc(v.user_id)}">Approve</button>
@@ -1114,6 +1109,7 @@ function openMemberModal(userId){
   const complete = isComplete(m);
   const rows = [
     ['Member number (admin only)', memberNo(m)],
+    ['Consent recorded', m.consent_at ? (new Date(m.consent_at).toLocaleDateString('en-GB') + ' (' + (m.consent_version || 'version unknown') + ')') : 'Not recorded yet'],
     ['Profile status', complete ? 'Complete' : 'Incomplete. Still missing: ' + (missingFor(m).join(', ') || 'details')],
     ['Name', m.name], ['Business', m.business_name], ['Category', m.category],
     ['Phone / WhatsApp', m.phone], ['Email (private)', m.email],
