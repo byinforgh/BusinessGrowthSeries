@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My data | BYINFORGH Business Growth Series</title>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
+<style>
+:root{--bg:#FAF6EC;--teal:#0F4C5C;--deep:#0A363F;--gold:#B08D3F;--sand:#F1E8D2;--ink:#1C1C1C;--dim:rgba(28,28,28,.66);--line:rgba(15,76,92,.16);--red:#A6453B;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1600px;margin:0 auto;padding:0 28px;}
+.gate{min-height:60vh;display:grid;place-items:center;font:600 12px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);}
+.hero{background:var(--deep);color:#fff;padding:48px 0;}
+.eyebrow{font:700 11.5px Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#E4C77E;}
+h1{font:800 clamp(28px,4.4vw,44px)/1.1 Inter,sans-serif;letter-spacing:-.02em;margin:12px 0;}
+.hero p{color:#cfe3e8;font-size:15px;line-height:1.7;max-width:46em;margin:0;}
+main{padding:36px 0 70px;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;align-items:start;}
+.card{background:#fff;border:1px solid var(--line);padding:28px 30px;}
+.card h2{font:800 20px Inter,sans-serif;color:var(--deep);margin:0 0 8px;}
+.card p,.card li{font-size:14px;line-height:1.7;color:var(--dim);margin:0 0 12px;}
+.card ul{margin:0 0 12px;padding-left:20px;}
+.btn{display:inline-block;border:0;cursor:pointer;background:var(--teal);color:#fff;padding:13px 22px;font:700 12px Inter,sans-serif;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;}
+.btn:disabled{opacity:.5;cursor:default;}
+.btn.red{background:var(--red);}
+.row{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:14px 0;border-top:1px solid var(--line);}
+.row:first-of-type{border-top:0;}
+.row b{display:block;font:700 14px Inter,sans-serif;color:var(--ink);}
+.row span{font-size:12.5px;color:var(--dim);line-height:1.55;}
+.sw{position:relative;width:48px;height:28px;flex-shrink:0;}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;inset:0;margin:0;cursor:pointer;z-index:2;}
+.sw i{position:absolute;inset:0;background:#ccd6d8;border-radius:20px;transition:.2s;}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:.2s;}
+.sw input:checked+i{background:var(--teal);}
+.sw input:checked+i:after{left:23px;}
+.status{font:600 12.5px Inter,sans-serif;color:var(--teal);margin-top:10px;min-height:18px;}
+.status.err{color:var(--red);}
+.danger{border-color:rgba(166,69,59,.4);}
+.danger h2{color:var(--red);}
+input.txt{width:100%;padding:12px 14px;border:1px solid var(--line);font:500 14px Poppins,sans-serif;margin:6px 0 12px;}
+@media(max-width:900px){.grid{grid-template-columns:1fr;}.wrap{padding:0 18px;}.card{padding:22px 18px;}}
+</style>
+<style>/* ===== shared BYINFORGH header (identical on every page) ===== */
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:#0F4C5C;}
+.kente-stripe span:nth-child(4n+2){background:#B08D3F;}
+.kente-stripe span:nth-child(4n+3){background:#3F93A8;}
+.kente-stripe span:nth-child(4n+4){background:#F1E8D2;}
+.app-topbar{position:sticky;top:0;z-index:80;background:rgba(250,246,236,0.94);backdrop-filter:blur(10px);border-bottom:1px solid rgba(15,76,92,0.15);color:#1C1C1C;font-family:'Poppins',sans-serif;}
+.app-topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1600px;margin:0 auto;gap:12px;}
+.app-topbar-row2{position:relative;border-top:1px solid rgba(15,76,92,0.15);}
+.app-topbar-row2::after{content:'';position:absolute;top:0;right:0;bottom:0;width:28px;pointer-events:none;background:linear-gradient(90deg,transparent,#FAF6EC);}
+.app-topbar .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;color:#1C1C1C;}
+.app-topbar .brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid #B08D3F;display:flex;align-items:center;justify-content:center;font-size:14px;color:#B08D3F;overflow:hidden;background:#fff;flex-shrink:0;}
+.app-topbar .brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.app-topbar .btn-ghost{background:transparent;color:rgba(28,28,28,0.62);border:1px solid rgba(15,76,92,0.15);padding:10px 16px;font-family:'Poppins',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;width:auto;}
+.app-topbar .btn-ghost:hover{border-color:rgba(28,28,28,0.62);color:#1C1C1C;transform:none;}
+.jump-nav{display:flex;gap:10px;align-items:center;overflow-x:auto;white-space:nowrap;max-width:1600px;margin:0 auto;padding:10px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.jump-nav::-webkit-scrollbar{display:none;}
+.jump-nav a{flex-shrink:0;}
+.jump-nav a.active{background:#0F4C5C;color:#FAF6EC;border-color:#0F4C5C;}
+</style>
+</head>
+<body>
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-row1">
+    <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
+    <span style="display:flex;gap:8px;align-items:center;"><a href="my-data.html" class="btn-ghost">My data</a><button class="btn-ghost" id="logoutBtn">Log out</button></span>
+  </div>
+  <div class="app-topbar-row2">
+    <div class="jump-nav" id="jumpNav">
+      <a href="app.html" class="btn-ghost" data-page="app.html">Dashboard</a>
+      <a href="curriculum.html" class="btn-ghost" data-page="curriculum.html">Curriculum</a>
+      <a href="lounge.html" class="btn-ghost" data-page="lounge.html">Live Lounge</a>
+      <a href="community.html" class="btn-ghost" data-page="community.html">Community</a>
+      <a href="directory.html" class="btn-ghost" data-page="directory.html">Directory</a>
+      <a href="connections.html" class="btn-ghost" data-page="connections.html">Connections</a>
+      <a href="groups.html" class="btn-ghost" data-page="groups.html">Groups</a>
+      <a href="messages.html" class="btn-ghost" data-page="messages.html">Messages</a>
+      <a href="qa.html" class="btn-ghost" data-page="qa.html">Q&amp;A</a>
+      <a href="tecxfra.html" class="btn-ghost" data-page="tecxfra.html">TecXFRA</a>
+      <a href="arena.html" class="btn-ghost" data-page="arena.html">Arena</a>
+      <a href="corporate.html" class="btn-ghost" data-page="corporate.html">Corporate</a>
+      <a href="zero-cedis-guide.html" class="btn-ghost" data-page="zero-cedis-guide.html">Start a Business</a>
+    </div>
+  </div>
+</nav>
+
+<div id="gate" class="gate">Checking your session...</div>
+<div id="shell" style="display:none;">
+<section class="hero"><div class="wrap">
+  <span class="eyebrow">Your data, your choice</span>
+  <h1>My data</h1>
+  <p>See what we hold, download a copy, choose what other members see, or delete your account. You do not need to ask us for permission or wait for a reply.</p>
+</div></section>
+<main><div class="wrap grid">
+  <div>
+    <div class="card" style="margin-bottom:22px;">
+      <h2>Download my data</h2>
+      <p>You get one file with your profile, progress, posts, questions, Arena plays, messages you sent, notifications and activity records. Private details such as your email and struggle are included because they are yours.</p>
+      <button class="btn" id="dlBtn">Download my data</button>
+      <div class="status" id="dlStatus"></div>
+    </div>
+    <div class="card" style="margin-bottom:22px;">
+      <h2>My phone number</h2>
+      <p>Optional. If you add a number, other members can see it in the directory so customers can reach you on WhatsApp. Remove it any time and it disappears from the directory straight away.</p>
+      <input class="txt" id="phoneInput" type="tel" placeholder="+233 XX XXX XXXX">
+      <button class="btn" id="phoneSave">Save number</button>
+      <button class="btn" id="phoneRemove" style="background:#6b7a7e;margin-left:8px;">Remove my number</button>
+      <div class="status" id="phoneStatus"></div>
+    </div>
+    <div class="card">
+      <h2>My choices</h2>
+      <div class="row"><div><b>Show me on the Arena weekly board</b><span>When on, your name and business name can appear on the Business Arena board for other members.</span></div><label class="sw"><input type="checkbox" id="swArena"><i></i></label></div>
+      <div class="row"><div><b>Email reminders</b><span>Weekly Business Hour and progress reminders by email. Turn off to stop them. Login emails still arrive, because you need them to sign in.</span></div><label class="sw"><input type="checkbox" id="swEmail"><i></i></label></div>
+      <div class="status" id="prefStatus"></div>
+      <p style="margin-top:14px;" id="consentLine"></p>
+    </div>
+  </div>
+  <div>
+    <div class="card danger">
+      <h2>Delete my account</h2>
+      <p>This permanently deletes:</p>
+      <ul>
+        <li>your profile, progress, check ins, Arena plays and badges</li>
+        <li>your posts, questions, answers, wins, reviews and suggestions</li>
+        <li>every direct, group and Live Lounge message you sent</li>
+        <li>your logo and spotlight photos</li>
+        <li>your connections, notifications and activity records</li>
+      </ul>
+      <p>It cannot be undone. Business Hour attendance records are deleted with the account. If your account was suspended for breaking the rules, contact us on WhatsApp instead, so we can handle it properly.</p>
+      <label style="font:700 12px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);">Type DELETE to confirm</label>
+      <input class="txt" id="delConfirm" autocomplete="off" placeholder="DELETE">
+      <button class="btn red" id="delBtn" disabled>Delete my account forever</button>
+      <div class="status" id="delStatus"></div>
+    </div>
+    <div class="card" style="margin-top:22px;">
+      <h2>Something else?</h2>
+      <p>To correct details, ask a question about your data, or make a complaint, message BYINFORGH on <a href="https://wa.me/233509960980" target="_blank" rel="noopener" style="color:var(--teal);font-weight:600;">WhatsApp 0509 960 980</a>. You can also complain to Ghana's Data Protection Commission. Read the full <a href="privacy.html" style="color:var(--teal);font-weight:600;">Privacy Policy</a>.</p>
+    </div>
+  </div>
+</div></main>
+</div>
+<script>
+var SUPABASE_URL='https://wmveknhawfgrwmauwegp.supabase.co', SUPABASE_ANON_KEY='sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+var uid=null;
+function $(i){return document.getElementById(i);}
+async function init(){
+  if(!sb){ $('gate').textContent='Not connected'; return; }
+  var r=await sb.auth.getSession();
+  if(!r.data.session){ location.href='auth.html'; return; }
+  uid=r.data.session.user.id;
+  var p=await sb.from('profiles').select('arena_visible,email_reminders,consent_at,consent_version,phone').eq('id',uid).single();
+  $('gate').style.display='none'; $('shell').style.display='block';
+  var d=p.data||{};
+  $('phoneInput').value = d.phone || '';
+  $('swArena').checked = d.arena_visible !== false;
+  $('swEmail').checked = d.email_reminders !== false;
+  $('consentLine').textContent = d.consent_at ? ('You agreed to the Privacy Policy on '+new Date(d.consent_at).toLocaleDateString('en-GB')+'.') : 'Your agreement to the updated Privacy Policy has not been recorded yet. Go to the dashboard and tap I agree.';
+}
+async function savePref(col, val){
+  var x=await sb.from('profiles').update(JSON.parse('{"'+col+'":'+val+'}')).eq('id',uid);
+  $('prefStatus').className='status'+(x.error?' err':''); $('prefStatus').textContent = x.error ? 'Could not save, please try again.' : 'Saved.';
+}
+
+async function savePhone(val){
+  var st=$('phoneStatus'); st.className='status';
+  if(val){ var digits=val.replace(/\D/g,''); if(digits.length<9){ st.className='status err'; st.textContent='Please enter a full phone number.'; return; } }
+  var x=await sb.from('profiles').update({phone: val || null}).eq('id',uid);
+  st.className='status'+(x.error?' err':''); st.textContent = x.error ? 'Could not save, please try again.' : (val ? 'Saved. Members can now see your number.' : 'Removed. Your number is no longer shown.');
+  if(!x.error && !val) $('phoneInput').value='';
+}
+$('phoneSave').addEventListener('click',function(){ savePhone($('phoneInput').value.trim()); });
+$('phoneRemove').addEventListener('click',function(){ savePhone(''); });
+$('swArena').addEventListener('change',function(){ savePref('arena_visible', this.checked); });
+$('swEmail').addEventListener('change',function(){ savePref('email_reminders', this.checked); });
+$('dlBtn').addEventListener('click', async function(){
+  this.disabled=true; $('dlStatus').className='status'; $('dlStatus').textContent='Preparing your file...';
+  var x=await sb.rpc('export_my_data');
+  this.disabled=false;
+  if(x.error||!x.data||x.data.error){ $('dlStatus').className='status err'; $('dlStatus').textContent='Could not prepare your file. Please try again.'; return; }
+  var blob=new Blob([JSON.stringify(x.data,null,2)],{type:'application/json'});
+  var a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='my-byinforgh-data.json'; a.click();
+  $('dlStatus').textContent='Downloaded.';
+});
+$('delConfirm').addEventListener('input',function(){ $('delBtn').disabled = this.value.trim()!=='DELETE'; });
+$('delBtn').addEventListener('click', async function(){
+  if(!confirm('This permanently deletes your account and everything you posted. Continue?')) return;
+  this.disabled=true; $('delStatus').className='status'; $('delStatus').textContent='Deleting...';
+  var x=await sb.functions.invoke('delete-my-account');
+  var err = x.error || (x.data && x.data.error);
+  if(err){
+    var msg='Could not delete your account. Please try again or message us on WhatsApp.';
+    try{ if(x.error && x.error.context){ var b=await x.error.context.json(); if(b && b.error) msg=b.error; } else if(x.data && x.data.error) msg=x.data.error; }catch(e){}
+    $('delStatus').className='status err'; $('delStatus').textContent=msg; this.disabled=false; return;
+  }
+  await sb.auth.signOut();
+  location.href='index.html';
+});
+init();
+</script>
+<script>
+(function(){
+  var page = location.pathname.split('/').pop() || 'app.html';
+  document.querySelectorAll('#jumpNav a[data-page]').forEach(function(a){
+    if (a.getAttribute('data-page') === page) {
+      a.classList.add('active');
+      var jn = document.getElementById('jumpNav'), dash = jn && jn.querySelector('a[data-page="app.html"]');
+      if (dash && a !== dash) { dash.insertAdjacentElement('afterend', a); }
+      if (jn) { jn.scrollLeft = 0; }
+    }
+  });
+  var url = 'https://wmveknhawfgrwmauwegp.supabase.co', key = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+  var c = sb;
+  var btn = document.getElementById('logoutBtn');
+  if (c) c.auth.getSession().then(function(r){
+    if (!r.data.session) { btn.textContent = 'Log in'; btn.onclick = function(){ location.href = 'auth.html'; }; }
+    else { btn.onclick = async function(){ await c.auth.signOut(); location.href = 'index.html'; }; }
+  });
+  else { btn.onclick = function(){ location.href = 'auth.html'; }; }
+})();
+</script>
+</body>
+</html>
