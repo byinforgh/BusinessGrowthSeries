@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Directory: BYINFORGH Business Growth Series</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
 <style>
 :root{
   --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
@@ -204,7 +202,7 @@ form button[type="submit"]{flex-shrink:0;}
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
     <div class="app-topbar-row1">
    <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
-   <button class="btn-ghost" id="logoutBtn">Log out</button>
+   <span style="display:flex;gap:8px;align-items:center;"><a href="my-data.html" class="btn-ghost">My data</a><button class="btn-ghost" id="logoutBtn">Log out</button></span>
   </div>
   <div class="app-topbar-row2">
     <div class="jump-nav" id="jumpNav">
@@ -398,7 +396,7 @@ function isProfileComplete(p){
   const t = v => (v == null ? '' : String(v)).trim();
   const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
   if (t(p.name).length < 2 || junk(p.name)) return false;
-  if (t(p.phone).replace(/\D/g, '').length < 9) return false;
+  if (t(p.phone) !== '' && t(p.phone).replace(/\D/g, '').length < 9) return false;
   if (t(p.location).length < 2 || junk(p.location)) return false;
   const stage = p.business_stage || (p.has_business === false ? 'starting' : 'running');
   if (stage === 'education') return t(p.series_goal).length >= 5;
@@ -470,7 +468,7 @@ async function loadDirectory(){
   if (error) { console.error(error); return; }
   const now = Date.now();
   const t0 = v => (v == null ? '' : String(v)).trim();
-  const eligible = p => t0(p.name).length >= 2 && t0(p.phone).replace(/\D/g, '').length >= 9 && t0(p.location).length >= 2 &&
+  const eligible = p => t0(p.name).length >= 2 && (t0(p.phone) === '' || t0(p.phone).replace(/\D/g, '').length >= 9) && t0(p.location).length >= 2 &&
     t0(p.business_name).length >= 2 && t0(p.category) !== '' && t0(p.sells).length >= 3 &&
     p.has_business !== false && (!p.business_stage || p.business_stage === 'running');
   directoryData = (data || []).filter(eligible).map(p => ({
@@ -606,7 +604,7 @@ async function loadVerifyPanel(){
     panel.className = 'verify-panel pending';
     panel.innerHTML = `
       <div class="verify-row">
-        <div><div class="verify-title">Verification submitted</div><div class="verify-desc">Your document is being reviewed. This usually takes a few days.</div></div>
+        <div><div class="verify-title">Verification submitted</div><div class="verify-desc">Your link is being reviewed. This usually takes a few days.</div></div>
         <span class="verify-status-badge pending">Pending review</span>
       </div>`;
     return;
@@ -615,23 +613,14 @@ async function loadVerifyPanel(){
   panel.className = 'verify-panel';
   panel.innerHTML = `
     <div class="verify-row">
-      <div><div class="verify-title">Get a Verified badge</div><div class="verify-desc">Show us this is a real, active business: a photo of it, a screenshot of what you sell, and a social media handle if you have one. A real person reviews it privately, nobody else ever sees what you submit here.${latest && latest.status === 'rejected' ? " Your last submission wasn't approved, you can try again below." : ''}</div></div>
+      <div><div class="verify-title">Get a Verified badge</div><div class="verify-desc">Show us this is a real, active business by sharing a link to its public page, such as Facebook, Instagram, TikTok, Google Business or a WhatsApp Business catalogue. A real person reviews it privately, and nobody else sees what you submit here.${latest && latest.status === 'rejected' ? " Your last submission wasn't approved, you can try again below." : ''}</div></div>
       <button class="btn-primary" id="verifyToggleBtn">${latest && latest.status === 'rejected' ? 'Resubmit' : 'Request verification'}</button>
     </div>
     <form class="verify-form" id="verifyForm">
       <div class="field">
-        <label>A real photo of your business</label>
-        <input type="file" id="verifyPhotoFile" accept="image/*" required>
-        <span class="field-hint">Your shop, stall, workspace, stock, or you at work, anything that shows this is a real, active business.</span>
-      </div>
-      <div class="field">
-        <label>A screenshot of what you sell</label>
-        <input type="file" id="verifyProductFile" accept="image/*" required>
-        <span class="field-hint">A WhatsApp catalogue, a price list, a product photo you've already posted, anything showing what you actually offer.</span>
-      </div>
-      <div class="field">
-        <label>Social media handle or business page (optional, but it helps)</label>
-        <input type="text" id="verifySocial" placeholder="e.g. @yourbusiness on Instagram, or your Facebook page name">
+        <label>Link to your business page or WhatsApp Business catalogue</label>
+        <input type="text" id="verifySocial" placeholder="e.g. your Facebook or Instagram page, TikTok, Google Business listing, or WhatsApp Business link" required>
+        <span class="field-hint">We check that it is a real, active business by looking at what is already public. No photos or documents are needed. Please do not send ID cards.</span>
       </div>
       <div class="field">
         <label>Anything else that helps us confirm this (optional)</label>
@@ -650,25 +639,14 @@ async function loadVerifyPanel(){
 async function submitVerification(e){
   e.preventDefault();
   const statusEl = document.getElementById('verifySubmitStatus');
-  const photoFile = document.getElementById('verifyPhotoFile').files[0];
-  const productFile = document.getElementById('verifyProductFile').files[0];
   const social = document.getElementById('verifySocial').value.trim();
   const notes = document.getElementById('verifyNotes').value.trim();
-  if (!photoFile || !productFile || !sb || !currentUser) return;
+  if (!social || !sb || !currentUser) return;
 
-  statusEl.textContent = 'Uploading...';
-  const safe = (name) => name.replace(/[^a-z0-9.]+/gi, '_');
-  const photoPath = `${currentUser.id}/${Date.now()}_photo_${safe(photoFile.name)}`;
-  const productPath = `${currentUser.id}/${Date.now()}_product_${safe(productFile.name)}`;
-
-  const { error: photoErr } = await sb.storage.from('verification-documents').upload(photoPath, photoFile);
-  if (photoErr) { statusEl.textContent = 'Upload failed, please try again.'; return; }
-  const { error: productErr } = await sb.storage.from('verification-documents').upload(productPath, productFile);
-  if (productErr) { statusEl.textContent = 'Upload failed, please try again.'; return; }
-
+  statusEl.textContent = 'Submitting...';
   const { error } = await sb.from('verification_requests').insert({
-    user_id: currentUser.id, photo_url: photoPath, product_url: productPath,
-    social_handle: social || null, notes: notes || null,
+    user_id: currentUser.id,
+    social_handle: social, notes: notes || null,
   });
   statusEl.textContent = error ? 'Something went wrong, please try again.' : 'Submitted. Thanks, someone will review this soon.';
   if (!error) setTimeout(loadVerifyPanel, 1200);
