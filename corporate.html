@@ -5,9 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>BYINFORGH Business Infrastructure Programme | Corporate Transformation</title>
 <meta name="description" content="Audit, build, train and support. The BYINFORGH Business Infrastructure Programme turns disconnected operations into one managed business. See how The White House Events and More was rebuilt in 18 weeks.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts.css">
 <style>
 :root{
   --teal:#0F4C5C; --deep:#0A2A33; --night:#071E25; --blue:#4DA3B8; --sand:#F2E8CF; --cream:#FAF6EC;
@@ -287,7 +285,7 @@ footer a:hover{color:var(--gold-soft);}
 .jump-nav a{flex-shrink:0;}
 .jump-nav a.active{background:#0F4C5C;color:#FAF6EC;border-color:#0F4C5C;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 </head>
 <body>
 
@@ -295,7 +293,7 @@ footer a:hover{color:var(--gold-soft);}
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="app-topbar-row1">
     <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
-    <button class="btn-ghost" id="logoutBtn">Log out</button>
+    <span style="display:flex;gap:8px;align-items:center;"><a href="profile.html" class="btn-ghost">My profile</a><a href="mydata.html" class="btn-ghost">My data</a><button class="btn-ghost" id="logoutBtn">Log out</button></span>
   </div>
   <div class="app-topbar-row2">
     <div class="jump-nav" id="jumpNav">
@@ -393,7 +391,7 @@ footer a:hover{color:var(--gold-soft);}
       <div class="lv-body" id="lvBody" role="tabpanel" aria-live="polite"></div>
     </div>
     <div style="margin-top:26px;display:flex;gap:14px;flex-wrap:wrap;align-items:center;">
-      <a class="btn ghost" href="https://byinforgh.github.io/byinforgh-dashboard/business-solutions-diagnostic-dashboard.html" target="_blank" rel="noopener">Take the free diagnostic: find your level</a>
+      <a class="btn ghost" href="business-solutions-diagnostic-dashboard.html" target="_blank" rel="noopener">Take the free diagnostic: find your level</a>
       <span style="font-size:12.5px;color:#9fc1c9;">Five minutes. No obligation.</span>
     </div>
   </div>
@@ -480,7 +478,7 @@ footer a:hover{color:var(--gold-soft);}
       </div>
       <a class="btn gold" href="#" data-book>Your business could be next</a>
     </div>
-    <p class="fine">Source: Metricool, 14 Aug to 12 Nov 2026, plus the Social Media Insights report for 1 Jul to 31 Oct. Views are defined differently on each platform, so they are not added into one reach figure. Case study shared with the permission of The White House Events and More.</p>
+    <p class="fine">Source: Metricool, 14 Aug to 12 Nov 2026, plus the Social Media Insights report for 1 Jul to 31 Oct. Views are defined differently on each platform, so they are not added into one reach figure.</p>
   </div>
 </section>
 
@@ -518,7 +516,7 @@ footer a:hover{color:var(--gold-soft);}
       <tr><td><b>Vendor lock in.</b> Custom proprietary code that breaks the moment the developer disappears.</td><td><b>100% owned infrastructure.</b> Deployed directly to your own cloud accounts. You keep it even if BYINFORGH is never involved again.</td></tr>
       <tr><td><b>Handover and hope.</b> Software dumped on your team with a PDF manual nobody reads.</td><td><b>Enforced adoption.</b> Live staff stress testing and hands on SOP training until your team is certified, not just shown.</td></tr>
     </table></div>
-    <div class="ctas" style="margin-top:36px;"><a class="btn gold" href="#" data-book>Book a consultation</a><a class="btn ghost" href="https://byinforgh.github.io/byinforgh-dashboard/business-solutions-diagnostic-dashboard.html" target="_blank" rel="noopener">Take the Business Infrastructure Audit</a></div>
+    <div class="ctas" style="margin-top:36px;"><a class="btn gold" href="#" data-book>Book a consultation</a><a class="btn ghost" href="business-solutions-diagnostic-dashboard.html" target="_blank" rel="noopener">Take the Business Infrastructure Audit</a></div>
   </div>
 </section>
 
@@ -570,7 +568,7 @@ footer a:hover{color:var(--gold-soft);}
     <p>Book a consultation and we will show you exactly where your business sits today, what to build first, and what it will take.</p>
     <div class="ctas">
       <a class="btn gold" href="#" data-book>Book a consultation</a>
-      <a class="btn ghost" href="https://byinforgh.github.io/byinforgh-dashboard/business-solutions-diagnostic-dashboard.html" target="_blank" rel="noopener">Take the Business Infrastructure Audit first</a>
+      <a class="btn ghost" href="business-solutions-diagnostic-dashboard.html" target="_blank" rel="noopener">Take the Business Infrastructure Audit first</a>
     </div>
   </div>
 </section>
