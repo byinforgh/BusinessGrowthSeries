@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Join the BYINFORGH Business Hour</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
 <style>
 :root{--bg:#FAF6EC;--ink:#1c1c1c;--ink-dim:#5d5a52;--teal:#0F4C5C;--gold:#B08D3F;--line:rgba(0,0,0,0.12);}
 *{box-sizing:border-box;}
@@ -52,7 +50,7 @@ async function run(){
   const { data: profile } = await sb.from('profiles').select('*').eq('id', session.user.id).single();
   const t = v => (v == null ? '' : String(v)).trim();
   const stage = profile && (profile.business_stage || (profile.has_business === false ? 'starting' : 'running'));
-  const complete = profile && t(profile.name).length >= 2 && t(profile.phone).replace(/\D/g,'').length >= 9 && t(profile.location).length >= 2 &&
+  const complete = profile && t(profile.name).length >= 2 && (t(profile.phone) === '' || t(profile.phone).replace(/\D/g,'').length >= 9) && t(profile.location).length >= 2 &&
     ((stage === 'education' && t(profile.series_goal).length >= 5) ||
      (stage === 'starting' && t(profile.business_idea).length >= 5 && t(profile.series_goal).length >= 5) ||
      (stage === 'running' && t(profile.business_name).length >= 2 && t(profile.category) !== '' && t(profile.sells).length >= 3));
