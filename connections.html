@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>Connections: BYINFORGH Business Growth Series</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
 <style>
 :root{
   --bg:#FAF6EC; --surface:#FFFFFF; --surface-2:#F1E8D2; --line: rgba(15,76,92,0.15);
@@ -183,7 +181,7 @@ form button[type="submit"]{flex-shrink:0;}
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
     <div class="app-topbar-row1">
    <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
-   <button class="btn-ghost" id="logoutBtn">Log out</button>
+   <span style="display:flex;gap:8px;align-items:center;"><a href="profile.html" class="btn-ghost">My profile</a><a href="mydata.html" class="btn-ghost">My data</a><button class="btn-ghost" id="logoutBtn">Log out</button></span>
   </div>
   <div class="app-topbar-row2">
     <div class="jump-nav" id="jumpNav">
@@ -313,7 +311,7 @@ function isProfileComplete(p){
   const t = v => (v == null ? '' : String(v)).trim();
   const junk = v => /^(n\/?a|none|nil|null|test|xxx+|-+|\.+)$/i.test(t(v));
   if (t(p.name).length < 2 || junk(p.name)) return false;
-  if (t(p.phone).replace(/\D/g, '').length < 9) return false;
+  if (t(p.phone) !== '' && t(p.phone).replace(/\D/g, '').length < 9) return false;
   if (t(p.location).length < 2 || junk(p.location)) return false;
   const stage = p.business_stage || (p.has_business === false ? 'starting' : 'running');
   if (stage === 'education') return t(p.series_goal).length >= 5;
