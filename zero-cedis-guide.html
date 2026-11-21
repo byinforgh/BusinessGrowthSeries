@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Start a Business with 0 Cedis | BYINFORGH Business Growth Series</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="fonts.css">
 <style>
 :root{--bg:#FAF6EC;--teal:#0F4C5C;--deep:#0A363F;--gold:#B08D3F;--sand:#F1E8D2;--ink:#1C1C1C;--dim:rgba(28,28,28,.66);--line:rgba(15,76,92,.16);}
 *{box-sizing:border-box;}
@@ -61,14 +59,14 @@ main{padding:44px 0 20px;}
 .jump-nav a{flex-shrink:0;}
 .jump-nav a.active{background:#0F4C5C;color:#FAF6EC;border-color:#0F4C5C;}
 </style>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase.js"></script>
 </head>
 <body>
 <nav class="app-topbar">
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="app-topbar-row1">
     <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
-    <button class="btn-ghost" id="logoutBtn">Log out</button>
+    <span style="display:flex;gap:8px;align-items:center;"><a href="profile.html" class="btn-ghost">My profile</a><a href="mydata.html" class="btn-ghost">My data</a><button class="btn-ghost" id="logoutBtn">Log out</button></span>
   </div>
   <div class="app-topbar-row2">
     <div class="jump-nav" id="jumpNav">
