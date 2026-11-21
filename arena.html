@@ -4,10 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>The Business Arena | BYINFORGH Business Growth Series</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
 <style>
 :root{--bg:#FAF6EC;--surface:#fff;--sand:#F1E8D2;--line:rgba(15,76,92,.15);--ink:#1C1C1C;--dim:rgba(28,28,28,.62);--teal:#0F4C5C;--deep:#0A363F;--gold:#B08D3F;--gold2:#E4C77E;--blue:#3F93A8;--red:#A6453B;--green:#2e7d5b;}
 *{box-sizing:border-box;}
@@ -97,7 +95,7 @@ main{padding:34px 0 60px;}
   <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
   <div class="app-topbar-row1">
     <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
-    <button class="btn-ghost" id="logoutBtn">Log out</button>
+    <span style="display:flex;gap:8px;align-items:center;"><a href="profile.html" class="btn-ghost">My profile</a><a href="mydata.html" class="btn-ghost">My data</a><button class="btn-ghost" id="logoutBtn">Log out</button></span>
   </div>
   <div class="app-topbar-row2">
     <div class="jump-nav" id="jumpNav">
@@ -144,7 +142,7 @@ main{padding:34px 0 60px;}
     </div>
   </div>
   <div>
-    <div class="card"><h2>This week's top players</h2><p class="sub">Last 7 days. Play today to get on the board.</p><ol class="lb" id="lb"></ol></div>
+    <div class="card"><h2>This week's top players</h2><p class="sub">Last 7 days. Your name and business name show here when you play. Prefer not to appear? Turn it off in <a href="mydata.html" style="color:var(--teal);font-weight:600;">My data</a>.</p><ol class="lb" id="lb"></ol></div>
     <div class="card"><h2>Levels</h2><p class="sub">Your title in the community.</p><div class="lvls" id="lvls"></div></div>
   </div>
 </div></main>
@@ -155,14 +153,14 @@ const SUPABASE_URL = 'https://wmveknhawfgrwmauwegp.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
 const sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 const SITE = 'https://businessgrowthseries.byinforgh.com/arena.html';
-// Edit titles and perks here any time. Perks are promises BYINFORGH keeps, so only list what you will honour.
+// Levels are titles only. Do not add rewards here unless BYINFORGH will actually deliver them.
 const LEVELS = [
-  {xp:0,   name:'Hustler',    perk:'Welcome to the Arena'},
-  {xp:100, name:'Trader',     perk:'Your questions are answered first at the Business Hour'},
-  {xp:300, name:'Shop Owner', perk:'Top Player badge next to your name in the directory'},
-  {xp:600, name:'Manager',    perk:'Priority feedback on your business profile'},
-  {xp:1000,name:'Director',   perk:'Invited to the monthly founders circle'},
-  {xp:2000,name:'Founder',    perk:'Featured as a Business Spotlight'}
+  {xp:0,   name:'Hustler',    perk:'Where everyone starts'},
+  {xp:100, name:'Trader',     perk:'100 XP earned'},
+  {xp:300, name:'Shop Owner', perk:'300 XP earned'},
+  {xp:600, name:'Manager',    perk:'600 XP earned'},
+  {xp:1000,name:'Director',   perk:'1,000 XP earned'},
+  {xp:2000,name:'Founder',    perk:'2,000 XP earned'}
 ];
 const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const $ = id => document.getElementById(id);
@@ -171,7 +169,7 @@ let me = null, today = null;
 function profileComplete(p){
   if (!p) return false;
   const t = v => (v == null ? '' : String(v)).trim();
-  if (t(p.name).length < 2 || t(p.phone).replace(/\D/g,'').length < 9 || t(p.location).length < 2) return false;
+  if (t(p.name).length < 2 || (t(p.phone) !== '' && t(p.phone).replace(/\D/g,'').length < 9) || t(p.location).length < 2) return false;
   const st = p.business_stage || (p.has_business === false ? 'starting' : 'running');
   if (st === 'education') return t(p.series_goal).length >= 5;
   if (st === 'starting') return t(p.business_idea).length >= 5 && t(p.series_goal).length >= 5;
