@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My profile | BYINFORGH Business Growth Series</title>
+<link rel="stylesheet" href="fonts.css">
+<script src="supabase.js"></script>
+<style>
+:root{--bg:#FAF6EC;--teal:#0F4C5C;--deep:#0A363F;--gold:#B08D3F;--sand:#F1E8D2;--ink:#1C1C1C;--dim:rgba(28,28,28,.66);--line:rgba(15,76,92,.16);--red:#A6453B;}
+*{box-sizing:border-box;}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Poppins',sans-serif;-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1600px;margin:0 auto;padding:0 28px;}
+.gate{min-height:60vh;display:grid;place-items:center;font:600 12px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--teal);}
+.hero{background:var(--deep);color:#fff;padding:48px 0;}
+.eyebrow{font:700 11.5px Inter,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:#E4C77E;}
+h1{font:800 clamp(28px,4.4vw,44px)/1.1 Inter,sans-serif;letter-spacing:-.02em;margin:12px 0;}
+.hero p{color:#cfe3e8;font-size:15px;line-height:1.7;max-width:46em;margin:0;}
+main{padding:36px 0 70px;}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:22px;align-items:start;}
+.card{background:#fff;border:1px solid var(--line);padding:28px 30px;}
+.card h2{font:800 20px Inter,sans-serif;color:var(--deep);margin:0 0 8px;}
+.card p,.card li{font-size:14px;line-height:1.7;color:var(--dim);margin:0 0 12px;}
+.card ul{margin:0 0 12px;padding-left:20px;}
+.btn{display:inline-block;border:0;cursor:pointer;background:var(--teal);color:#fff;padding:13px 22px;font:700 12px Inter,sans-serif;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;}
+.btn:disabled{opacity:.5;cursor:default;}
+.btn.red{background:var(--red);}
+.row{display:flex;justify-content:space-between;gap:18px;align-items:center;padding:14px 0;border-top:1px solid var(--line);}
+.row:first-of-type{border-top:0;}
+.row b{display:block;font:700 14px Inter,sans-serif;color:var(--ink);}
+.row span{font-size:12.5px;color:var(--dim);line-height:1.55;}
+.sw{position:relative;width:48px;height:28px;flex-shrink:0;}
+.sw input{opacity:0;width:100%;height:100%;position:absolute;inset:0;margin:0;cursor:pointer;z-index:2;}
+.sw i{position:absolute;inset:0;background:#ccd6d8;border-radius:20px;transition:.2s;}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;background:#fff;border-radius:50%;transition:.2s;}
+.sw input:checked+i{background:var(--teal);}
+.sw input:checked+i:after{left:23px;}
+.status{font:600 12.5px Inter,sans-serif;color:var(--teal);margin-top:10px;min-height:18px;}
+.status.err{color:var(--red);}
+.danger{border-color:rgba(166,69,59,.4);}
+.danger h2{color:var(--red);}
+input.txt{width:100%;padding:12px 14px;border:1px solid var(--line);font:500 14px Poppins,sans-serif;margin:6px 0 12px;}
+@media(max-width:900px){.grid{grid-template-columns:1fr;}.wrap{padding:0 18px;}.card{padding:22px 18px;}}
+</style>
+<style>/* ===== shared BYINFORGH header (identical on every page) ===== */
+.kente-stripe{height:6px;display:flex;}
+.kente-stripe span{flex:1;}
+.kente-stripe span:nth-child(4n+1){background:#0F4C5C;}
+.kente-stripe span:nth-child(4n+2){background:#B08D3F;}
+.kente-stripe span:nth-child(4n+3){background:#3F93A8;}
+.kente-stripe span:nth-child(4n+4){background:#F1E8D2;}
+.app-topbar{position:sticky;top:0;z-index:80;background:rgba(250,246,236,0.94);backdrop-filter:blur(10px);border-bottom:1px solid rgba(15,76,92,0.15);color:#1C1C1C;font-family:'Poppins',sans-serif;}
+.app-topbar-row1{display:flex;align-items:center;justify-content:space-between;padding:12px 20px;max-width:1600px;margin:0 auto;gap:12px;}
+.app-topbar-row2{position:relative;border-top:1px solid rgba(15,76,92,0.15);}
+.app-topbar-row2::after{content:'';position:absolute;top:0;right:0;bottom:0;width:28px;pointer-events:none;background:linear-gradient(90deg,transparent,#FAF6EC);}
+.app-topbar .brand{display:flex;align-items:center;gap:10px;font-family:'Inter',sans-serif;font-weight:800;font-size:16px;text-decoration:none;color:#1C1C1C;}
+.app-topbar .brand-mark{width:32px;height:32px;border-radius:50%;border:2px solid #B08D3F;display:flex;align-items:center;justify-content:center;font-size:14px;color:#B08D3F;overflow:hidden;background:#fff;flex-shrink:0;}
+.app-topbar .brand-mark img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+.app-topbar .btn-ghost{background:transparent;color:rgba(28,28,28,0.62);border:1px solid rgba(15,76,92,0.15);padding:10px 16px;font-family:'Poppins',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.04em;font-size:11px;cursor:pointer;border-radius:2px;text-decoration:none;display:inline-block;width:auto;}
+.app-topbar .btn-ghost:hover{border-color:rgba(28,28,28,0.62);color:#1C1C1C;transform:none;}
+.jump-nav{display:flex;gap:10px;align-items:center;overflow-x:auto;white-space:nowrap;max-width:1600px;margin:0 auto;padding:10px 20px;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.jump-nav::-webkit-scrollbar{display:none;}
+.jump-nav a{flex-shrink:0;}
+.jump-nav a.active{background:#0F4C5C;color:#FAF6EC;border-color:#0F4C5C;}
+</style>
+
+<style>
+.fgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+.f{display:flex;flex-direction:column;gap:6px;margin-bottom:6px;}
+.f label{font:700 11.5px Inter,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);}
+.f input,.f select,.f textarea{border:1px solid var(--line);padding:12px 14px;font:500 14px Poppins,sans-serif;background:#fff;color:var(--ink);width:100%;}
+.f input:focus,.f select:focus,.f textarea:focus{outline:2px solid var(--teal);outline-offset:-1px;}
+.f small{font-size:12px;color:var(--dim);line-height:1.5;}
+.f.full{grid-column:1/-1;}
+.stage{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+.stage button{border:1px solid var(--line);background:#fff;padding:12px 16px;font:600 13px Poppins,sans-serif;cursor:pointer;color:var(--ink);}
+.stage button.on{background:var(--teal);color:#fff;border-color:var(--teal);}
+.logo-row{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
+.logo-prev{width:72px;height:72px;border-radius:50%;border:1px dashed var(--line);display:grid;place-items:center;overflow:hidden;background:#fff;font:800 22px Inter,sans-serif;color:var(--gold);flex-shrink:0;}
+.logo-prev img{width:100%;height:100%;object-fit:cover;}
+.sec{margin:22px 0 10px;font:800 13px Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
+.opt{font-weight:500;text-transform:none;letter-spacing:0;color:var(--dim);}
+@media(max-width:900px){.fgrid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<nav class="app-topbar">
+  <div class="kente-stripe"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="app-topbar-row1">
+    <a href="app.html" class="brand"><div class="brand-mark"><img src="logo.png" alt="BYINFORGH" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';"><span style="display:none;">B</span></div>BYINFORGH</a>
+    <span style="display:flex;gap:8px;align-items:center;"><a href="profile.html" class="btn-ghost">My profile</a><a href="mydata.html" class="btn-ghost">My data</a><button class="btn-ghost" id="logoutBtn">Log out</button></span>
+  </div>
+  <div class="app-topbar-row2">
+    <div class="jump-nav" id="jumpNav">
+      <a href="app.html" class="btn-ghost" data-page="app.html">Dashboard</a>
+      <a href="curriculum.html" class="btn-ghost" data-page="curriculum.html">Curriculum</a>
+      <a href="lounge.html" class="btn-ghost" data-page="lounge.html">Live Lounge</a>
+      <a href="community.html" class="btn-ghost" data-page="community.html">Community</a>
+      <a href="directory.html" class="btn-ghost" data-page="directory.html">Directory</a>
+      <a href="connections.html" class="btn-ghost" data-page="connections.html">Connections</a>
+      <a href="groups.html" class="btn-ghost" data-page="groups.html">Groups</a>
+      <a href="messages.html" class="btn-ghost" data-page="messages.html">Messages</a>
+      <a href="qa.html" class="btn-ghost" data-page="qa.html">Q&amp;A</a>
+      <a href="tecxfra.html" class="btn-ghost" data-page="tecxfra.html">TecXFRA</a>
+      <a href="arena.html" class="btn-ghost" data-page="arena.html">Arena</a>
+      <a href="corporate.html" class="btn-ghost" data-page="corporate.html">Corporate</a>
+      <a href="zero-cedis-guide.html" class="btn-ghost" data-page="zero-cedis-guide.html">Start a Business</a>
+    </div>
+  </div>
+</nav>
+
+<div id="gate" class="gate">Checking your session...</div>
+<div id="shell" style="display:none;">
+<section class="hero"><div class="wrap">
+  <span class="eyebrow">Your business, your details</span>
+  <h1>My profile</h1>
+  <p>Keep your details up to date. Other members see your name, business name, category, location and what you sell. Fields marked optional can be left empty. Your email, business idea, goals and struggle stay private.</p>
+</div></section>
+<main><div class="wrap">
+  <div class="card" style="max-width:1000px;">
+    <div class="sec" style="margin-top:0;">Where are you with your business?</div>
+    <div class="stage" id="stageBtns">
+      <button type="button" data-stage="running">I have a running business</button>
+      <button type="button" data-stage="starting">I'm starting a business</button>
+      <button type="button" data-stage="education">I just want the education</button>
+    </div>
+
+    <div class="sec">About you</div>
+    <div class="fgrid">
+      <div class="f"><label>Your name</label><input id="fName" autocomplete="name"></div>
+      <div class="f"><label>Location (town or city in Ghana)</label><input id="fLocation" placeholder="e.g. Kumasi"></div>
+      <div class="f"><label>WhatsApp / phone number <span class="opt">(optional)</span></label><input id="fPhone" type="tel" placeholder="+233 XX XXX XXXX"><small>If you add it, other members can see it in the directory. Leave empty to keep it private.</small></div>
+      <div class="f"><label>Nearest landmark <span class="opt">(optional)</span></label><input id="fLandmark" placeholder="e.g. Near Adum Market"></div>
+    </div>
+
+    <div id="runBox">
+      <div class="sec">Your business</div>
+      <div class="fgrid">
+        <div class="f"><label>Business name</label><input id="fBiz"></div>
+        <div class="f"><label>Category</label><select id="fCat"><option value="">Select one</option><option>Fashion</option><option>Food</option><option>Retail</option><option>Services</option><option>Logistics</option><option>Other</option></select></div>
+        <div class="f full"><label>What do you sell or offer</label><textarea id="fSells" rows="2"></textarea></div>
+        <div class="f full"><label>What are you looking for right now <span class="opt">(optional)</span></label><textarea id="fLooking" rows="2"></textarea><small>Visible to other members.</small></div>
+      </div>
+    </div>
+
+    <div id="startBox">
+      <div class="sec">Your business idea</div>
+      <div class="fgrid">
+        <div class="f full"><label>What is your business idea</label><textarea id="fIdea" rows="2"></textarea><small>Private to you and BYINFORGH.</small></div>
+      </div>
+    </div>
+
+    <div id="goalBox">
+      <div class="sec">Your goal</div>
+      <div class="fgrid">
+        <div class="f full"><label>What do you want from the Business Growth Series</label><textarea id="fGoal" rows="2"></textarea><small>Private to you and BYINFORGH.</small></div>
+      </div>
+    </div>
+
+    <div class="sec">Optional and private</div>
+    <div class="fgrid">
+      <div class="f full"><label>Your biggest struggle right now <span class="opt">(optional)</span></label><textarea id="fStruggle" rows="2"></textarea><small>Only you and BYINFORGH can see this. It helps us point you to the right lessons.</small></div>
+    </div>
+
+    <div class="sec">Logo or photo <span class="opt">(optional)</span></div>
+    <div class="logo-row">
+      <div class="logo-prev" id="logoPrev">B</div>
+      <div>
+        <input type="file" id="fLogo" accept="image/*">
+        <div style="margin-top:8px;"><button type="button" class="btn" id="logoRemove" style="background:#6b7a7e;padding:9px 14px;">Remove logo</button></div>
+        <small style="display:block;margin-top:6px;color:var(--dim);font-size:12px;">Anyone with the link to an uploaded image can open it. Use a business logo, not an ID.</small>
+      </div>
+    </div>
+
+    <div style="margin-top:26px;">
+      <button class="btn" id="saveBtn">Save my profile</button>
+      <a href="mydata.html" class="btn" style="background:#6b7a7e;margin-left:8px;">My data and privacy</a>
+    </div>
+    <div class="status" id="saveStatus"></div>
+  </div>
+</div></main>
+</div>
+<script>
+var SUPABASE_URL='https://wmveknhawfgrwmauwegp.supabase.co', SUPABASE_ANON_KEY='sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+var uid=null, stage='running', logoUrl=null, pendingFile=null;
+function $(i){return document.getElementById(i);}
+function v(i){return ($(i).value||'').trim();}
+function showStage(){
+  document.querySelectorAll('#stageBtns button').forEach(function(b){ b.classList.toggle('on', b.dataset.stage===stage); });
+  $('runBox').style.display = stage==='running' ? '' : 'none';
+  $('startBox').style.display = stage==='starting' ? '' : 'none';
+}
+document.querySelectorAll('#stageBtns button').forEach(function(b){ b.addEventListener('click', function(){ stage=b.dataset.stage; showStage(); }); });
+function drawLogo(){
+  $('logoPrev').innerHTML = logoUrl ? '<img alt="Logo" src="'+logoUrl.replace(/"/g,'&quot;')+'">' : 'B';
+}
+async function init(){
+  if(!sb){ $('gate').innerHTML='Something is not connected. Please contact BYINFORGH.'; return; }
+  var r=await sb.auth.getSession();
+  if(!r.data.session){ try{sessionStorage.setItem('byg_redirect','profile.html');}catch(e){} location.href='auth.html'; return; }
+  uid=r.data.session.user.id;
+  var p=await sb.from('profiles').select('*').eq('id',uid).single();
+  var d=p.data||{};
+  if(d.banned){ $('gate').textContent='Account suspended'; return; }
+  stage = d.business_stage || (d.has_business===false ? 'starting' : 'running');
+  $('fName').value=d.name||''; $('fLocation').value=d.location||''; $('fPhone').value=d.phone||''; $('fLandmark').value=d.landmark||'';
+  $('fBiz').value=d.business_name||''; $('fCat').value=d.category||''; $('fSells').value=d.sells||''; $('fLooking').value=d.looking_for||'';
+  $('fIdea').value=d.business_idea||''; $('fGoal').value=d.series_goal||''; $('fStruggle').value=d.struggle||'';
+  logoUrl=d.logo_url||null;
+  showStage(); drawLogo();
+  $('gate').style.display='none'; $('shell').style.display='block';
+}
+$('fLogo').addEventListener('change', function(){
+  var f=this.files[0]; if(!f) return;
+  if(!/^image\//.test(f.type)){ $('saveStatus').className='status err'; $('saveStatus').textContent='Please choose an image file.'; this.value=''; return; }
+  if(f.size>5*1024*1024){ $('saveStatus').className='status err'; $('saveStatus').textContent='That image is bigger than 5 MB. Please choose a smaller one.'; this.value=''; return; }
+  pendingFile=f;
+  var rd=new FileReader(); rd.onload=function(){ $('logoPrev').innerHTML='<img alt="Logo preview" src="'+rd.result+'">'; }; rd.readAsDataURL(f);
+});
+function pathFromUrl(u){ var m=(u||'').match(/member-photos\/(.+)$/); return m?decodeURIComponent(m[1].split('?')[0]):null; }
+$('logoRemove').addEventListener('click', async function(){
+  var st=$('saveStatus'); st.className='status';
+  var path=pathFromUrl(logoUrl);
+  var x=await sb.from('profiles').update({logo_url:null}).eq('id',uid);
+  if(x.error){ st.className='status err'; st.textContent='Could not remove the logo. Please try again.'; return; }
+  if(path) await sb.storage.from('member-photos').remove([path]);
+  logoUrl=null; pendingFile=null; $('fLogo').value=''; drawLogo(); st.textContent='Logo removed.';
+});
+$('saveBtn').addEventListener('click', async function(){
+  var st=$('saveStatus'); st.className='status err';
+  var name=v('fName'), loc=v('fLocation'), phone=v('fPhone');
+  if(name.length<2){ st.textContent='Please enter your name.'; return; }
+  if(loc.length<2){ st.textContent='Please enter your location.'; return; }
+  if(phone && phone.replace(/\D/g,'').length<9){ st.textContent='Please enter a full phone number, or leave it empty.'; return; }
+  if(stage==='running'){
+    if(v('fBiz').length<2){ st.textContent='Please enter your business name.'; return; }
+    if(!v('fCat')){ st.textContent='Please choose a category.'; return; }
+    if(v('fSells').length<3){ st.textContent='Please say what you sell or offer.'; return; }
+  } else if(stage==='starting'){
+    if(v('fIdea').length<5){ st.textContent='Please describe your business idea.'; return; }
+    if(v('fGoal').length<5){ st.textContent='Please say what you want from the Series.'; return; }
+  } else {
+    if(v('fGoal').length<5){ st.textContent='Please say what you want from the Series.'; return; }
+  }
+  this.disabled=true; st.className='status'; st.textContent='Saving...';
+  var newLogo=logoUrl, oldPath=pathFromUrl(logoUrl);
+  if(pendingFile){
+    var ext=(pendingFile.name.split('.').pop()||'png').toLowerCase().replace(/[^a-z0-9]/g,'');
+    var path=uid+'/logo-'+Date.now()+'.'+ext;
+    var up=await sb.storage.from('member-photos').upload(path, pendingFile, {upsert:true});
+    if(up.error){ st.className='status err'; st.textContent='The logo could not be uploaded. Your other changes were not saved. Please try again.'; this.disabled=false; return; }
+    newLogo=sb.storage.from('member-photos').getPublicUrl(path).data.publicUrl;
+  }
+  var row={
+    name:name, location:loc, phone:phone||null, landmark:v('fLandmark')||null,
+    business_stage:stage, has_business:(stage==='running'),
+    business_name:v('fBiz')||null, category:v('fCat')||null, sells:v('fSells')||null, looking_for:v('fLooking')||null,
+    business_idea:v('fIdea')||null, series_goal:v('fGoal')||null, struggle:v('fStruggle')||null,
+    logo_url:newLogo
+  };
+  var x=await sb.from('profiles').update(row).eq('id',uid);
+  this.disabled=false;
+  if(x.error){ st.className='status err'; st.textContent='Something went wrong, please try again.'; return; }
+  if(pendingFile && oldPath){ await sb.storage.from('member-photos').remove([oldPath]); }
+  logoUrl=newLogo; pendingFile=null; $('fLogo').value='';
+  st.textContent='Saved. Your profile is up to date.';
+});
+init();
+</script>
+<script>
+(function(){
+  var page = location.pathname.split('/').pop() || 'app.html';
+  document.querySelectorAll('#jumpNav a[data-page]').forEach(function(a){
+    if (a.getAttribute('data-page') === page) {
+      a.classList.add('active');
+      var jn = document.getElementById('jumpNav'), dash = jn && jn.querySelector('a[data-page="app.html"]');
+      if (dash && a !== dash) { dash.insertAdjacentElement('afterend', a); }
+      if (jn) { jn.scrollLeft = 0; }
+    }
+  });
+  var url = 'https://wmveknhawfgrwmauwegp.supabase.co', key = 'sb_publishable_7rjWccmbUcPaDeJtnxt4Ew_wQ5NbjKC';
+  var c = sb;
+  var btn = document.getElementById('logoutBtn');
+  if (c) c.auth.getSession().then(function(r){
+    if (!r.data.session) { btn.textContent = 'Log in'; btn.onclick = function(){ location.href = 'auth.html'; }; }
+    else { btn.onclick = async function(){ await c.auth.signOut(); location.href = 'index.html'; }; }
+  });
+  else { btn.onclick = function(){ location.href = 'auth.html'; }; }
+})();
+</script>
+</body>
+</html>
